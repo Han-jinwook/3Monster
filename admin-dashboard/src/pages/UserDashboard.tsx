@@ -1,4 +1,3 @@
-import React from 'react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { 
@@ -23,7 +22,7 @@ const products = [
         description: "국내 유일의 Apollo State 파싱 엔진 탑재. 가장 정확하고 풍부한 플레이스 DB를 광속으로 수집합니다.",
         icon: Layers,
         color: "from-blue-600 to-indigo-700",
-        tag: "Best Seller",
+        badge: "Best Seller",
         features: ["이메일/인스타 자동 추출", "실시간 중복 필터링", "무제한 엑셀 저장"]
     },
     {
@@ -33,7 +32,7 @@ const products = [
         description: "게시글 수집부터 댓글 집계까지. 카페 마케팅에 필요한 모든 기능을 하나에 담았습니다.",
         icon: Smartphone,
         color: "from-orange-500 to-rose-600",
-        tag: "Powerful",
+        badge: "Powerful",
         features: ["키워드 실시간 모니터링", "댓글 작성기 연동", "타겟팅 DB 확보"]
     },
     {
@@ -43,7 +42,7 @@ const products = [
         description: "전문 지식 마케팅을 위한 필수 도구. 방대한 학술 데이터를 분석하기 쉬운 형태로 변환합니다.",
         icon: Monitor,
         color: "from-emerald-500 to-teal-600",
-        tag: "Professional",
+        badge: "Professional",
         features: ["RISS/DBpia 지원", "요약본 자동 생성", "논문 마케팅 타겟팅"]
     },
     {
@@ -53,7 +52,7 @@ const products = [
         description: "봇 탐지를 우회하는 정교한 알고리즘. 자연스러운 상호작용으로 도달률을 극대화합니다.",
         icon: Activity,
         color: "from-pink-500 to-purple-600",
-        tag: "Hot",
+        badge: "Hot",
         features: ["휴먼 시뮬레이션", "다중 계정 관리", "맞춤형 답변 엔진"]
     }
 ];
@@ -120,7 +119,7 @@ export const UserDashboard = () => {
                                             <product.icon className="w-8 h-8" />
                                         </div>
                                         <span className="px-4 py-1.5 rounded-full bg-slate-100 text-slate-500 text-[10px] font-black uppercase tracking-tighter">
-                                            {product.tag}
+                                            {product.badge}
                                         </span>
                                     </div>
 
@@ -135,7 +134,7 @@ export const UserDashboard = () => {
                                     <div className="grid grid-cols-1 gap-2">
                                         {product.features.map(f => (
                                             <div key={f} className="flex items-center gap-2 text-slate-400 text-xs font-bold">
-                                                <div className="w-1 h-1 rounded-full bg-indigo-400" /> {f}
+                                                <div className="w-1.5 h-1.5 rounded-full bg-indigo-400" /> {f}
                                             </div>
                                         ))}
                                     </div>

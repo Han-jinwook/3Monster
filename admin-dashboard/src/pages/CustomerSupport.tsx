@@ -15,7 +15,9 @@ import {
     ChevronUp, 
     ExternalLink,
     Plus,
-    Search
+    Search,
+    ShieldCheck,
+    Zap
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { Modal } from '../components/ui/Modal';
