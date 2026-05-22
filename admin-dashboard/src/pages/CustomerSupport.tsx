@@ -57,6 +57,25 @@ export const CustomerSupport = () => {
     const [replyLog, setReplyLog] = useState<File | null>(null);
     const [isSubmittingReply, setIsSubmittingReply] = useState(false);
 
+    const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>, target: 'ticket' | 'reply') => {
+        const items = e.clipboardData.items;
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf('image') !== -1) {
+                const file = items[i].getAsFile();
+                if (file) {
+                    const pastedFile = new File([file], `screenshot_${Date.now()}.png`, { type: file.type });
+                    if (target === 'ticket') {
+                        setImageFile(pastedFile);
+                    } else {
+                        setReplyImage(pastedFile);
+                    }
+                    e.preventDefault();
+                    break;
+                }
+            }
+        }
+    };
+
     React.useEffect(() => {
         setReplyText('');
         setReplyImage(null);
@@ -617,6 +636,7 @@ export const CustomerSupport = () => {
                                                                 placeholder="추가 문의사항이나 답변을 여기에 입력해주세요..."
                                                                 value={replyText}
                                                                 onChange={(e) => setReplyText(e.target.value)}
+                                                                onPaste={(e) => handlePaste(e, 'reply')}
                                                                 className="w-full min-h-[100px] rounded-2xl bg-slate-50 p-5 text-sm font-bold border-none outline-none focus:ring-2 focus:ring-indigo-100 transition-all resize-none placeholder:text-slate-350 text-slate-800"
                                                             />
                                                         </div>
@@ -833,7 +853,8 @@ export const CustomerSupport = () => {
                                 required
                                 value={description}
                                 onChange={e => setDescription(e.target.value)}
-                                placeholder="문제 상황이나 증상을 최대한 자세히 적어주세요."
+                                onPaste={e => handlePaste(e, 'ticket')}
+                                placeholder="문제 상황이나 증상을 최대한 자세히 적어주세요. (캡처한 이미지를 이 입력창에 붙여넣기 하실 수 있습니다)"
                                 className="w-full min-h-[160px] rounded-2xl bg-slate-50 p-5 text-sm font-bold border-none outline-none focus:ring-2 focus:ring-indigo-100 transition-all resize-none"
                             />
                         </div>
@@ -846,39 +867,79 @@ export const CustomerSupport = () => {
                                 <p className="text-xs font-black text-indigo-900">스크린샷 찍는 가장 빠른 방법</p>
                                 <p className="text-[11px] font-bold text-indigo-600/70 leading-relaxed">
                                     <span className="bg-indigo-600 text-white px-1.5 py-0.5 rounded mx-0.5 font-black">Win + Shift + S</span>를 눌러 에러 화면을 찍은 후, <br />
-                                    저장할 필요 없이 아래 첨부칸이나 채팅창에 바로 붙여넣으세요!
+                                    저장할 필요 없이 <span className="underline font-black text-indigo-800">위 상세 내용 입력창</span>이나 <span className="underline font-black text-indigo-800">답변 채팅창</span>에 마우스 커서를 두고 붙여넣기(Ctrl + V) 하세요!
                                 </p>
                             </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="relative group">
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={e => setImageFile(e.target.files?.[0] || null)}
-                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                />
-                                <div className="h-14 w-full rounded-2xl bg-slate-50 flex items-center px-4 border-2 border-dashed border-slate-200 group-hover:border-indigo-300 group-hover:bg-indigo-50/50 transition-all">
-                                    <ImageIcon className="w-5 h-5 text-slate-400 mr-3" />
-                                    <span className="text-xs font-black text-slate-500 truncate">
-                                        {imageFile ? imageFile.name : '이미지 첨부'}
-                                    </span>
-                                </div>
+                                {imageFile ? (
+                                    <div className="h-14 w-full rounded-2xl bg-indigo-50/30 border-2 border-indigo-200 flex items-center justify-between px-4 transition-all">
+                                        <div className="flex items-center min-w-0 flex-1 mr-2">
+                                            <ImageIcon className="w-5 h-5 text-indigo-500 mr-3 flex-shrink-0" />
+                                            <span className="text-xs font-black text-indigo-700 truncate">
+                                                {imageFile.name}
+                                            </span>
+                                        </div>
+                                        <button 
+                                            type="button"
+                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setImageFile(null); }}
+                                            className="text-slate-400 hover:text-rose-500 font-black text-sm p-1 z-20 relative"
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={e => setImageFile(e.target.files?.[0] || null)}
+                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                        />
+                                        <div className="h-14 w-full rounded-2xl bg-slate-50 flex items-center px-4 border-2 border-dashed border-slate-200 group-hover:border-indigo-300 group-hover:bg-indigo-50/50 transition-all">
+                                            <ImageIcon className="w-5 h-5 text-slate-400 mr-3" />
+                                            <span className="text-xs font-black text-slate-500 truncate">
+                                                이미지 첨부
+                                            </span>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                             <div className="relative group">
-                                <input
-                                    type="file"
-                                    accept=".log,.txt"
-                                    onChange={e => setLogFile(e.target.files?.[0] || null)}
-                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                />
-                                <div className="h-14 w-full rounded-2xl bg-slate-50 flex items-center px-4 border-2 border-dashed border-slate-200 group-hover:border-indigo-300 group-hover:bg-indigo-50/50 transition-all">
-                                    <FileText className="w-5 h-5 text-slate-400 mr-3" />
-                                    <span className="text-xs font-black text-slate-500 truncate">
-                                        {logFile ? logFile.name : '로그 파일 첨부'}
-                                    </span>
-                                </div>
+                                {logFile ? (
+                                    <div className="h-14 w-full rounded-2xl bg-indigo-50/30 border-2 border-indigo-200 flex items-center justify-between px-4 transition-all">
+                                        <div className="flex items-center min-w-0 flex-1 mr-2">
+                                            <FileText className="w-5 h-5 text-indigo-500 mr-3 flex-shrink-0" />
+                                            <span className="text-xs font-black text-indigo-700 truncate">
+                                                {logFile.name}
+                                            </span>
+                                        </div>
+                                        <button 
+                                            type="button"
+                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setLogFile(null); }}
+                                            className="text-slate-400 hover:text-rose-500 font-black text-sm p-1 z-20 relative"
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <input
+                                            type="file"
+                                            accept=".log,.txt"
+                                            onChange={e => setLogFile(e.target.files?.[0] || null)}
+                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                        />
+                                        <div className="h-14 w-full rounded-2xl bg-slate-50 flex items-center px-4 border-2 border-dashed border-slate-200 group-hover:border-indigo-300 group-hover:bg-indigo-50/50 transition-all">
+                                            <FileText className="w-5 h-5 text-slate-400 mr-3" />
+                                            <span className="text-xs font-black text-slate-500 truncate">
+                                                로그 파일 첨부
+                                            </span>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </div>
 
