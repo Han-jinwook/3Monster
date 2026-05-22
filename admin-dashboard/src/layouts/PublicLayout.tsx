@@ -42,7 +42,6 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                     {/* Logo */}
                     <Link to="/" className="flex items-center gap-3 group">
                         <img src="/logo.png" alt="Logo" className="h-10 w-auto object-contain group-hover:scale-105 transition-transform" />
-                        <span className="text-xl font-black tracking-tight text-slate-800">3Monster</span>
                     </Link>
 
                     {/* Desktop Navigation */}
@@ -188,7 +187,6 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
                     <div className="flex items-center gap-3">
                         <img src="/logo.png" alt="Logo" className="h-8 w-auto object-contain brightness-0 invert" />
-                        <span className="text-lg font-black tracking-tight text-white">3Monster</span>
                     </div>
                     <p className="text-xs text-slate-500 font-medium">
                         © 2026 3Monster Series. All rights reserved. Secured by Cloud Shield.
