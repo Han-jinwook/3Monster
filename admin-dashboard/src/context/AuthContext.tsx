@@ -39,9 +39,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 .from('admins')
                 .select('email')
                 .eq('email', userEmail.toLowerCase())
-                .single();
+                .maybeSingle();
             
-            if (adminError && adminError.code !== 'PGRST116') { // PGRST116 is 'no rows'
+            if (adminError) {
                 throw adminError;
             }
 
@@ -55,9 +55,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 .from('buyers')
                 .select('email, channel')
                 .eq('email', userEmail.toLowerCase())
-                .single();
+                .maybeSingle();
 
-            if (buyerError && buyerError.code !== 'PGRST116') {
+            if (buyerError) {
                 throw buyerError;
             }
 
@@ -75,7 +75,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const { data: licenseData, error: licenseError } = await supabase
                 .from('licenses')
                 .select('id')
-                .eq('email', userEmail.toLowerCase())
+                .eq('contact', userEmail.toLowerCase())
                 .limit(1);
 
             if (licenseError) {

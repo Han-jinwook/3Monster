@@ -115,8 +115,8 @@ export const Dashboard = () => {
             if (error) throw error;
             
             const filtered = (data || []).filter(lic => {
-                const hasNoEmail = !lic.email || lic.email.trim() === '';
-                const isSameEmail = lic.email?.toLowerCase() === buyer.email.toLowerCase();
+                const hasNoEmail = !lic.contact || lic.contact.trim() === '';
+                const isSameEmail = lic.contact?.toLowerCase() === buyer.email.toLowerCase();
                 return hasNoEmail || isSameEmail;
             });
 
@@ -125,7 +125,7 @@ export const Dashboard = () => {
             // Auto-select exact matching buyer_name
             const exactMatch = filtered.find(lic => 
                 lic.buyer_name?.toLowerCase() === buyer.name.toLowerCase() ||
-                lic.email?.toLowerCase() === buyer.email.toLowerCase()
+                lic.contact?.toLowerCase() === buyer.email.toLowerCase()
             );
             if (exactMatch) {
                 setSelectedLicenseId(exactMatch.id);
@@ -149,7 +149,7 @@ export const Dashboard = () => {
             const { error: licError } = await supabase
                 .from('licenses')
                 .update({ 
-                    email: selectedBuyer.email.toLowerCase(),
+                    contact: selectedBuyer.email.toLowerCase(),
                     buyer_name: selectedBuyer.name
                 })
                 .eq('id', selectedLicenseId);

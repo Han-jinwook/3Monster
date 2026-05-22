@@ -128,7 +128,7 @@ export const Login = () => {
                 .from('otps')
                 .select('*')
                 .eq('email', email.toLowerCase())
-                .single();
+                .maybeSingle();
 
             if (otpError || !otpData || otpData.code !== otp) {
                 setError('인증번호가 올바르지 않거나 만료되었습니다.');

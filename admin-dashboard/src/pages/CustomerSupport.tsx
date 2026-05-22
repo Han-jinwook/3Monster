@@ -93,8 +93,8 @@ export const CustomerSupport = () => {
                 // 1. Try matching via email first
                 const { data: emailData, error: emailError } = await supabase
                     .from('licenses')
-                    .select('id, product_id, serial_key, buyer_name, email')
-                    .eq('email', contactEmail.toLowerCase());
+                    .select('id, product_id, serial_key, buyer_name, contact')
+                    .eq('contact', contactEmail.toLowerCase());
 
                 if (emailError) throw emailError;
 
@@ -111,7 +111,7 @@ export const CustomerSupport = () => {
                 if (kmongNickname.trim()) {
                     const { data: nameData, error: nameError } = await supabase
                         .from('licenses')
-                        .select('id, product_id, serial_key, buyer_name, email')
+                        .select('id, product_id, serial_key, buyer_name, contact')
                         .eq('buyer_name', kmongNickname.trim());
 
                     if (nameError) throw nameError;
@@ -242,12 +242,12 @@ export const CustomerSupport = () => {
 
             // Handle automatic matching / binding
             if (selectedLic) {
-                const isKmongMatched = !selectedLic.email || selectedLic.email.toLowerCase() !== contactEmail.toLowerCase();
+                const isKmongMatched = !selectedLic.contact || selectedLic.contact.toLowerCase() !== contactEmail.toLowerCase();
                 
                 if (isKmongMatched) {
                     await supabase
                         .from('licenses')
-                        .update({ email: contactEmail.toLowerCase() })
+                        .update({ contact: contactEmail.toLowerCase() })
                         .eq('id', selectedLic.id);
                 }
 
