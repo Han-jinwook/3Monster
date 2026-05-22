@@ -48,6 +48,7 @@ export const CustomerSupport = () => {
     const [tickets, setTickets] = useState<any[]>([]);
     const [expandedTicketId, setExpandedTicketId] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedProduct, setSelectedProduct] = useState('PlaceDB');
 
     // Reply/Thread states
     const [replyText, setReplyText] = useState('');
@@ -140,17 +141,18 @@ export const CustomerSupport = () => {
 
 
     const fetchTickets = async () => {
-        if (!user) return;
+        const userEmail = verifiedEmail || localStorage.getItem('user_email') || user?.email;
+        if (!user && !userEmail) return;
         
         let query = supabase
             .from('support_tickets')
             .select('*');
         
         if (role !== 'admin') {
-            const userEmail = verifiedEmail || localStorage.getItem('user_email') || user.email;
             if (userEmail) {
-                query = query.or(`uid.eq.${user.id},email.eq.${userEmail.toLowerCase()}`);
-            } else {
+                const uidFilter = user?.id ? `uid.eq.${user.id},` : '';
+                query = query.or(`${uidFilter}email.eq.${userEmail.toLowerCase()}`);
+            } else if (user?.id) {
                 query = query.eq('uid', user.id);
             }
         }
@@ -181,11 +183,10 @@ export const CustomerSupport = () => {
     }, [user, verifiedEmail, role]);
 
     const handleUploadFile = async (file: File, folder: string): Promise<string> => {
-        if (!user) throw new Error('Not authenticated');
-        
+        const userId = user?.id || 'guest';
         const fileExt = file.name.split('.').pop();
         const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
-        const filePath = `${user.id}/${folder}/${fileName}`;
+        const filePath = `${userId}/${folder}/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
             .from('support')
@@ -202,7 +203,11 @@ export const CustomerSupport = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!user) return;
+        
+        if (!contactEmail.trim()) {
+            setError('답변받을 이메일을 입력해주세요.');
+            return;
+        }
         
         setLoading(true);
         setError('');
@@ -220,14 +225,18 @@ export const CustomerSupport = () => {
 
             if (selectedLic) {
                 finalDescription = `[문의 제품: ${selectedLic.product_id} (시리얼: ${selectedLic.serial_key})]\n${finalDescription}`;
-            } else if (kmongNickname.trim()) {
+            } else {
+                finalDescription = `[문의 제품: ${selectedProduct}]\n${finalDescription}`;
+            }
+
+            if (kmongNickname.trim()) {
                 finalDescription = `[수동 구매 인증 요청: 크몽 닉네임 - ${kmongNickname.trim()}]\n${finalDescription}`;
             }
 
             const { error: insertError } = await supabase
                 .from('support_tickets')
                 .insert([{
-                    uid: user.id,
+                    uid: user?.id || null,
                     email: contactEmail.toLowerCase(),
                     issue_type: issueType,
                     description: finalDescription,
@@ -237,6 +246,9 @@ export const CustomerSupport = () => {
                 }]);
 
             if (insertError) throw insertError;
+
+            // 비로그인 사용자도 본인 목록 조회가 되도록 localStorage 갱신
+            localStorage.setItem('user_email', contactEmail.toLowerCase());
 
             // 즉시 목록 갱신
             await fetchTickets();
@@ -498,27 +510,44 @@ export const CustomerSupport = () => {
                                         </div>
                                     )}
 
-                                    {/* Dropdown to select matching licenses */}
-                                    {purchasedLicenses.length > 0 && (
-                                        <div className="space-y-2 animate-in fade-in duration-200">
-                                            <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest pl-2">
-                                                문의하실 제품 선택 <span className="text-emerald-500 font-bold">*필수</span>
-                                            </label>
+                                    {/* 문의 제품 선택 드롭다운 (라이선스 보유 여부에 상관없이 노출) */}
+                                    <div className="space-y-2">
+                                        <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest pl-2">
+                                            문의 대상 제품 <span className="text-indigo-500 font-bold">*필수</span>
+                                        </label>
+                                        {purchasedLicenses.length > 0 ? (
                                             <select
                                                 required
                                                 className="w-full h-14 rounded-2xl bg-slate-50 px-5 text-sm font-bold border-none outline-none focus:ring-2 focus:ring-emerald-100 transition-all appearance-none"
                                                 value={selectedLicenseId}
-                                                onChange={e => setSelectedLicenseId(e.target.value)}
+                                                onChange={e => {
+                                                    setSelectedLicenseId(e.target.value);
+                                                    const lic = purchasedLicenses.find(l => l.id === e.target.value);
+                                                    if (lic) setSelectedProduct(lic.product_id);
+                                                }}
                                             >
-                                                <option value="">-- 문의 대상 제품을 선택해주세요 --</option>
+                                                <option value="">-- 문의할 보유 라이선스 선택 --</option>
                                                 {purchasedLicenses.map((lic) => (
                                                     <option key={lic.id} value={lic.id}>
                                                         {lic.product_id} ({lic.serial_key ? lic.serial_key.substring(0, 8) + '...' : '시리얼 없음'}) - {lic.buyer_name || '이름 없음'}
                                                     </option>
                                                 ))}
                                             </select>
-                                        </div>
-                                    )}
+                                        ) : (
+                                            <select
+                                                required
+                                                className="w-full h-14 rounded-2xl bg-slate-50 px-5 text-sm font-bold border-none outline-none focus:ring-2 focus:ring-indigo-100 transition-all appearance-none"
+                                                value={selectedProduct}
+                                                onChange={e => setSelectedProduct(e.target.value)}
+                                            >
+                                                <option value="PlaceDB">PlaceDB (플레이스디비)</option>
+                                                <option value="CafeMonster">Cafe Monster (카페몬스터)</option>
+                                                <option value="AppMonster">App Monster (앱몬스터)</option>
+                                                <option value="MarketingMonster">Marketing Monster (마케팅몬스터)</option>
+                                                <option value="Other">기타 / 공통 문의</option>
+                                            </select>
+                                        )}
+                                    </div>
 
                                     <div className="space-y-3">
                                         <div className="flex items-center justify-between px-2">
