@@ -20,7 +20,6 @@ import {
     Zap
 } from 'lucide-react';
 import { cn } from '../lib/utils';
-import { Modal } from '../components/ui/Modal';
 import { motion } from 'framer-motion';
 
 interface ThreadMessage {
@@ -35,7 +34,6 @@ interface ThreadMessage {
 
 export const CustomerSupport = () => {
     const { user, email: verifiedEmail, role, refreshRole } = useAuth();
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState('');
@@ -149,7 +147,7 @@ export const CustomerSupport = () => {
             .select('*');
         
         if (role !== 'admin') {
-            const userEmail = verifiedEmail || user.email;
+            const userEmail = verifiedEmail || localStorage.getItem('user_email') || user.email;
             if (userEmail) {
                 query = query.or(`uid.eq.${user.id},email.eq.${userEmail.toLowerCase()}`);
             } else {
@@ -180,7 +178,7 @@ export const CustomerSupport = () => {
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [user]);
+    }, [user, verifiedEmail, role]);
 
     const handleUploadFile = async (file: File, folder: string): Promise<string> => {
         if (!user) throw new Error('Not authenticated');
@@ -240,6 +238,9 @@ export const CustomerSupport = () => {
 
             if (insertError) throw insertError;
 
+            // 즉시 목록 갱신
+            await fetchTickets();
+
             // Handle automatic matching / binding
             if (selectedLic) {
                 const isKmongMatched = !selectedLic.contact || selectedLic.contact.toLowerCase() !== contactEmail.toLowerCase();
@@ -281,7 +282,6 @@ export const CustomerSupport = () => {
 
             setTimeout(() => {
                 setSuccess(false);
-                setIsModalOpen(false);
                 setDescription('');
                 setKmongNickname('');
                 setSelectedLicenseId('');
@@ -380,10 +380,11 @@ export const CustomerSupport = () => {
     };
 
     const isAdmin = role === 'admin';
+    const userEmail = verifiedEmail || localStorage.getItem('user_email') || user?.email;
     const filteredTickets = tickets.filter(t => {
         // 일반 유저라면 자신의 글만 보임 (이메일 매칭 혹은 UID 매칭)
         const isOwn = 
-            (t.email && verifiedEmail && t.email.toLowerCase() === verifiedEmail.toLowerCase()) || 
+            (t.email && userEmail && t.email.toLowerCase() === userEmail.toLowerCase()) || 
             (t.uid === user?.id);
         
         // Q&A 형식의 상품 질문글은 고객센터 메인 목록에서 제외시킵니다. (이후 상품 전용 Q&A 섹션에 노출되도록 함)
@@ -397,528 +398,535 @@ export const CustomerSupport = () => {
     });
 
     return (
-        <div className="max-w-6xl mx-auto space-y-8 pb-20 px-4">
+        <div className="max-w-7xl mx-auto space-y-8 pb-20 px-4">
             {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div className="space-y-2">
-                    <h1 className="text-4xl font-black text-slate-900 tracking-tight">
-                        {role === 'admin' ? '고객센터 관리' : (user && verifiedEmail ? '내 문의/답변' : '고객센터/문의')}
-                    </h1>
-                    <p className="text-slate-400 font-bold">
-                        {role === 'admin' ? '전체 고객 문의 리스트 및 관리 화면입니다.' : '3Monster 서비스 이용 문의 및 버그 제보 게시판입니다.'}
-                    </p>
-                </div>
-                {!isAdmin && (
-                    <Button 
-                        onClick={() => setIsModalOpen(true)}
-                        className="h-14 px-8 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-lg rounded-2xl shadow-indigo-100 shadow-xl transition-all"
-                    >
-                        <Plus className="mr-2 w-6 h-6" /> 문의 등록하기
-                    </Button>
-                )}
+            <div className="space-y-2">
+                <h1 className="text-4xl font-black text-slate-900 tracking-tight">
+                    {role === 'admin' ? '고객센터 관리' : (user && verifiedEmail ? '내 문의/답변' : '고객센터/문의')}
+                </h1>
+                <p className="text-slate-400 font-bold">
+                    {role === 'admin' ? '전체 고객 문의 리스트 및 관리 화면입니다.' : '3Monster 서비스 이용 문의 및 버그 제보 게시판입니다.'}
+                </p>
             </div>
 
-            {/* List View Main */}
-            <div className="space-y-6">
-                <div className="flex flex-col sm:flex-row gap-4">
-                    <div className="relative flex-1 group">
-                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-indigo-500 transition-colors" />
-                        <Input 
-                            value={searchTerm}
-                            onChange={e => setSearchTerm(e.target.value)}
-                            placeholder="이메일이나 내용으로 검색..."
-                            className="h-14 pl-14 bg-white border-none shadow-sm rounded-2xl font-bold placeholder:text-slate-300 focus:ring-2 focus:ring-indigo-100"
-                        />
-                    </div>
-                </div>
+            {/* Main Content Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                {/* Left side: Inquiry Form (Visible only for non-admin) */}
+                {!isAdmin && (
+                    <div className="lg:col-span-5 space-y-6">
+                        <Card className="p-6 bg-white border-none shadow-sm rounded-3xl border border-slate-100">
+                            <h3 className="text-xl font-black text-slate-800 mb-6 flex items-center gap-2">
+                                <Plus className="w-5 h-5 text-indigo-500" /> 새 문의 등록하기
+                            </h3>
 
-                <div className="grid gap-4">
-                    {filteredTickets.map((ticket, index) => {
-                        // Check ownership by verified email first, fallback to UID
-                        const isOwn = 
-                            (ticket.email && verifiedEmail && ticket.email.toLowerCase() === verifiedEmail.toLowerCase()) || 
-                            (ticket.uid === user?.id);
-                            
-                        const isExpanded = expandedTicketId === ticket.id;
-                        const canViewDetail = isAdmin || isOwn;
+                            <div className="space-y-6">
+                                {success && (
+                                    <div className="flex items-center gap-4 bg-emerald-50 text-emerald-600 p-5 rounded-2xl animate-in fade-in zoom-in">
+                                        <CheckCircle2 className="w-7 h-7" />
+                                        <p className="font-black">접수가 완료되었습니다! 목록에서 확인해 주세요.</p>
+                                    </div>
+                                )}
+                                {error && (
+                                    <div className="flex items-center gap-4 bg-rose-50 text-rose-600 p-5 rounded-2xl">
+                                        <AlertCircle className="w-7 h-7" />
+                                        <p className="font-black">{error}</p>
+                                    </div>
+                                )}
 
-                        return (
-                            <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: index * 0.05 }}
-                                key={ticket.id}
-                            >
-                                <Card className={cn(
-                                    "overflow-hidden border-none shadow-sm hover:shadow-xl transition-all duration-300 rounded-3xl",
-                                    isExpanded && "ring-2 ring-indigo-50"
-                                )}>
-                                    <div 
-                                        className={cn(
-                                            "flex items-center justify-between p-6 cursor-pointer group",
-                                            isExpanded ? "bg-indigo-50/30" : "bg-white"
-                                        )}
-                                        onClick={() => canViewDetail && setExpandedTicketId(isExpanded ? null : ticket.id)}
-                                    >
-                                        <div className="flex items-center gap-6">
-                                            <div className={cn(
-                                                "w-14 h-14 rounded-2xl flex items-center justify-center transition-all",
-                                                canViewDetail ? "bg-indigo-100 text-indigo-600 scale-100" : "bg-slate-50 text-slate-300 scale-90"
-                                            )}>
-                                                {canViewDetail ? <FileText className="w-6 h-6" /> : <Lock className="w-6 h-6" />}
-                                            </div>
-                                            <div className="space-y-1">
-                                                <div className="flex items-center gap-3">
-                                                    <span className={cn(
-                                                        "px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider",
-                                                        ticket.issue_type === 'bug' ? "bg-rose-50 text-rose-500" :
-                                                        ticket.issue_type === 'feature' ? "bg-indigo-50 text-indigo-500" :
-                                                        ticket.issue_type === 'license' ? "bg-amber-50 text-amber-500" : "bg-slate-100 text-slate-500"
-                                                    )}>
-                                                        {ticket.issue_type === 'bug' ? '버그/오류' : 
-                                                         ticket.issue_type === 'feature' ? '기능제안' :
-                                                         ticket.issue_type === 'license' ? '라이선스' : '기타'}
-                                                    </span>
-                                                    <span className="text-slate-400 font-bold text-xs">
-                                                        {canViewDetail ? ticket.email : maskEmail(ticket.email)}
-                                                    </span>
-                                                </div>
-                                                <h4 className={cn(
-                                                    "text-base font-black truncate max-w-[200px] sm:max-w-md",
-                                                    canViewDetail ? "text-slate-800" : "text-slate-300 italic"
-                                                )}>
-                                                    {canViewDetail ? ticket.description : "비밀글입니다."}
-                                                </h4>
+                                <form onSubmit={handleSubmit} className="space-y-6 text-left">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest pl-2">답변받을 이메일</label>
+                                            <Input
+                                                required
+                                                type="email"
+                                                value={contactEmail}
+                                                onChange={e => setContactEmail(e.target.value)}
+                                                className={cn(
+                                                    "h-14 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 transition-all",
+                                                    purchasedLicenses.length > 0 ? "ring-2 ring-emerald-500 bg-emerald-50/30" : "focus:ring-indigo-100"
+                                                )}
+                                            />
+                                            {isCheckingLicenses && <p className="text-[10px] font-bold text-slate-400 mt-1 ml-2 animate-pulse">인증 정보 확인 중...</p>}
+                                            {!isCheckingLicenses && purchasedLicenses.length > 0 && (
+                                                <motion.div 
+                                                    initial={{ opacity: 0, x: -10 }} 
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    className="flex items-center gap-1.5 mt-2 ml-2 text-emerald-600"
+                                                >
+                                                    <ShieldCheck className="w-4 h-4" />
+                                                    <span className="text-xs font-black uppercase tracking-tight">인증된 구매자 (제품 {purchasedLicenses.length}개)</span>
+                                                </motion.div>
+                                            )}
+                                            {!isCheckingLicenses && purchasedLicenses.length === 0 && (
+                                                <p className="text-[10px] font-bold text-slate-400 mt-1 ml-2 italic">일반/체험판 사용자</p>
+                                            )}
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest pl-2">문의 유형</label>
+                                            <select
+                                                className="w-full h-14 rounded-2xl bg-slate-50 px-5 text-sm font-bold border-none outline-none focus:ring-2 focus:ring-indigo-100 transition-all appearance-none"
+                                                value={issueType}
+                                                onChange={e => setIssueType(e.target.value)}
+                                            >
+                                                <option value="bug">버그/오류 신고</option>
+                                                <option value="feature">기능 제안/문의</option>
+                                                <option value="license">라이선스 관련</option>
+                                                <option value="other">기타</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    {/* 2nd filter: Kmong nickname input if email matches nothing */}
+                                    {purchasedLicenses.length === 0 && (
+                                        <div className="space-y-2 animate-in fade-in duration-200">
+                                            <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest pl-2">
+                                                크몽 닉네임 <span className="text-indigo-500 font-bold">*2차 자동 매칭용</span>
+                                            </label>
+                                            <Input
+                                                placeholder="크몽 닉네임을 입력하시면 구매하신 상품이 자동 매칭됩니다."
+                                                value={kmongNickname}
+                                                onChange={e => setKmongNickname(e.target.value)}
+                                                className="h-14 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-100 transition-all"
+                                            />
+                                            {kmongNickname.trim() && !isCheckingLicenses && purchasedLicenses.length === 0 && (
+                                                <p className="text-[10px] text-amber-500 font-bold mt-1 ml-2">
+                                                    ⚠️ 입력하신 닉네임으로 등록된 제품을 찾지 못했습니다. 제출하시면 관리자가 확인 후 수동으로 연동해 드립니다.
+                                                </p>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* Dropdown to select matching licenses */}
+                                    {purchasedLicenses.length > 0 && (
+                                        <div className="space-y-2 animate-in fade-in duration-200">
+                                            <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest pl-2">
+                                                문의하실 제품 선택 <span className="text-emerald-500 font-bold">*필수</span>
+                                            </label>
+                                            <select
+                                                required
+                                                className="w-full h-14 rounded-2xl bg-slate-50 px-5 text-sm font-bold border-none outline-none focus:ring-2 focus:ring-emerald-100 transition-all appearance-none"
+                                                value={selectedLicenseId}
+                                                onChange={e => setSelectedLicenseId(e.target.value)}
+                                            >
+                                                <option value="">-- 문의 대상 제품을 선택해주세요 --</option>
+                                                {purchasedLicenses.map((lic) => (
+                                                    <option key={lic.id} value={lic.id}>
+                                                        {lic.product_id} ({lic.serial_key ? lic.serial_key.substring(0, 8) + '...' : '시리얼 없음'}) - {lic.buyer_name || '이름 없음'}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    )}
+
+                                    <div className="space-y-3">
+                                        <div className="flex items-center justify-between px-2">
+                                            <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest">상세 증상 및 내용</label>
+                                            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 text-amber-600 rounded-lg text-[10px] font-black animate-bounce shadow-sm border border-amber-100">
+                                                <Zap className="w-3 h-3" /> 빠른 해결을 위해 스샷을 꼭 첨부해주세요!
                                             </div>
                                         </div>
-                                        
-                                        <div className="flex items-center gap-6">
-                                            <div className="hidden sm:flex flex-col items-end">
-                                                <span className={cn(
-                                                    "text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full",
-                                                    ticket.status === 'open' ? "bg-indigo-50 text-indigo-500" : "bg-emerald-50 text-emerald-500"
-                                                )}>
-                                                    {ticket.status === 'open' ? '처리 대기중' : '진행 완료'}
-                                                </span>
-                                                <span className="text-[10px] font-bold text-slate-300 mt-1 uppercase">
-                                                    {ticket.created_at ? new Date(ticket.created_at).toLocaleDateString() : 'N/A'}
-                                                </span>
-                                            </div>
-                                            {canViewDetail && (
-                                                <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center group-hover:bg-indigo-50 transition-colors">
-                                                    {isExpanded ? <ChevronUp className="w-5 h-5 text-indigo-500" /> : <ChevronDown className="w-5 h-5 text-slate-300 group-hover:text-indigo-500" />}
+                                        <textarea
+                                            required
+                                            value={description}
+                                            onChange={e => setDescription(e.target.value)}
+                                            placeholder="문제 상황이나 증상을 최대한 자세히 적어주세요."
+                                            className="w-full min-h-[160px] rounded-2xl bg-slate-50 p-5 text-sm font-bold border-none outline-none focus:ring-2 focus:ring-indigo-100 transition-all resize-none"
+                                        />
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="relative group">
+                                            {imageFile ? (
+                                                <div className="h-14 w-full rounded-2xl bg-indigo-50/30 border-2 border-indigo-200 flex items-center justify-between px-4 transition-all">
+                                                    <div className="flex items-center min-w-0 flex-1 mr-2">
+                                                        <ImageIcon className="w-5 h-5 text-indigo-500 mr-3 flex-shrink-0" />
+                                                        <span className="text-xs font-black text-indigo-700 truncate">
+                                                            {imageFile.name}
+                                                        </span>
+                                                    </div>
+                                                    <button 
+                                                        type="button"
+                                                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setImageFile(null); }}
+                                                        className="text-slate-400 hover:text-rose-500 font-black text-sm p-1 z-20 relative"
+                                                    >
+                                                        ✕
+                                                    </button>
                                                 </div>
+                                            ) : (
+                                                <>
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        onChange={e => setImageFile(e.target.files?.[0] || null)}
+                                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                                    />
+                                                    <div className="h-14 w-full rounded-2xl bg-slate-50 flex items-center px-4 border-2 border-dashed border-slate-200 group-hover:border-indigo-300 group-hover:bg-indigo-50/50 transition-all">
+                                                        <ImageIcon className="w-5 h-5 text-slate-400 mr-3" />
+                                                        <span className="text-xs font-black text-slate-500 truncate">
+                                                            이미지 첨부
+                                                        </span>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
+                                        <div className="relative group">
+                                            {logFile ? (
+                                                <div className="h-14 w-full rounded-2xl bg-indigo-50/30 border-2 border-indigo-200 flex items-center justify-between px-4 transition-all">
+                                                    <div className="flex items-center min-w-0 flex-1 mr-2">
+                                                        <FileText className="w-5 h-5 text-indigo-500 mr-3 flex-shrink-0" />
+                                                        <span className="text-xs font-black text-indigo-700 truncate">
+                                                            {logFile.name}
+                                                        </span>
+                                                    </div>
+                                                    <button 
+                                                        type="button"
+                                                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setLogFile(null); }}
+                                                        className="text-slate-400 hover:text-rose-500 font-black text-sm p-1 z-20 relative"
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <input
+                                                        type="file"
+                                                        accept=".log,.txt"
+                                                        onChange={e => setLogFile(e.target.files?.[0] || null)}
+                                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                                    />
+                                                    <div className="h-14 w-full rounded-2xl bg-slate-50 flex items-center px-4 border-2 border-dashed border-slate-200 group-hover:border-indigo-300 group-hover:bg-indigo-50/50 transition-all">
+                                                        <FileText className="w-5 h-5 text-slate-400 mr-3" />
+                                                        <span className="text-xs font-black text-slate-500 truncate">
+                                                            로그 파일 첨부
+                                                        </span>
+                                                    </div>
+                                                </>
                                             )}
                                         </div>
                                     </div>
+
+                                    <Button 
+                                        type="submit" 
+                                        className="w-full h-14 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-lg rounded-2xl shadow-indigo-100 shadow-xl transition-all" 
+                                        isLoading={loading}
+                                    >
+                                        <UploadCloud className="mr-2 w-5 h-5" /> 문의 내용 전송하기
+                                    </Button>
+                                </form>
+                            </div>
+                        </Card>
+                    </div>
+                )}
+
+                {/* Right side: Ticket List (Admin: span 12, Buyer/User: span 7) */}
+                <div className={cn(
+                    "space-y-6",
+                    isAdmin ? "lg:col-span-12" : "lg:col-span-7"
+                )}>
+                    {/* List View Main */}
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="relative flex-1 group">
+                            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-indigo-500 transition-colors" />
+                            <Input 
+                                value={searchTerm}
+                                onChange={e => setSearchTerm(e.target.value)}
+                                placeholder="이메일이나 내용으로 검색..."
+                                className="h-14 pl-14 bg-white border-none shadow-sm rounded-2xl font-bold placeholder:text-slate-300 focus:ring-2 focus:ring-indigo-100"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid gap-4">
+                        {filteredTickets.length === 0 ? (
+                            <Card className="p-12 text-center bg-white border-none shadow-sm rounded-3xl">
+                                <p className="text-slate-400 font-bold">등록된 문의 내역이 없습니다.</p>
+                            </Card>
+                        ) : (
+                            filteredTickets.map((ticket, index) => {
+                                // Check ownership by verified email first, fallback to UID
+                                const isOwn = 
+                                    (ticket.email && verifiedEmail && ticket.email.toLowerCase() === verifiedEmail.toLowerCase()) || 
+                                    (ticket.uid === user?.id);
                                     
-                                    {isExpanded && canViewDetail && (
-                                        <div className="px-8 pb-8 pt-2 bg-indigo-50/30">
-                                            <div className="p-8 bg-white rounded-[2rem] shadow-sm border border-indigo-50/50 space-y-8">
-                                                <div>
-                                                    <div className="flex items-center gap-2 mb-6 text-indigo-600">
-                                                        <FileText className="w-5 h-5" />
-                                                        <h3 className="font-black text-lg">상세 내용</h3>
+                                const isExpanded = expandedTicketId === ticket.id;
+                                const canViewDetail = isAdmin || isOwn;
+
+                                return (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: index * 0.05 }}
+                                        key={ticket.id}
+                                    >
+                                        <Card className={cn(
+                                            "overflow-hidden border-none shadow-sm hover:shadow-xl transition-all duration-300 rounded-3xl",
+                                            isExpanded && "ring-2 ring-indigo-50"
+                                        )}>
+                                            <div 
+                                                className={cn(
+                                                    "flex items-center justify-between p-6 cursor-pointer group",
+                                                    isExpanded ? "bg-indigo-50/30" : "bg-white"
+                                                )}
+                                                onClick={() => canViewDetail && setExpandedTicketId(isExpanded ? null : ticket.id)}
+                                            >
+                                                <div className="flex items-center gap-6">
+                                                    <div className={cn(
+                                                        "w-14 h-14 rounded-2xl flex items-center justify-center transition-all",
+                                                        canViewDetail ? "bg-indigo-100 text-indigo-600 scale-100" : "bg-slate-50 text-slate-300 scale-90"
+                                                    )}>
+                                                        {canViewDetail ? <FileText className="w-6 h-6" /> : <Lock className="w-6 h-6" />}
                                                     </div>
-                                                    <p className="text-slate-600 font-bold leading-relaxed whitespace-pre-wrap text-base">
-                                                        {ticket.description}
-                                                    </p>
-                                                    
-                                                    {(ticket.image_url || ticket.log_url) && (
-                                                        <div className="mt-8 pt-8 border-t border-slate-50 flex flex-wrap gap-4">
-                                                            {ticket.image_url && (
-                                                                <a href={ticket.image_url} target="_blank" rel="noopener noreferrer" 
-                                                                className="flex items-center gap-3 px-6 py-4 bg-slate-50 hover:bg-indigo-50 text-slate-700 hover:text-indigo-600 rounded-2xl text-sm font-black transition-all group/link">
-                                                                    <ImageIcon className="w-5 h-5" /> 스크린샷 보기 <ExternalLink className="w-4 h-4 opacity-30 group-hover/link:opacity-100" />
-                                                                </a>
-                                                            )}
-                                                            {ticket.log_url && (
-                                                                <a href={ticket.log_url} target="_blank" rel="noopener noreferrer" 
-                                                                className="flex items-center gap-3 px-6 py-4 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-2xl text-sm font-black transition-all">
-                                                                    <FileText className="w-5 h-5" /> 로그 파일 다운로드 <ExternalLink className="w-4 h-4 opacity-30" />
-                                                                </a>
-                                                            )}
+                                                    <div className="space-y-1">
+                                                        <div className="flex items-center gap-3">
+                                                            <span className={cn(
+                                                                "px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider",
+                                                                ticket.issue_type === 'bug' ? "bg-rose-50 text-rose-500" :
+                                                                ticket.issue_type === 'feature' ? "bg-indigo-50 text-indigo-500" :
+                                                                ticket.issue_type === 'license' ? "bg-amber-50 text-amber-500" : "bg-slate-100 text-slate-500"
+                                                            )}>
+                                                                {ticket.issue_type === 'bug' ? '버그/오류' : 
+                                                                ticket.issue_type === 'feature' ? '기능제안' :
+                                                                ticket.issue_type === 'license' ? '라이선스' : '기타'}
+                                                            </span>
+                                                            <span className="text-slate-400 font-bold text-xs">
+                                                                {canViewDetail ? ticket.email : maskEmail(ticket.email)}
+                                                            </span>
+                                                        </div>
+                                                        <h4 className={cn(
+                                                            "text-base font-black truncate max-w-[200px] sm:max-w-md",
+                                                            canViewDetail ? "text-slate-800" : "text-slate-300 italic"
+                                                        )}>
+                                                            {canViewDetail ? ticket.description : "비밀글입니다."}
+                                                        </h4>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div className="flex items-center gap-6">
+                                                    <div className="hidden sm:flex flex-col items-end">
+                                                        <span className={cn(
+                                                            "text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full",
+                                                            ticket.status === 'open' ? "bg-indigo-50 text-indigo-500" : "bg-emerald-50 text-emerald-500"
+                                                        )}>
+                                                            {ticket.status === 'open' ? '처리 대기중' : '진행 완료'}
+                                                        </span>
+                                                        <span className="text-[10px] font-bold text-slate-300 mt-1 uppercase">
+                                                            {ticket.created_at ? new Date(ticket.created_at).toLocaleDateString() : 'N/A'}
+                                                        </span>
+                                                    </div>
+                                                    {canViewDetail && (
+                                                        <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center group-hover:bg-indigo-50 transition-colors">
+                                                            {isExpanded ? <ChevronUp className="w-5 h-5 text-indigo-500" /> : <ChevronDown className="w-5 h-5 text-slate-300 group-hover:text-indigo-500" />}
                                                         </div>
                                                     )}
                                                 </div>
-
-                                                {/* Thread & Reply Section */}
-                                                <div className="pt-8 border-t border-slate-100 space-y-6">
-                                                    <div className="flex items-center gap-2 text-indigo-600">
-                                                        <CheckCircle2 className="w-5 h-5" />
-                                                        <h3 className="font-black text-lg">대화 기록 및 댓글</h3>
-                                                    </div>
-
-                                                    {/* Thread History */}
-                                                    <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 flex flex-col">
-                                                        {parseThread(ticket).length === 0 ? (
-                                                            <p className="text-slate-400 font-bold text-sm text-center py-6 bg-slate-50 rounded-2xl border border-dashed border-slate-100">
-                                                                아직 등록된 댓글이 없습니다. 아래 폼에서 첫 대화를 시작해 보세요!
+                                            </div>
+                                            
+                                            {isExpanded && canViewDetail && (
+                                                <div className="px-8 pb-8 pt-2 bg-indigo-50/30">
+                                                    <div className="p-8 bg-white rounded-[2rem] shadow-sm border border-indigo-50/50 space-y-8">
+                                                        <div>
+                                                            <div className="flex items-center gap-2 mb-6 text-indigo-600">
+                                                                <FileText className="w-5 h-5" />
+                                                                <h3 className="font-black text-lg">상세 내용</h3>
+                                                            </div>
+                                                            <p className="text-slate-600 font-bold leading-relaxed whitespace-pre-wrap text-base">
+                                                                {ticket.description}
                                                             </p>
-                                                        ) : (
-                                                            parseThread(ticket).map((msg) => {
-                                                                const isMsgAdmin = msg.sender === 'admin';
-                                                                return (
-                                                                    <div 
-                                                                        key={msg.id} 
-                                                                        className={cn(
-                                                                            "flex flex-col max-w-[85%] p-4 rounded-2xl shadow-sm border transition-all duration-300",
-                                                                            isMsgAdmin 
-                                                                                ? "bg-emerald-50/50 border-emerald-100/50 ml-auto rounded-tr-none" 
-                                                                                : "bg-indigo-50/40 border-indigo-100/30 mr-auto rounded-tl-none"
-                                                                        )}
-                                                                    >
-                                                                        <div className="flex items-center gap-2 mb-2 justify-between">
-                                                                            <span className={cn(
-                                                                                "text-xs font-black",
-                                                                                isMsgAdmin ? "text-emerald-700" : "text-indigo-700"
-                                                                            )}>
-                                                                                {isMsgAdmin ? "🛡️ 관리자" : `👤 ${maskEmail(msg.sender_email)}`}
-                                                                            </span>
-                                                                            <span className="text-[10px] font-bold text-slate-400">
-                                                                                {new Date(msg.created_at).toLocaleString()}
-                                                                            </span>
-                                                                        </div>
-                                                                        
-                                                                        <p className={cn(
-                                                                            "text-sm font-semibold leading-relaxed whitespace-pre-wrap",
-                                                                            isMsgAdmin ? "text-emerald-900" : "text-slate-700"
-                                                                        )}>
-                                                                            {msg.text}
-                                                                        </p>
+                                                            
+                                                            {(ticket.image_url || ticket.log_url) && (
+                                                                <div className="mt-8 pt-8 border-t border-slate-50 flex flex-wrap gap-4">
+                                                                    {ticket.image_url && (
+                                                                        <a href={ticket.image_url} target="_blank" rel="noopener noreferrer" 
+                                                                        className="flex items-center gap-3 px-6 py-4 bg-slate-50 hover:bg-indigo-50 text-slate-700 hover:text-indigo-600 rounded-2xl text-sm font-black transition-all group/link">
+                                                                            <ImageIcon className="w-5 h-5" /> 스크린샷 보기 <ExternalLink className="w-4 h-4 opacity-30 group-hover/link:opacity-100" />
+                                                                        </a>
+                                                                    )}
+                                                                    {ticket.log_url && (
+                                                                        <a href={ticket.log_url} target="_blank" rel="noopener noreferrer" 
+                                                                        className="flex items-center gap-3 px-6 py-4 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-2xl text-sm font-black transition-all">
+                                                                            <FileText className="w-5 h-5" /> 로그 파일 다운로드 <ExternalLink className="w-4 h-4 opacity-30" />
+                                                                        </a>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </div>
 
-                                                                        {/* Uploaded attachments in reply */}
-                                                                        {(msg.image_url || msg.log_url) && (
-                                                                            <div className="mt-3 pt-3 border-t border-slate-100/50 flex flex-wrap gap-2">
-                                                                                {msg.image_url && (
-                                                                                    <a href={msg.image_url} target="_blank" rel="noopener noreferrer" 
-                                                                                       className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-100 rounded-lg text-xs font-black transition-all">
-                                                                                        <ImageIcon className="w-3.5 h-3.5 text-slate-500" /> 스크린샷 보기
-                                                                                    </a>
+                                                        {/* Thread & Reply Section */}
+                                                        <div className="pt-8 border-t border-slate-100 space-y-6">
+                                                            <div className="flex items-center gap-2 text-indigo-600">
+                                                                <CheckCircle2 className="w-5 h-5" />
+                                                                <h3 className="font-black text-lg">대화 기록 및 댓글</h3>
+                                                            </div>
+
+                                                            {/* Thread History */}
+                                                            <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 flex flex-col">
+                                                                {parseThread(ticket).length === 0 ? (
+                                                                    <p className="text-slate-400 font-bold text-sm text-center py-6 bg-slate-50 rounded-2xl border border-dashed border-slate-100">
+                                                                        아직 등록된 댓글이 없습니다. 아래 폼에서 첫 대화를 시작해 보세요!
+                                                                    </p>
+                                                                ) : (
+                                                                    parseThread(ticket).map((msg) => {
+                                                                        const isMsgAdmin = msg.sender === 'admin';
+                                                                        return (
+                                                                            <div 
+                                                                                key={msg.id} 
+                                                                                className={cn(
+                                                                                    "flex flex-col max-w-[85%] p-4 rounded-2xl shadow-sm border transition-all duration-300",
+                                                                                    isMsgAdmin 
+                                                                                        ? "bg-emerald-50/50 border-emerald-100/50 ml-auto rounded-tr-none" 
+                                                                                        : "bg-indigo-50/40 border-indigo-100/30 mr-auto rounded-tl-none"
                                                                                 )}
-                                                                                {msg.log_url && (
-                                                                                    <a href={msg.log_url} target="_blank" rel="noopener noreferrer" 
-                                                                                       className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-100 rounded-lg text-xs font-black transition-all">
-                                                                                        <FileText className="w-3.5 h-3.5 text-slate-500" /> 로그 다운로드
-                                                                                    </a>
+                                                                            >
+                                                                                <div className="flex items-center gap-2 mb-2 justify-between">
+                                                                                    <span className={cn(
+                                                                                        "text-xs font-black",
+                                                                                        isMsgAdmin ? "text-emerald-700" : "text-indigo-700"
+                                                                                    )}>
+                                                                                        {isMsgAdmin ? "🛡️ 관리자" : `👤 ${maskEmail(msg.sender_email)}`}
+                                                                                    </span>
+                                                                                    <span className="text-[10px] font-bold text-slate-400">
+                                                                                        {new Date(msg.created_at).toLocaleString()}
+                                                                                    </span>
+                                                                                </div>
+                                                                                
+                                                                                <p className={cn(
+                                                                                    "text-sm font-semibold leading-relaxed whitespace-pre-wrap",
+                                                                                    isMsgAdmin ? "text-emerald-900" : "text-slate-700"
+                                                                                )}>
+                                                                                    {msg.text}
+                                                                                </p>
+
+                                                                                {/* Uploaded attachments in reply */}
+                                                                                {(msg.image_url || msg.log_url) && (
+                                                                                    <div className="mt-3 pt-3 border-t border-slate-100/50 flex flex-wrap gap-2">
+                                                                                        {msg.image_url && (
+                                                                                            <a href={msg.image_url} target="_blank" rel="noopener noreferrer" 
+                                                                                               className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-100 rounded-lg text-xs font-black transition-all">
+                                                                                                <ImageIcon className="w-3.5 h-3.5 text-slate-500" /> 스크린샷 보기
+                                                                                            </a>
+                                                                                        )}
+                                                                                        {msg.log_url && (
+                                                                                            <a href={msg.log_url} target="_blank" rel="noopener noreferrer" 
+                                                                                               className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-100 rounded-lg text-xs font-black transition-all">
+                                                                                                <FileText className="w-3.5 h-3.5 text-slate-500" /> 로그 다운로드
+                                                                                            </a>
+                                                                                        )}
+                                                                                    </div>
                                                                                 )}
                                                                             </div>
-                                                                        )}
+                                                                        );
+                                                                    })
+                                                                )}
+                                                            </div>
+
+                                                            {/* New Message Input Form */}
+                                                            <div className="space-y-4 pt-4 border-t border-slate-100/80">
+                                                                <div className="relative">
+                                                                    <textarea
+                                                                        placeholder="추가 문의사항이나 답변을 여기에 입력해주세요..."
+                                                                        value={replyText}
+                                                                        onChange={(e) => setReplyText(e.target.value)}
+                                                                        className="w-full min-h-[100px] rounded-2xl bg-slate-50 p-5 text-sm font-bold border-none outline-none focus:ring-2 focus:ring-indigo-100 transition-all resize-none placeholder:text-slate-350 text-slate-800"
+                                                                    />
+                                                                </div>
+
+                                                                {/* Attachment status inside input form */}
+                                                                <div className="flex flex-wrap gap-3">
+                                                                    <div className="relative group">
+                                                                        <input
+                                                                            type="file"
+                                                                            accept="image/*"
+                                                                            onChange={e => setReplyImage(e.target.files?.[0] || null)}
+                                                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                                                        />
+                                                                        <div className="h-10 px-4 rounded-xl bg-slate-50 hover:bg-indigo-50 border border-slate-150 hover:border-indigo-300 flex items-center transition-all">
+                                                                            <ImageIcon className="w-4 h-4 text-slate-400 mr-2 group-hover:text-indigo-500" />
+                                                                            <span className="text-xs font-black text-slate-500 truncate max-w-[150px]">
+                                                                                {replyImage ? replyImage.name : '사진 첨부'}
+                                                                            </span>
+                                                                            {replyImage && (
+                                                                                <button 
+                                                                                    type="button"
+                                                                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setReplyImage(null); }}
+                                                                                    className="ml-2 text-slate-400 hover:text-rose-500 font-bold text-xs z-20"
+                                                                                >
+                                                                                    ✕
+                                                                                </button>
+                                                                            )}
+                                                                        </div>
                                                                     </div>
-                                                                );
-                                                            })
-                                                        )}
-                                                    </div>
+                                                                    <div className="relative group">
+                                                                        <input
+                                                                            type="file"
+                                                                            accept=".log,.txt"
+                                                                            onChange={e => setReplyLog(e.target.files?.[0] || null)}
+                                                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                                                        />
+                                                                        <div className="h-10 px-4 rounded-xl bg-slate-50 hover:bg-indigo-50 border border-slate-150 hover:border-indigo-300 flex items-center transition-all">
+                                                                            <FileText className="w-4 h-4 text-slate-400 mr-2 group-hover:text-indigo-500" />
+                                                                            <span className="text-xs font-black text-slate-500 truncate max-w-[150px]">
+                                                                                {replyLog ? replyLog.name : '로그 파일 첨부'}
+                                                                            </span>
+                                                                            {replyLog && (
+                                                                                <button 
+                                                                                    type="button"
+                                                                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setReplyLog(null); }}
+                                                                                    className="ml-2 text-slate-400 hover:text-rose-500 font-bold text-xs z-20"
+                                                                                >
+                                                                                    ✕
+                                                                                </button>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
 
-                                                    {/* New Message Input Form */}
-                                                    <div className="space-y-4 pt-4 border-t border-slate-100/80">
-                                                        <div className="relative">
-                                                            <textarea
-                                                                placeholder="추가 문의사항이나 답변을 여기에 입력해주세요..."
-                                                                value={replyText}
-                                                                onChange={(e) => setReplyText(e.target.value)}
-                                                                className="w-full min-h-[100px] rounded-2xl bg-slate-50 p-5 text-sm font-bold border-none outline-none focus:ring-2 focus:ring-indigo-100 transition-all resize-none placeholder:text-slate-350 text-slate-800"
-                                                            />
-                                                        </div>
-
-                                                        {/* Attachment status inside input form */}
-                                                        <div className="flex flex-wrap gap-3">
-                                                            <div className="relative group">
-                                                                <input
-                                                                    type="file"
-                                                                    accept="image/*"
-                                                                    onChange={e => setReplyImage(e.target.files?.[0] || null)}
-                                                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                                                />
-                                                                <div className="h-10 px-4 rounded-xl bg-slate-50 hover:bg-indigo-50 border border-slate-150 hover:border-indigo-300 flex items-center transition-all">
-                                                                    <ImageIcon className="w-4 h-4 text-slate-400 mr-2 group-hover:text-indigo-500" />
-                                                                    <span className="text-xs font-black text-slate-500 truncate max-w-[150px]">
-                                                                        {replyImage ? replyImage.name : '사진 첨부'}
-                                                                    </span>
-                                                                    {replyImage && (
-                                                                        <button 
-                                                                            type="button"
-                                                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setReplyImage(null); }}
-                                                                            className="ml-2 text-slate-400 hover:text-rose-500 font-bold text-xs z-20"
+                                                                {/* Action Buttons */}
+                                                                <div className="flex justify-end gap-3 pt-2">
+                                                                    {isAdmin ? (
+                                                                        <>
+                                                                            <Button 
+                                                                                onClick={() => handleSubmitReply(ticket, 'open')}
+                                                                                isLoading={isSubmittingReply}
+                                                                                disabled={!replyText.trim() && !replyImage && !replyLog}
+                                                                                className="bg-slate-200 hover:bg-slate-350 text-slate-700 rounded-xl px-6 h-12 text-xs font-black transition-all"
+                                                                            >
+                                                                                댓글 등록 (대기유지)
+                                                                            </Button>
+                                                                            <Button 
+                                                                                onClick={() => handleSubmitReply(ticket, 'closed')}
+                                                                                isLoading={isSubmittingReply}
+                                                                                disabled={!replyText.trim() && !replyImage && !replyLog}
+                                                                                className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl px-6 h-12 text-xs font-black shadow-lg shadow-emerald-100 transition-all"
+                                                                            >
+                                                                                답변 완료 및 해결완료 처리
+                                                                            </Button>
+                                                                        </>
+                                                                    ) : (
+                                                                        <Button 
+                                                                            onClick={() => handleSubmitReply(ticket, 'open')}
+                                                                            isLoading={isSubmittingReply}
+                                                                            disabled={!replyText.trim() && !replyImage && !replyLog}
+                                                                            className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-8 h-12 text-sm font-black shadow-lg shadow-indigo-100 transition-all"
                                                                         >
-                                                                            ✕
-                                                                        </button>
+                                                                            댓글 등록하기
+                                                                        </Button>
                                                                     )}
                                                                 </div>
                                                             </div>
-                                                            <div className="relative group">
-                                                                <input
-                                                                    type="file"
-                                                                    accept=".log,.txt"
-                                                                    onChange={e => setReplyLog(e.target.files?.[0] || null)}
-                                                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                                                />
-                                                                <div className="h-10 px-4 rounded-xl bg-slate-50 hover:bg-indigo-50 border border-slate-150 hover:border-indigo-300 flex items-center transition-all">
-                                                                    <FileText className="w-4 h-4 text-slate-400 mr-2 group-hover:text-indigo-500" />
-                                                                    <span className="text-xs font-black text-slate-500 truncate max-w-[150px]">
-                                                                        {replyLog ? replyLog.name : '로그 파일 첨부'}
-                                                                    </span>
-                                                                    {replyLog && (
-                                                                        <button 
-                                                                            type="button"
-                                                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setReplyLog(null); }}
-                                                                            className="ml-2 text-slate-400 hover:text-rose-500 font-bold text-xs z-20"
-                                                                        >
-                                                                            ✕
-                                                                        </button>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        {/* Action Buttons */}
-                                                        <div className="flex justify-end gap-3 pt-2">
-                                                            {isAdmin ? (
-                                                                <>
-                                                                    <Button 
-                                                                        onClick={() => handleSubmitReply(ticket, 'open')}
-                                                                        isLoading={isSubmittingReply}
-                                                                        disabled={!replyText.trim() && !replyImage && !replyLog}
-                                                                        className="bg-slate-200 hover:bg-slate-350 text-slate-700 rounded-xl px-6 h-12 text-xs font-black transition-all"
-                                                                    >
-                                                                        댓글 등록 (대기유지)
-                                                                    </Button>
-                                                                    <Button 
-                                                                        onClick={() => handleSubmitReply(ticket, 'closed')}
-                                                                        isLoading={isSubmittingReply}
-                                                                        disabled={!replyText.trim() && !replyImage && !replyLog}
-                                                                        className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl px-6 h-12 text-xs font-black shadow-lg shadow-emerald-100 transition-all"
-                                                                    >
-                                                                        답변 완료 및 해결완료 처리
-                                                                    </Button>
-                                                                </>
-                                                            ) : (
-                                                                <Button 
-                                                                    onClick={() => handleSubmitReply(ticket, 'open')}
-                                                                    isLoading={isSubmittingReply}
-                                                                    disabled={!replyText.trim() && !replyImage && !replyLog}
-                                                                    className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-8 h-12 text-sm font-black shadow-lg shadow-indigo-100 transition-all"
-                                                                >
-                                                                    댓글 등록하기
-                                                                </Button>
-                                                            )}
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </div>
-                                    )}
-                                </Card>
-                            </motion.div>
-                        );
-                    })}
+                                            )}
+                                        </Card>
+                                    </motion.div>
+                                );
+                            })
+                        )}
+                    </div>
                 </div>
             </div>
-
-            {/* Inquiry Registration Modal */}
-            <Modal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                title="문의 접수하기"
-                className="max-w-2xl bg-white border-none"
-            >
-                <div className="space-y-6">
-                    {success && (
-                        <div className="flex items-center gap-4 bg-emerald-50 text-emerald-600 p-5 rounded-2xl animate-in fade-in zoom-in">
-                            <CheckCircle2 className="w-7 h-7" />
-                            <p className="font-black">접수가 완료되었습니다! 목록에서 확인 가능합니다.</p>
-                        </div>
-                    )}
-                    {error && (
-                        <div className="flex items-center gap-4 bg-rose-50 text-rose-600 p-5 rounded-2xl">
-                            <AlertCircle className="w-7 h-7" />
-                            <p className="font-black">{error}</p>
-                        </div>
-                    )}
-
-                    <form onSubmit={handleSubmit} className="space-y-6 text-left">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest pl-2">답변받을 이메일</label>
-                                <Input
-                                    required
-                                    type="email"
-                                    value={contactEmail}
-                                    onChange={e => setContactEmail(e.target.value)}
-                                    className={cn(
-                                        "h-14 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 transition-all",
-                                        purchasedLicenses.length > 0 ? "ring-2 ring-emerald-500 bg-emerald-50/30" : "focus:ring-indigo-100"
-                                    )}
-                                />
-                                {isCheckingLicenses && <p className="text-[10px] font-bold text-slate-400 mt-1 ml-2 animate-pulse">인증 정보 확인 중...</p>}
-                                {!isCheckingLicenses && purchasedLicenses.length > 0 && (
-                                    <motion.div 
-                                        initial={{ opacity: 0, x: -10 }} 
-                                        animate={{ opacity: 1, x: 0 }}
-                                        className="flex items-center gap-1.5 mt-2 ml-2 text-emerald-600"
-                                    >
-                                        <ShieldCheck className="w-4 h-4" />
-                                        <span className="text-xs font-black uppercase tracking-tight">인증된 구매자 (제품 {purchasedLicenses.length}개 보유)</span>
-                                    </motion.div>
-                                )}
-                                {!isCheckingLicenses && purchasedLicenses.length === 0 && (
-                                    <p className="text-[10px] font-bold text-slate-400 mt-1 ml-2 italic">일반/체험판 사용자</p>
-                                )}
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest pl-2">문의 유형</label>
-                                <select
-                                    className="w-full h-14 rounded-2xl bg-slate-50 px-5 text-sm font-bold border-none outline-none focus:ring-2 focus:ring-indigo-100 transition-all appearance-none"
-                                    value={issueType}
-                                    onChange={e => setIssueType(e.target.value)}
-                                >
-                                    <option value="bug">버그/오류 신고</option>
-                                    <option value="feature">기능 제안/문의</option>
-                                    <option value="license">라이선스 관련</option>
-                                    <option value="other">기타</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        {/* 2nd filter: Kmong nickname input if email matches nothing */}
-                        {purchasedLicenses.length === 0 && (
-                            <div className="space-y-2 animate-in fade-in duration-200">
-                                <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest pl-2">
-                                    크몽 닉네임 <span className="text-indigo-500 font-bold">*2차 자동 매칭용</span>
-                                </label>
-                                <Input
-                                    placeholder="크몽 닉네임을 입력하시면 구매하신 상품이 자동 매칭됩니다."
-                                    value={kmongNickname}
-                                    onChange={e => setKmongNickname(e.target.value)}
-                                    className="h-14 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-100 transition-all"
-                                />
-                                {kmongNickname.trim() && !isCheckingLicenses && purchasedLicenses.length === 0 && (
-                                    <p className="text-[10px] text-amber-500 font-bold mt-1 ml-2">
-                                        ⚠️ 입력하신 닉네임으로 등록된 제품을 찾지 못했습니다. 제출하시면 관리자가 확인 후 수동으로 연동해 드립니다.
-                                    </p>
-                                )}
-                            </div>
-                        )}
-
-                        {/* Dropdown to select matching licenses */}
-                        {purchasedLicenses.length > 0 && (
-                            <div className="space-y-2 animate-in fade-in duration-200">
-                                <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest pl-2">
-                                    문의하실 제품 선택 <span className="text-emerald-500 font-bold">*필수</span>
-                                </label>
-                                <select
-                                    required
-                                    className="w-full h-14 rounded-2xl bg-slate-50 px-5 text-sm font-bold border-none outline-none focus:ring-2 focus:ring-emerald-100 transition-all appearance-none"
-                                    value={selectedLicenseId}
-                                    onChange={e => setSelectedLicenseId(e.target.value)}
-                                >
-                                    <option value="">-- 문의 대상 제품을 선택해주세요 --</option>
-                                    {purchasedLicenses.map((lic) => (
-                                        <option key={lic.id} value={lic.id}>
-                                            {lic.product_id} ({lic.serial_key ? lic.serial_key.substring(0, 8) + '...' : '시리얼 없음'}) - {lic.buyer_name || '이름 없음'}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        )}
-
-                        <div className="space-y-3">
-                            <div className="flex items-center justify-between px-2">
-                                <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest">상세 증상 및 내용</label>
-                                <div className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 text-amber-600 rounded-lg text-[10px] font-black animate-bounce shadow-sm border border-amber-100">
-                                    <Zap className="w-3 h-3" /> 빠른 해결을 위해 스샷을 꼭 첨부해주세요!
-                                </div>
-                            </div>
-                            <textarea
-                                required
-                                value={description}
-                                onChange={e => setDescription(e.target.value)}
-                                placeholder="문제 상황이나 증상을 최대한 자세히 적어주세요."
-                                className="w-full min-h-[160px] rounded-2xl bg-slate-50 p-5 text-sm font-bold border-none outline-none focus:ring-2 focus:ring-indigo-100 transition-all resize-none"
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="relative group">
-                                {imageFile ? (
-                                    <div className="h-14 w-full rounded-2xl bg-indigo-50/30 border-2 border-indigo-200 flex items-center justify-between px-4 transition-all">
-                                        <div className="flex items-center min-w-0 flex-1 mr-2">
-                                            <ImageIcon className="w-5 h-5 text-indigo-500 mr-3 flex-shrink-0" />
-                                            <span className="text-xs font-black text-indigo-700 truncate">
-                                                {imageFile.name}
-                                            </span>
-                                        </div>
-                                        <button 
-                                            type="button"
-                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setImageFile(null); }}
-                                            className="text-slate-400 hover:text-rose-500 font-black text-sm p-1 z-20 relative"
-                                        >
-                                            ✕
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <>
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={e => setImageFile(e.target.files?.[0] || null)}
-                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                        />
-                                        <div className="h-14 w-full rounded-2xl bg-slate-50 flex items-center px-4 border-2 border-dashed border-slate-200 group-hover:border-indigo-300 group-hover:bg-indigo-50/50 transition-all">
-                                            <ImageIcon className="w-5 h-5 text-slate-400 mr-3" />
-                                            <span className="text-xs font-black text-slate-500 truncate">
-                                                이미지 첨부
-                                            </span>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                            <div className="relative group">
-                                {logFile ? (
-                                    <div className="h-14 w-full rounded-2xl bg-indigo-50/30 border-2 border-indigo-200 flex items-center justify-between px-4 transition-all">
-                                        <div className="flex items-center min-w-0 flex-1 mr-2">
-                                            <FileText className="w-5 h-5 text-indigo-500 mr-3 flex-shrink-0" />
-                                            <span className="text-xs font-black text-indigo-700 truncate">
-                                                {logFile.name}
-                                            </span>
-                                        </div>
-                                        <button 
-                                            type="button"
-                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setLogFile(null); }}
-                                            className="text-slate-400 hover:text-rose-500 font-black text-sm p-1 z-20 relative"
-                                        >
-                                            ✕
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <>
-                                        <input
-                                            type="file"
-                                            accept=".log,.txt"
-                                            onChange={e => setLogFile(e.target.files?.[0] || null)}
-                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                        />
-                                        <div className="h-14 w-full rounded-2xl bg-slate-50 flex items-center px-4 border-2 border-dashed border-slate-200 group-hover:border-indigo-300 group-hover:bg-indigo-50/50 transition-all">
-                                            <FileText className="w-5 h-5 text-slate-400 mr-3" />
-                                            <span className="text-xs font-black text-slate-500 truncate">
-                                                로그 파일 첨부
-                                            </span>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                        </div>
-
-                        <Button 
-                            type="submit" 
-                            className="w-full h-14 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-lg rounded-2xl shadow-indigo-100 shadow-xl transition-all" 
-                            isLoading={loading}
-                        >
-                            <UploadCloud className="mr-2 w-5 h-5" /> 문의 내용 전송하기
-                        </Button>
-                    </form>
-                </div>
-            </Modal>
         </div>
     );
 };
