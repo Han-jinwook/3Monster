@@ -143,10 +143,21 @@ export const CustomerSupport = () => {
 
     const fetchTickets = async () => {
         if (!user) return;
-        const { data, error } = await supabase
+        
+        let query = supabase
             .from('support_tickets')
-            .select('*')
-            .order('created_at', { ascending: false });
+            .select('*');
+        
+        if (role !== 'admin') {
+            const userEmail = verifiedEmail || user.email;
+            if (userEmail) {
+                query = query.or(`uid.eq.${user.id},email.eq.${userEmail.toLowerCase()}`);
+            } else {
+                query = query.eq('uid', user.id);
+            }
+        }
+        
+        const { data, error } = await query.order('created_at', { ascending: false });
         
         if (error) {
             console.error('Error fetching tickets:', error);
@@ -369,18 +380,33 @@ export const CustomerSupport = () => {
     };
 
     const isAdmin = role === 'admin';
-    const filteredTickets = tickets.filter(t => 
-        (t.email || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
-        (t.description || '').toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredTickets = tickets.filter(t => {
+        // 일반 유저라면 자신의 글만 보임 (이메일 매칭 혹은 UID 매칭)
+        const isOwn = 
+            (t.email && verifiedEmail && t.email.toLowerCase() === verifiedEmail.toLowerCase()) || 
+            (t.uid === user?.id);
+        
+        // Q&A 형식의 상품 질문글은 고객센터 메인 목록에서 제외시킵니다. (이후 상품 전용 Q&A 섹션에 노출되도록 함)
+        const isProductQna = t.issue_type && t.issue_type.startsWith('qna_');
+        if (isProductQna) return false;
+
+        if (!isAdmin && !isOwn) return false;
+
+        return (t.email || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+               (t.description || '').toLowerCase().includes(searchTerm.toLowerCase());
+    });
 
     return (
         <div className="max-w-6xl mx-auto space-y-8 pb-20 px-4">
             {/* Header Section */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div className="space-y-2">
-                    <h1 className="text-4xl font-black text-slate-900 tracking-tight">고객센터</h1>
-                    <p className="text-slate-400 font-bold">3Monster 서비스 이용 문의 및 버그 제보 게시판입니다.</p>
+                    <h1 className="text-4xl font-black text-slate-900 tracking-tight">
+                        {role === 'admin' ? '고객센터 관리' : (user && verifiedEmail ? '내 문의/답변' : '고객센터/문의')}
+                    </h1>
+                    <p className="text-slate-400 font-bold">
+                        {role === 'admin' ? '전체 고객 문의 리스트 및 관리 화면입니다.' : '3Monster 서비스 이용 문의 및 버그 제보 게시판입니다.'}
+                    </p>
                 </div>
                 {!isAdmin && (
                     <Button 

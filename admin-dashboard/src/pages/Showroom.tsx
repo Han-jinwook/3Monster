@@ -1,6 +1,9 @@
+import React, { useState, useEffect } from 'react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { supabase } from '../lib/supabase';
 import { 
     Layers, 
     Smartphone, 
@@ -11,8 +14,24 @@ import {
     Zap,
     MapPin,
     MessageCircle,
-    BellRing
+    BellRing,
+    ChevronDown,
+    ChevronUp,
+    FileText,
+    Image as ImageIcon
 } from 'lucide-react';
+import { cn } from '../lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
+
+interface ThreadMessage {
+    id: string;
+    sender: 'user' | 'admin';
+    sender_email: string;
+    text: string;
+    image_url?: string | null;
+    log_url?: string | null;
+    created_at: string;
+}
 
 const productCategories = [
     {
@@ -99,6 +118,230 @@ const productCategories = [
 ];
 
 export const Showroom = () => {
+    const { user, email: verifiedEmail, role } = useAuth();
+    const isAdmin = role === 'admin';
+
+    // Q&A state management
+    const [activeQnaProductId, setActiveQnaProductId] = useState<string | null>(null);
+    const [questions, setQuestions] = useState<any[]>([]);
+    const [loadingQuestions, setLoadingQuestions] = useState(false);
+    
+    // New Question States
+    const [newQuestionText, setNewQuestionText] = useState('');
+    const [newQuestionImage, setNewQuestionImage] = useState<File | null>(null);
+    const [newQuestionLog, setNewQuestionLog] = useState<File | null>(null);
+    const [isSubmittingQuestion, setIsSubmittingQuestion] = useState(false);
+
+    // Reply States (Mapped by ticket ID)
+    const [replyTextMap, setReplyTextMap] = useState<{[ticketId: string]: string}>({});
+    const [replyImageMap, setReplyImageMap] = useState<{[ticketId: string]: File | null}>({});
+    const [replyLogMap, setReplyLogMap] = useState<{[ticketId: string]: File | null}>({});
+    const [submittingReplyId, setSubmittingReplyId] = useState<string | null>(null);
+
+    // Expanded Q&A thread inside product Q&A list
+    const [expandedQuestionId, setExpandedQuestionId] = useState<string | null>(null);
+
+    const maskEmail = (email: string) => {
+        if (!email) return 'unknown';
+        const [userPart, domain] = email.split('@');
+        if (!domain) return email;
+        const masked = userPart.length > 2 ? userPart.substring(0, 2) + '*'.repeat(userPart.length - 2) : userPart + '*';
+        return `${masked}@${domain}`;
+    };
+
+    const handleUploadFile = async (file: File, folder: string): Promise<string> => {
+        if (!user) throw new Error('Not authenticated');
+        
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const filePath = `${user.id}/${folder}/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+            .from('support')
+            .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+            .from('support')
+            .getPublicUrl(filePath);
+
+        return publicUrl;
+    };
+
+    const fetchQuestions = async (productId: string) => {
+        setLoadingQuestions(true);
+        try {
+            const { data, error } = await supabase
+                .from('support_tickets')
+                .select('*')
+                .eq('issue_type', `qna_${productId}`)
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+            setQuestions(data || []);
+        } catch (e) {
+            console.error("Error fetching product questions:", e);
+        } finally {
+            setLoadingQuestions(false);
+        }
+    };
+
+    // Auto-fetch and real-time subscription when a product's Q&A is opened
+    useEffect(() => {
+        if (!activeQnaProductId) {
+            setQuestions([]);
+            return;
+        }
+
+        fetchQuestions(activeQnaProductId);
+
+        const channel = supabase
+            .channel(`qna-sync-${activeQnaProductId}`)
+            .on('postgres_changes', { 
+                event: '*', 
+                schema: 'public', 
+                table: 'support_tickets',
+                filter: `issue_type=eq.qna_${activeQnaProductId}`
+            }, () => {
+                fetchQuestions(activeQnaProductId);
+            })
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [activeQnaProductId]);
+
+    const handleSubmitQuestion = async (productId: string, e: React.FormEvent) => {
+        e.preventDefault();
+        if (!user) {
+            alert("로그인 혹은 이메일 인증이 필요합니다.");
+            return;
+        }
+        if (!newQuestionText.trim() && !newQuestionImage && !newQuestionLog) {
+            alert("내용을 입력하거나 파일을 첨부해주세요.");
+            return;
+        }
+
+        setIsSubmittingQuestion(true);
+        try {
+            let imageUrl = null;
+            let logUrl = null;
+
+            if (newQuestionImage) imageUrl = await handleUploadFile(newQuestionImage, 'qna/images');
+            if (newQuestionLog) logUrl = await handleUploadFile(newQuestionLog, 'qna/logs');
+
+            const { error: insertError } = await supabase
+                .from('support_tickets')
+                .insert([{
+                    uid: user.id,
+                    email: verifiedEmail || user.email || 'unknown@3monster.net',
+                    issue_type: `qna_${productId}`,
+                    description: newQuestionText,
+                    image_url: imageUrl,
+                    log_url: logUrl,
+                    status: 'open'
+                }]);
+
+            if (insertError) throw insertError;
+
+            setNewQuestionText('');
+            setNewQuestionImage(null);
+            setNewQuestionLog(null);
+            await fetchQuestions(productId);
+            alert("질문이 등록되었습니다.");
+        } catch (err: any) {
+            console.error("Error submitting question:", err);
+            alert(`질문 등록 중 오류가 발생했습니다: ${err.message}`);
+        } finally {
+            setIsSubmittingQuestion(false);
+        }
+    };
+
+    const parseThread = (ticket: any): ThreadMessage[] => {
+        if (!ticket.reply) return [];
+        try {
+            const parsed = JSON.parse(ticket.reply);
+            if (Array.isArray(parsed)) {
+                return parsed;
+            }
+        } catch (e) {
+            // Fail silent
+        }
+        
+        return [{
+            id: 'legacy',
+            sender: 'admin',
+            sender_email: 'admin@3monster.net',
+            text: ticket.reply,
+            image_url: null,
+            log_url: null,
+            created_at: ticket.replied_at || ticket.created_at
+        }];
+    };
+
+    const handleSubmitReply = async (ticket: any, nextStatus: 'open' | 'closed') => {
+        const replyText = replyTextMap[ticket.id] || '';
+        const replyImage = replyImageMap[ticket.id] || null;
+        const replyLog = replyLogMap[ticket.id] || null;
+
+        if (!replyText.trim() && !replyImage && !replyLog) {
+            alert("댓글 내용을 입력하거나 파일을 첨부해주세요.");
+            return;
+        }
+
+        setSubmittingReplyId(ticket.id);
+        try {
+            let imageUrl = null;
+            let logUrl = null;
+
+            if (replyImage) imageUrl = await handleUploadFile(replyImage, 'qna/replies/images');
+            if (replyLog) logUrl = await handleUploadFile(replyLog, 'qna/replies/logs');
+
+            const currentThread = parseThread(ticket);
+
+            const newMessage: ThreadMessage = {
+                id: Date.now().toString(),
+                sender: isAdmin ? 'admin' : 'user',
+                sender_email: verifiedEmail || user?.email || 'unknown@3monster.net',
+                text: replyText,
+                image_url: imageUrl,
+                log_url: logUrl,
+                created_at: new Date().toISOString()
+            };
+
+            const updatedThread = [...currentThread, newMessage];
+            
+            const { error: updateError } = await supabase
+                .from('support_tickets')
+                .update({
+                    reply: JSON.stringify(updatedThread),
+                    status: nextStatus,
+                    replied_at: new Date().toISOString()
+                })
+                .eq('id', ticket.id);
+
+            if (updateError) throw updateError;
+
+            // Clear map states
+            setReplyTextMap(prev => ({ ...prev, [ticket.id]: '' }));
+            setReplyImageMap(prev => ({ ...prev, [ticket.id]: null }));
+            setReplyLogMap(prev => ({ ...prev, [ticket.id]: null }));
+            
+            if (activeQnaProductId) {
+                await fetchQuestions(activeQnaProductId);
+            }
+            
+            alert("댓글이 등록되었습니다.");
+        } catch (err: any) {
+            console.error("Error submitting reply:", err);
+            alert(`댓글 등록 중 오류가 발생했습니다: ${err.message}`);
+        } finally {
+            setSubmittingReplyId(null);
+        }
+    };
+
     return (
         <div className="max-w-7xl mx-auto space-y-20 py-12 px-6">
             {/* Hero Banner Section */}
@@ -157,26 +400,46 @@ export const Showroom = () => {
                         {category.products.map((product) => (
                             <Card 
                                 key={product.id} 
-                                className="group overflow-hidden border-none shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2.5rem] bg-white h-full flex flex-col"
+                                className="group overflow-hidden border-none shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2.5rem] bg-white h-full flex flex-col cursor-pointer"
+                                onClick={() => {
+                                    if (activeQnaProductId === product.id) {
+                                        setActiveQnaProductId(null);
+                                        setExpandedQuestionId(null);
+                                    } else {
+                                        setActiveQnaProductId(product.id);
+                                        setExpandedQuestionId(null);
+                                    }
+                                }}
                             >
                                 <div className={`h-3 p-0 w-full bg-gradient-to-r ${product.color}`} />
                                 <div className="p-10 space-y-8 flex-1 flex flex-col">
-                                    <div className="flex justify-between items-start">
-                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-white shadow-lg bg-gradient-to-br ${product.color}`}>
-                                            <product.icon className="w-7 h-7" />
+                                    <div className="flex items-start justify-between gap-4">
+                                        <div className="space-y-3 flex-1">
+                                            <div className="flex items-center gap-2">
+                                                {product.badge && (
+                                                    <span className={cn(
+                                                        "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider",
+                                                        "bg-indigo-50 text-indigo-600"
+                                                    )}>
+                                                        {product.badge}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <h3 className="text-2xl font-black text-slate-900">{product.title}</h3>
+                                            <p className="text-indigo-600 font-black text-sm">{product.subtitle}</p>
                                         </div>
-                                        <span className="px-3.5 py-1 rounded-full bg-slate-100 text-slate-500 text-[10px] font-black uppercase tracking-wider">
-                                            {product.badge}
-                                        </span>
+                                        {product.icon && (
+                                            <div className={cn(
+                                                "w-12 h-12 rounded-2xl flex items-center justify-center bg-slate-50 text-slate-700 shrink-0"
+                                            )}>
+                                                <product.icon className="w-6 h-6" />
+                                            </div>
+                                        )}
                                     </div>
 
-                                    <div className="space-y-3">
-                                        <h3 className="text-2xl font-black text-slate-900">{product.title}</h3>
-                                        <p className="text-indigo-600 font-black text-sm">{product.subtitle}</p>
-                                        <p className="text-slate-500 font-medium text-sm leading-relaxed">
-                                            {product.description}
-                                        </p>
-                                    </div>
+                                    <p className="text-slate-500 font-medium text-sm leading-relaxed">
+                                        {product.description}
+                                    </p>
 
                                     <div className="grid grid-cols-1 gap-2 pt-2">
                                         {product.features.map(f => (
@@ -187,13 +450,355 @@ export const Showroom = () => {
                                     </div>
 
                                     <div className="pt-6 mt-auto flex gap-3">
-                                        <Link to="/support" className="flex-1">
+                                        <Button 
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                if (activeQnaProductId === product.id) {
+                                                    setActiveQnaProductId(null);
+                                                    setExpandedQuestionId(null);
+                                                } else {
+                                                    setActiveQnaProductId(product.id);
+                                                    setExpandedQuestionId(null);
+                                                }
+                                            }}
+                                            variant="outline"
+                                            className={cn(
+                                                "flex-1 h-12 rounded-xl font-bold transition-all flex items-center justify-center gap-2 border-slate-200",
+                                                activeQnaProductId === product.id ? "bg-indigo-50 border-indigo-200 text-indigo-600 font-black" : "hover:bg-slate-50 text-slate-700"
+                                            )}
+                                        >
+                                            <MessageSquare className="w-4 h-4" /> 질문/답변보기
+                                        </Button>
+                                        <Link 
+                                            to="/support" 
+                                            className="flex-1"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
                                             <Button className="w-full h-12 bg-slate-900 hover:bg-indigo-600 text-white rounded-xl font-bold transition-all flex items-center justify-center gap-2">
                                                 이용 및 도입 문의 <ArrowRight className="w-4 h-4" />
                                             </Button>
                                         </Link>
                                     </div>
                                 </div>
+                                
+                                {/* Q&A Panel Section */}
+                                <AnimatePresence>
+                                    {activeQnaProductId === product.id && (
+                                        <motion.div
+                                            initial={{ opacity: 0, height: 0 }}
+                                            animate={{ opacity: 1, height: 'auto' }}
+                                            exit={{ opacity: 0, height: 0 }}
+                                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                                            className="overflow-hidden bg-slate-50/50 border-t border-slate-100 px-10 py-8 space-y-6"
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <h4 className="text-base font-black text-slate-800 flex items-center gap-2">
+                                                    <MessageSquare className="w-5 h-5 text-indigo-600" /> '{product.title}' 질문/답변 게시판
+                                                </h4>
+                                            </div>
+
+                                            {/* 1. New Question Registration Form */}
+                                            {user ? (
+                                                <form onSubmit={(e) => handleSubmitQuestion(product.id, e)} className="space-y-4 bg-white p-5 rounded-2xl border border-indigo-50/50 shadow-sm text-left">
+                                                    <p className="text-[10px] font-black text-indigo-500 pl-1 uppercase tracking-wider">🙋‍♂️ 새 질문 등록</p>
+                                                    <div className="relative">
+                                                        <textarea
+                                                            placeholder="제품에 대해 궁금한 점을 적어주세요. 개발진이 직접 답변해 드립니다."
+                                                            value={newQuestionText}
+                                                            onChange={(e) => setNewQuestionText(e.target.value)}
+                                                            className="w-full min-h-[90px] rounded-xl bg-slate-50 p-4 text-xs font-bold border-none outline-none focus:ring-2 focus:ring-indigo-100 transition-all resize-none placeholder:text-slate-355 text-slate-800"
+                                                        />
+                                                    </div>
+
+                                                    <div className="flex flex-wrap items-center justify-between gap-3">
+                                                        <div className="flex gap-2">
+                                                            <div className="relative group">
+                                                                <input
+                                                                    type="file"
+                                                                    accept="image/*"
+                                                                    onChange={e => setNewQuestionImage(e.target.files?.[0] || null)}
+                                                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                                                />
+                                                                <div className="h-9 px-3 rounded-lg bg-slate-50 hover:bg-indigo-50 border border-slate-200/60 hover:border-indigo-300 flex items-center transition-all">
+                                                                    <ImageIcon className="w-3.5 h-3.5 text-slate-400 mr-1.5" />
+                                                                    <span className="text-[11px] font-black text-slate-500 truncate max-w-[100px]">
+                                                                        {newQuestionImage ? newQuestionImage.name : '사진 첨부'}
+                                                                    </span>
+                                                                    {newQuestionImage && (
+                                                                        <button 
+                                                                            type="button"
+                                                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setNewQuestionImage(null); }}
+                                                                            className="ml-1.5 text-slate-400 hover:text-rose-500 font-bold text-xs z-20"
+                                                                        >
+                                                                            ✕
+                                                                        </button>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                            <div className="relative group">
+                                                                <input
+                                                                    type="file"
+                                                                    accept=".log,.txt"
+                                                                    onChange={e => setNewQuestionLog(e.target.files?.[0] || null)}
+                                                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                                                />
+                                                                <div className="h-9 px-3 rounded-lg bg-slate-50 hover:bg-indigo-50 border border-slate-200/60 hover:border-indigo-300 flex items-center transition-all">
+                                                                    <FileText className="w-3.5 h-3.5 text-slate-400 mr-1.5" />
+                                                                    <span className="text-[11px] font-black text-slate-500 truncate max-w-[100px]">
+                                                                        {newQuestionLog ? newQuestionLog.name : '로그 첨부'}
+                                                                    </span>
+                                                                    {newQuestionLog && (
+                                                                        <button 
+                                                                            type="button"
+                                                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setNewQuestionLog(null); }}
+                                                                            className="ml-1.5 text-slate-400 hover:text-rose-500 font-bold text-xs z-20"
+                                                                        >
+                                                                            ✕
+                                                                        </button>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <Button 
+                                                            type="submit" 
+                                                            isLoading={isSubmittingQuestion}
+                                                            className="h-9 px-5 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs rounded-xl shadow-md shadow-indigo-100 transition-all"
+                                                        >
+                                                            질문 등록하기
+                                                        </Button>
+                                                    </div>
+                                                </form>
+                                            ) : (
+                                                <div className="bg-indigo-50/40 p-5 rounded-2xl border border-indigo-50 flex flex-col sm:flex-row items-center justify-between gap-3 text-left">
+                                                    <p className="text-xs text-indigo-900 font-bold">🙋‍♂️ 이 제품에 대해 궁금한 점을 질문하고 답변을 확인해 보세요!</p>
+                                                    <Link to="/support">
+                                                        <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs rounded-xl h-10 px-5 shadow-lg shadow-indigo-100">
+                                                            이메일 인증/로그인하기
+                                                        </Button>
+                                                    </Link>
+                                                </div>
+                                            )}
+
+                                            {/* 2. Questions List & Threads */}
+                                            <div className="space-y-3 text-left">
+                                                {loadingQuestions ? (
+                                                    <p className="text-xs font-bold text-slate-400 text-center py-6 animate-pulse">질문을 불러오는 중...</p>
+                                                ) : questions.length === 0 ? (
+                                                    <p className="text-xs font-bold text-slate-400 text-center py-8 bg-white rounded-2xl border border-slate-100">
+                                                        등록된 질문이 없습니다. 첫 질문을 남겨보세요!
+                                                    </p>
+                                                ) : (
+                                                    questions.map((q) => {
+                                                        const isQExpanded = expandedQuestionId === q.id;
+                                                        const thread = parseThread(q);
+                                                        const isQOwner = q.uid === user?.id || (q.email && verifiedEmail && q.email.toLowerCase() === verifiedEmail.toLowerCase());
+                                                        const canReply = isQOwner || isAdmin;
+
+                                                        return (
+                                                            <div key={q.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden transition-all duration-300">
+                                                                {/* Question Header (Click to expand) */}
+                                                                <div 
+                                                                    onClick={() => setExpandedQuestionId(isQExpanded ? null : q.id)}
+                                                                    className={cn(
+                                                                        "p-5 cursor-pointer flex items-center justify-between gap-4 transition-all hover:bg-slate-50/50",
+                                                                        isQExpanded && "bg-slate-50/30 border-b border-slate-100/50"
+                                                                    )}
+                                                                >
+                                                                    <div className="space-y-1.5 flex-1 min-w-0">
+                                                                        <div className="flex flex-wrap items-center gap-2">
+                                                                            <span className="text-[10px] font-black text-slate-400 bg-slate-100 px-2 py-0.5 rounded uppercase tracking-wider">
+                                                                                {maskEmail(q.email)}
+                                                                            </span>
+                                                                            <span className="text-[9px] font-bold text-slate-300">
+                                                                                {new Date(q.created_at).toLocaleString()}
+                                                                            </span>
+                                                                            {q.status === 'closed' ? (
+                                                                                <span className="text-[9px] font-black bg-emerald-50 text-emerald-500 px-2 py-0.5 rounded">답변 완료</span>
+                                                                            ) : (
+                                                                                <span className="text-[9px] font-black bg-indigo-50 text-indigo-500 px-2 py-0.5 rounded">대기중</span>
+                                                                            )}
+                                                                        </div>
+                                                                        <p className="text-xs font-black text-slate-800 leading-relaxed truncate">
+                                                                            {q.description}
+                                                                        </p>
+                                                                    </div>
+                                                                    <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400">
+                                                                        {isQExpanded ? <ChevronUp className="w-4 h-4 text-indigo-500" /> : <ChevronDown className="w-4 h-4 text-slate-350" />}
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Question Detail & Reply Thread */}
+                                                                {isQExpanded && (
+                                                                    <div className="p-5 bg-slate-50/20 space-y-5">
+                                                                        {/* Question Main Body */}
+                                                                        <div className="space-y-3">
+                                                                            <p className="text-xs text-slate-600 font-bold leading-relaxed whitespace-pre-wrap">
+                                                                                {q.description}
+                                                                            </p>
+                                                                            {(q.image_url || q.log_url) && (
+                                                                                <div className="flex flex-wrap gap-2 pt-1">
+                                                                                    {q.image_url && (
+                                                                                        <a href={q.image_url} target="_blank" rel="noopener noreferrer" 
+                                                                                           className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-white hover:bg-slate-50 border border-slate-200/50 text-slate-700 rounded-lg text-[10px] font-black transition-all">
+                                                                                            <ImageIcon className="w-3.5 h-3.5 text-slate-400" /> 스크린샷 보기
+                                                                                        </a>
+                                                                                    )}
+                                                                                    {q.log_url && (
+                                                                                        <a href={q.log_url} target="_blank" rel="noopener noreferrer" 
+                                                                                           className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-white hover:bg-slate-50 border border-slate-200/50 text-slate-700 rounded-lg text-[10px] font-black transition-all">
+                                                                                            <FileText className="w-3.5 h-3.5 text-slate-400" /> 로그 다운로드
+                                                                                        </a>
+                                                                                    )}
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+
+                                                                        {/* Thread Timeline Messages */}
+                                                                        <div className="space-y-3 pt-4 border-t border-slate-100 flex flex-col">
+                                                                            {thread.length === 0 ? (
+                                                                                <p className="text-[10px] font-bold text-slate-400 text-center py-2 italic">아직 달린 답변이 없습니다.</p>
+                                                                            ) : (
+                                                                                thread.map((msg) => {
+                                                                                    const isMsgAdmin = msg.sender === 'admin';
+                                                                                    return (
+                                                                                        <div 
+                                                                                            key={msg.id} 
+                                                                                            className={cn(
+                                                                                                "flex flex-col max-w-[85%] p-3.5 rounded-xl shadow-xs border transition-all duration-300",
+                                                                                                isMsgAdmin 
+                                                                                                    ? "bg-emerald-50/50 border-emerald-100/50 ml-auto rounded-tr-none" 
+                                                                                                    : "bg-indigo-50/40 border-indigo-100/30 mr-auto rounded-tl-none"
+                                                                                            )}
+                                                                                        >
+                                                                                            <div className="flex items-center gap-1.5 mb-1 justify-between">
+                                                                                                <span className={cn(
+                                                                                                    "text-[10px] font-black",
+                                                                                                    isMsgAdmin ? "text-emerald-700" : "text-indigo-700"
+                                                                                                )}>
+                                                                                                    {isMsgAdmin ? "🛡️ 관리자" : `👤 ${maskEmail(msg.sender_email)}`}
+                                                                                                </span>
+                                                                                                <span className="text-[8px] font-bold text-slate-400">
+                                                                                                    {new Date(msg.created_at).toLocaleString()}
+                                                                                                </span>
+                                                                                            </div>
+                                                                                            <p className={cn(
+                                                                                                "text-xs font-semibold leading-relaxed whitespace-pre-wrap",
+                                                                                                isMsgAdmin ? "text-emerald-900" : "text-slate-750"
+                                                                                            )}>
+                                                                                                {msg.text}
+                                                                                            </p>
+                                                                                            {(msg.image_url || msg.log_url) && (
+                                                                                                <div className="mt-2 pt-2 border-t border-slate-100/50 flex gap-1.5">
+                                                                                                    {msg.image_url && (
+                                                                                                        <a href={msg.image_url} target="_blank" rel="noopener noreferrer" 
+                                                                                                           className="inline-flex items-center gap-1 px-2 py-1 bg-white hover:bg-slate-50 border border-slate-100 rounded text-[9px] font-black">
+                                                                                                            스크린샷
+                                                                                                        </a>
+                                                                                                    )}
+                                                                                                    {msg.log_url && (
+                                                                                                        <a href={msg.log_url} target="_blank" rel="noopener noreferrer" 
+                                                                                                           className="inline-flex items-center gap-1 px-2 py-1 bg-white hover:bg-slate-50 border border-slate-100 rounded text-[9px] font-black">
+                                                                                                            로그
+                                                                                                        </a>
+                                                                                                    )}
+                                                                                                </div>
+                                                                                            )}
+                                                                                        </div>
+                                                                                    );
+                                                                                })
+                                                                            )}
+                                                                        </div>
+
+                                                                        {/* Reply Form (Visible to Admin or Question Owner) */}
+                                                                        {canReply ? (
+                                                                            <div className="pt-4 border-t border-slate-100 space-y-3">
+                                                                                <textarea
+                                                                                    placeholder="추가 문의사항이나 답변을 입력해주세요..."
+                                                                                    value={replyTextMap[q.id] || ''}
+                                                                                    onChange={(e) => setReplyTextMap(prev => ({ ...prev, [q.id]: e.target.value }))}
+                                                                                    className="w-full min-h-[70px] rounded-xl bg-white p-3 text-xs font-bold border border-slate-200 outline-none focus:ring-2 focus:ring-indigo-100 transition-all resize-none text-slate-800 placeholder:text-slate-300"
+                                                                                />
+                                                                                
+                                                                                <div className="flex flex-wrap items-center justify-between gap-2">
+                                                                                    <div className="flex gap-1.5">
+                                                                                        <div className="relative group">
+                                                                                            <input
+                                                                                                type="file"
+                                                                                                accept="image/*"
+                                                                                                onChange={e => setReplyImageMap(prev => ({ ...prev, [q.id]: e.target.files?.[0] || null }))}
+                                                                                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                                                                            />
+                                                                                            <div className="h-8 px-2.5 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 flex items-center transition-all">
+                                                                                                <ImageIcon className="w-3.5 h-3.5 text-slate-400 mr-1" />
+                                                                                                <span className="text-[10px] font-black text-slate-500 truncate max-w-[80px]">
+                                                                                                    {replyImageMap[q.id] ? replyImageMap[q.id]?.name : '사진'}
+                                                                                                </span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div className="relative group">
+                                                                                            <input
+                                                                                                type="file"
+                                                                                                accept=".log,.txt"
+                                                                                                onChange={e => setReplyLogMap(prev => ({ ...prev, [q.id]: e.target.files?.[0] || null }))}
+                                                                                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                                                                            />
+                                                                                            <div className="h-8 px-2.5 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 flex items-center transition-all">
+                                                                                                <FileText className="w-3.5 h-3.5 text-slate-400 mr-1" />
+                                                                                                <span className="text-[10px] font-black text-slate-500 truncate max-w-[80px]">
+                                                                                                    {replyLogMap[q.id] ? replyLogMap[q.id]?.name : '로그'}
+                                                                                                </span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    
+                                                                                    <div className="flex gap-2">
+                                                                                        {isAdmin ? (
+                                                                                            <>
+                                                                                                <Button 
+                                                                                                    onClick={() => handleSubmitReply(q, 'open')}
+                                                                                                    isLoading={submittingReplyId === q.id}
+                                                                                                    disabled={!(replyTextMap[q.id] || '').trim() && !replyImageMap[q.id] && !replyLogMap[q.id]}
+                                                                                                    className="h-8 px-3 bg-slate-200 hover:bg-slate-350 text-slate-700 rounded-lg text-[10px] font-black transition-all"
+                                                                                                >
+                                                                                                    대기등록
+                                                                                                </Button>
+                                                                                                <Button 
+                                                                                                    onClick={() => handleSubmitReply(q, 'closed')}
+                                                                                                    isLoading={submittingReplyId === q.id}
+                                                                                                    disabled={!(replyTextMap[q.id] || '').trim() && !replyImageMap[q.id] && !replyLogMap[q.id]}
+                                                                                                    className="h-8 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-black transition-all shadow-md shadow-emerald-100"
+                                                                                                >
+                                                                                                    답변완료
+                                                                                                </Button>
+                                                                                            </>
+                                                                                        ) : (
+                                                                                            <Button 
+                                                                                                onClick={() => handleSubmitReply(q, 'open')}
+                                                                                                isLoading={submittingReplyId === q.id}
+                                                                                                disabled={!(replyTextMap[q.id] || '').trim() && !replyImageMap[q.id] && !replyLogMap[q.id]}
+                                                                                                className="h-8 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-[10px] font-black transition-all shadow-md shadow-indigo-100"
+                                                                                            >
+                                                                                                댓글 등록
+                                                                                            </Button>
+                                                                                        )}
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        ) : (
+                                                                            <p className="text-[10px] text-slate-400 text-center italic pt-4 border-t border-slate-100">
+                                                                                질문 작성자 및 관리자만 대댓글을 달 수 있습니다.
+                                                                            </p>
+                                                                        )}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })
+                                                )}
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </Card>
                         ))}
                     </div>

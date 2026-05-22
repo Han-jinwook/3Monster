@@ -75,7 +75,7 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                                 className="h-10 px-5 rounded-xl font-bold flex items-center gap-2 border-slate-200"
                             >
                                 <HelpCircle className="w-4 h-4" />
-                                고객센터/문의
+                                {role === 'admin' ? '고객센터 관리' : (user && email ? '내 문의/답변' : '고객센터/문의')}
                             </Button>
                         </Link>
 
@@ -145,7 +145,8 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                         <div className="flex flex-col gap-3">
                             <Link to="/support" onClick={() => setMobileMenuOpen(false)} className="w-full">
                                 <Button variant="outline" className="w-full h-11 font-bold flex items-center justify-center gap-2 border-slate-200">
-                                    <HelpCircle className="w-4 h-4" /> 고객센터/문의
+                                    <HelpCircle className="w-4 h-4" /> 
+                                    {role === 'admin' ? '고객센터 관리' : (user && email ? '내 문의/답변' : '고객센터/문의')}
                                 </Button>
                             </Link>
                             
