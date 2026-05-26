@@ -417,15 +417,6 @@ export const CustomerSupport = () => {
     return (
         <div className="w-full bg-[#f8fafc] py-6 px-4 min-h-screen">
             <div className="max-w-7xl mx-auto space-y-5 pb-10">
-            {/* Header Section */}
-            <div className="space-y-1">
-                <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
-                    {role === 'admin' ? '고객센터 관리' : (user && verifiedEmail ? '내 문의/답변' : '고객센터/문의')}
-                </h1>
-                <p className="text-slate-500 font-medium text-xs">
-                    {role === 'admin' ? '전체 고객 문의 리스트 및 관리 화면입니다.' : '3Monster 서비스 이용 문의 및 버그 제보 게시판입니다.'}
-                </p>
-            </div>
 
             {/* Main Content Layout */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
