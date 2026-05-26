@@ -763,29 +763,29 @@ export const CustomerSupport = () => {
                                             </div>
                                             
                                             {isExpanded && canViewDetail && (
-                                                <div className="px-8 pb-8 pt-2 bg-indigo-50/30">
-                                                    <div className="p-8 bg-white rounded-[2rem] shadow-sm border border-indigo-50/50 space-y-8">
+                                                <div className="px-6 pb-6 pt-2 bg-indigo-50/30">
+                                                    <div className="p-6 bg-white rounded-[2rem] shadow-sm border border-indigo-50/55 space-y-6">
                                                         <div>
-                                                            <div className="flex items-center gap-2 mb-6 text-indigo-600">
-                                                                <FileText className="w-5 h-5" />
-                                                                <h3 className="font-black text-lg">상세 내용</h3>
+                                                            <div className="flex items-center gap-1.5 mb-4 text-indigo-600">
+                                                                <FileText className="w-4 h-4" />
+                                                                <h3 className="font-black text-sm">상세 내용</h3>
                                                             </div>
-                                                            <p className="text-slate-600 font-bold leading-relaxed whitespace-pre-wrap text-base">
+                                                            <p className="text-slate-600 font-semibold leading-relaxed whitespace-pre-wrap text-sm">
                                                                 {ticket.description}
                                                             </p>
                                                             
                                                             {(ticket.image_url || ticket.log_url) && (
-                                                                <div className="mt-8 pt-8 border-t border-slate-50 flex flex-wrap gap-4">
+                                                                <div className="mt-6 pt-6 border-t border-slate-50 flex flex-wrap gap-3">
                                                                     {ticket.image_url && (
                                                                         <a href={ticket.image_url} target="_blank" rel="noopener noreferrer" 
-                                                                        className="flex items-center gap-3 px-6 py-4 bg-slate-50 hover:bg-indigo-50 text-slate-700 hover:text-indigo-600 rounded-2xl text-sm font-black transition-all group/link">
-                                                                            <ImageIcon className="w-5 h-5" /> 스크린샷 보기 <ExternalLink className="w-4 h-4 opacity-30 group-hover/link:opacity-100" />
+                                                                        className="flex items-center gap-2 px-4 py-3 bg-slate-50 hover:bg-indigo-50 text-slate-700 hover:text-indigo-600 rounded-xl text-xs font-black transition-all group/link">
+                                                                            <ImageIcon className="w-4 h-4" /> 스크린샷 보기 <ExternalLink className="w-3.5 h-3.5 opacity-30 group-hover/link:opacity-100" />
                                                                         </a>
                                                                     )}
                                                                     {ticket.log_url && (
                                                                         <a href={ticket.log_url} target="_blank" rel="noopener noreferrer" 
-                                                                        className="flex items-center gap-3 px-6 py-4 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-2xl text-sm font-black transition-all">
-                                                                            <FileText className="w-5 h-5" /> 로그 파일 다운로드 <ExternalLink className="w-4 h-4 opacity-30" />
+                                                                        className="flex items-center gap-2 px-4 py-3 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-black transition-all">
+                                                                            <FileText className="w-4 h-4" /> 로그 파일 다운로드 <ExternalLink className="w-3.5 h-3.5 opacity-30" />
                                                                         </a>
                                                                     )}
                                                                 </div>
@@ -793,10 +793,10 @@ export const CustomerSupport = () => {
                                                         </div>
 
                                                         {/* Thread & Reply Section */}
-                                                        <div className="pt-8 border-t border-slate-100 space-y-6">
-                                                            <div className="flex items-center gap-2 text-indigo-600">
-                                                                <CheckCircle2 className="w-5 h-5" />
-                                                                <h3 className="font-black text-lg">대화 기록 및 댓글</h3>
+                                                        <div className="pt-6 border-t border-slate-100 space-y-5">
+                                                            <div className="flex items-center gap-1.5 text-indigo-600">
+                                                                <CheckCircle2 className="w-4 h-4" />
+                                                                <h3 className="font-black text-sm">대화 기록 및 댓글</h3>
                                                             </div>
 
                                                             {/* Thread History */}
