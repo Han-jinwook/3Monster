@@ -1,8 +1,8 @@
 # 🗄 Supabase 전역 DB 스키마 명세서
 
 - **문서 번호**: 3M-DOC-002
-- **버전**: v1.0
-- **갱신 일시**: 2026-05-18
+- **버전**: v1.1
+- **갱신 일시**: 2026-05-26
 - **관리 주체**: Monster 총괄 AI (Hub AI)
 
 ---
@@ -65,9 +65,24 @@
 | **image_url** | TEXT | NULLABLE | 첨부 이미지 URL (Supabase Storage 경로) |
 | **log_url** | TEXT | NULLABLE | 첨부 로그 파일 URL (Supabase Storage 경로) |
 | **status** | TEXT | DEFAULT 'open' | 티켓 진행 상태 (`open`, `in_progress`, `resolved`, `closed`) |
-| **reply** | TEXT | NULLABLE | 관리자 답변 본문 |
+| **reply** | TEXT | NULLABLE | 문의에 대한 대화 기록 및 댓글 목록 (JSON 포맷의 ThreadMessage[] 문자열) |
 | **replied_at** | TIMESTAMPTZ | NULLABLE | 답변 등록 일시 |
 | **created_at** | TIMESTAMPTZ | DEFAULT now() | 문의 등록 일시 |
+
+> **reply JSON 구조 (ThreadMessage[])**:
+> ```json
+> [
+>   {
+>     "id": "string (메시지 고유 ID)",
+>     "sender": "user | admin",
+>     "sender_email": "string",
+>     "text": "string (메시지 내용)",
+>     "image_url": "string | null (첨부 이미지 URL)",
+>     "log_url": "string | null (첨부 로그 URL)",
+>     "created_at": "string (ISO 8601 일시)"
+>   }
+> ]
+> ```
 
 ---
 
