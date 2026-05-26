@@ -424,9 +424,8 @@ export const CustomerSupport = () => {
             {/* Main Content Layout */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 
-                {/* Left side: Inquiry Form (Visible only for non-admin) */}
-                {!isAdmin && (
-                    <div className="lg:col-span-5 space-y-6">
+                {/* Left side: Inquiry Form */}
+                <div className="lg:col-span-5 space-y-6">
                         <Card className="p-6 bg-white border-none shadow-sm rounded-3xl border border-slate-100">
                             <h3 className="text-xl font-black text-slate-800 mb-6 flex items-center gap-2">
                                 <Plus className="w-5 h-5 text-indigo-500" /> 새 문의 등록하기
@@ -647,13 +646,9 @@ export const CustomerSupport = () => {
                             </div>
                         </Card>
                     </div>
-                )}
 
-                {/* Right side: Ticket List (Admin: span 12, Buyer/User: span 7) */}
-                <div className={cn(
-                    "space-y-6",
-                    isAdmin ? "lg:col-span-12" : "lg:col-span-7"
-                )}>
+                {/* Right side: Ticket List */}
+                <div className="lg:col-span-7 space-y-6">
                     {/* List View Main */}
                     <div className="flex flex-col sm:flex-row gap-4">
                         <div className="relative flex-1 group">
