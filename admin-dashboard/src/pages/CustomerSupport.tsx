@@ -426,10 +426,13 @@ export const CustomerSupport = () => {
                 
                 {/* Left side: Inquiry Form */}
                 <div className="lg:col-span-5 space-y-6">
-                        <Card className="p-6 bg-white border-none shadow-sm rounded-3xl border border-slate-100">
-                            <h3 className="text-xl font-black text-slate-800 mb-6 flex items-center gap-2">
-                                <Plus className="w-5 h-5 text-indigo-500" /> 새 문의 등록하기
+                    <Card className="p-8 bg-white border border-slate-200/80 shadow-[0_8px_30px_rgb(0,0,0,0.03)] hover:shadow-[0_15px_40px_rgb(0,0,0,0.05)] rounded-[2rem] transition-all duration-300">
+                        <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
+                            <h3 className="text-xl font-black bg-gradient-to-r from-slate-900 to-indigo-950 bg-clip-text text-transparent flex items-center gap-2">
+                                <Plus className="w-5 h-5 text-indigo-600" /> 새 문의 등록하기
                             </h3>
+                            <span className="text-[10px] px-2.5 py-1 bg-indigo-50 text-indigo-600 font-bold rounded-lg uppercase tracking-wider">Fast Support</span>
+                        </div>
 
                             <div className="space-y-6">
                                 {success && (
@@ -455,8 +458,8 @@ export const CustomerSupport = () => {
                                                 value={contactEmail}
                                                 onChange={e => setContactEmail(e.target.value)}
                                                 className={cn(
-                                                    "h-14 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 transition-all",
-                                                    purchasedLicenses.length > 0 ? "ring-2 ring-emerald-500 bg-emerald-50/30" : "focus:ring-indigo-100"
+                                                    "h-14 bg-white border border-slate-200 hover:border-slate-300 rounded-2xl font-bold focus:ring-4 focus:border-indigo-500 transition-all shadow-sm",
+                                                    purchasedLicenses.length > 0 ? "ring-2 ring-emerald-500 border-emerald-500 bg-emerald-50/10 focus:ring-emerald-100/50" : "focus:ring-indigo-100/50"
                                                 )}
                                             />
                                             {isCheckingLicenses && <p className="text-[10px] font-bold text-slate-400 mt-1 ml-2 animate-pulse">인증 정보 확인 중...</p>}
@@ -476,16 +479,19 @@ export const CustomerSupport = () => {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest pl-2">문의 유형</label>
-                                            <select
-                                                className="w-full h-14 rounded-2xl bg-slate-50 px-5 text-sm font-bold border-none outline-none focus:ring-2 focus:ring-indigo-100 transition-all appearance-none"
-                                                value={issueType}
-                                                onChange={e => setIssueType(e.target.value)}
-                                            >
-                                                <option value="bug">버그/오류 신고</option>
-                                                <option value="feature">기능 제안/문의</option>
-                                                <option value="license">라이선스 관련</option>
-                                                <option value="other">기타</option>
-                                            </select>
+                                            <div className="relative">
+                                                <select
+                                                    className="w-full h-14 rounded-2xl bg-white border border-slate-200 hover:border-slate-300 px-5 pr-12 text-sm font-bold outline-none focus:ring-4 focus:ring-indigo-100/50 focus:border-indigo-500 transition-all appearance-none cursor-pointer shadow-sm"
+                                                    value={issueType}
+                                                    onChange={e => setIssueType(e.target.value)}
+                                                >
+                                                    <option value="bug">버그/오류 신고</option>
+                                                    <option value="feature">기능 제안/문의</option>
+                                                    <option value="license">라이선스 관련</option>
+                                                    <option value="other">기타</option>
+                                                </select>
+                                                <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                                            </div>
                                         </div>
                                     </div>
 
@@ -499,7 +505,7 @@ export const CustomerSupport = () => {
                                                 placeholder="크몽 닉네임을 입력하시면 구매하신 상품이 자동 매칭됩니다."
                                                 value={kmongNickname}
                                                 onChange={e => setKmongNickname(e.target.value)}
-                                                className="h-14 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-100 transition-all"
+                                                className="h-14 bg-white border border-slate-200 hover:border-slate-300 rounded-2xl font-bold focus:ring-4 focus:ring-indigo-100/50 focus:border-indigo-500 transition-all shadow-sm"
                                             />
                                             {kmongNickname.trim() && !isCheckingLicenses && purchasedLicenses.length === 0 && (
                                                 <p className="text-[10px] text-amber-500 font-bold mt-1 ml-2">
@@ -514,38 +520,41 @@ export const CustomerSupport = () => {
                                         <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest pl-2">
                                             문의 대상 제품 <span className="text-indigo-500 font-bold">*필수</span>
                                         </label>
-                                        {purchasedLicenses.length > 0 ? (
-                                            <select
-                                                required
-                                                className="w-full h-14 rounded-2xl bg-slate-50 px-5 text-sm font-bold border-none outline-none focus:ring-2 focus:ring-emerald-100 transition-all appearance-none"
-                                                value={selectedLicenseId}
-                                                onChange={e => {
-                                                    setSelectedLicenseId(e.target.value);
-                                                    const lic = purchasedLicenses.find(l => l.id === e.target.value);
-                                                    if (lic) setSelectedProduct(lic.product_id);
-                                                }}
-                                            >
-                                                <option value="">-- 문의할 보유 라이선스 선택 --</option>
-                                                {purchasedLicenses.map((lic) => (
-                                                    <option key={lic.id} value={lic.id}>
-                                                        {lic.product_id} ({lic.serial_key ? lic.serial_key.substring(0, 8) + '...' : '시리얼 없음'}) - {lic.buyer_name || '이름 없음'}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        ) : (
-                                            <select
-                                                required
-                                                className="w-full h-14 rounded-2xl bg-slate-50 px-5 text-sm font-bold border-none outline-none focus:ring-2 focus:ring-indigo-100 transition-all appearance-none"
-                                                value={selectedProduct}
-                                                onChange={e => setSelectedProduct(e.target.value)}
-                                            >
-                                                <option value="PlaceDB">PlaceDB (플레이스디비)</option>
-                                                <option value="CafeMonster">Cafe Monster (카페몬스터)</option>
-                                                <option value="AppMonster">App Monster (앱몬스터)</option>
-                                                <option value="MarketingMonster">Marketing Monster (마케팅몬스터)</option>
-                                                <option value="Other">기타 / 공통 문의</option>
-                                            </select>
-                                        )}
+                                        <div className="relative">
+                                            {purchasedLicenses.length > 0 ? (
+                                                <select
+                                                    required
+                                                    className="w-full h-14 rounded-2xl bg-white border border-slate-200 hover:border-slate-300 px-5 pr-12 text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-100/50 focus:border-emerald-500 transition-all appearance-none cursor-pointer shadow-sm"
+                                                    value={selectedLicenseId}
+                                                    onChange={e => {
+                                                        setSelectedLicenseId(e.target.value);
+                                                        const lic = purchasedLicenses.find(l => l.id === e.target.value);
+                                                        if (lic) setSelectedProduct(lic.product_id);
+                                                    }}
+                                                >
+                                                    <option value="">-- 문의할 보유 라이선스 선택 --</option>
+                                                    {purchasedLicenses.map((lic) => (
+                                                        <option key={lic.id} value={lic.id}>
+                                                            {lic.product_id} ({lic.serial_key ? lic.serial_key.substring(0, 8) + '...' : '시리얼 없음'}) - {lic.buyer_name || '이름 없음'}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            ) : (
+                                                <select
+                                                    required
+                                                    className="w-full h-14 rounded-2xl bg-white border border-slate-200 hover:border-slate-300 px-5 pr-12 text-sm font-bold outline-none focus:ring-4 focus:ring-indigo-100/50 focus:border-indigo-500 transition-all appearance-none cursor-pointer shadow-sm"
+                                                    value={selectedProduct}
+                                                    onChange={e => setSelectedProduct(e.target.value)}
+                                                >
+                                                    <option value="PlaceDB">PlaceDB (플레이스디비)</option>
+                                                    <option value="CafeMonster">Cafe Monster (카페몬스터)</option>
+                                                    <option value="AppMonster">App Monster (앱몬스터)</option>
+                                                    <option value="MarketingMonster">Marketing Monster (마케팅몬스터)</option>
+                                                    <option value="Other">기타 / 공통 문의</option>
+                                                </select>
+                                            )}
+                                            <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                                        </div>
                                     </div>
 
                                     <div className="space-y-3">
@@ -560,16 +569,16 @@ export const CustomerSupport = () => {
                                             value={description}
                                             onChange={e => setDescription(e.target.value)}
                                             placeholder="문제 상황이나 증상을 최대한 자세히 적어주세요."
-                                            className="w-full min-h-[160px] rounded-2xl bg-slate-50 p-5 text-sm font-bold border-none outline-none focus:ring-2 focus:ring-indigo-100 transition-all resize-none"
+                                            className="w-full min-h-[160px] rounded-2xl bg-white border border-slate-200 hover:border-slate-300 p-5 text-sm font-bold outline-none focus:ring-4 focus:ring-indigo-100/50 focus:border-indigo-500 transition-all resize-none shadow-sm"
                                         />
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="relative group">
                                             {imageFile ? (
-                                                <div className="h-14 w-full rounded-2xl bg-indigo-50/30 border-2 border-indigo-200 flex items-center justify-between px-4 transition-all">
+                                                <div className="h-14 w-full rounded-2xl bg-indigo-50/30 border border-indigo-200 flex items-center justify-between px-4 transition-all">
                                                     <div className="flex items-center min-w-0 flex-1 mr-2">
-                                                        <ImageIcon className="w-5 h-5 text-indigo-500 mr-3 flex-shrink-0" />
+                                                        <ImageIcon className="w-5 h-5 text-indigo-600 mr-3 flex-shrink-0" />
                                                         <span className="text-xs font-black text-indigo-700 truncate">
                                                             {imageFile.name}
                                                         </span>
@@ -590,9 +599,9 @@ export const CustomerSupport = () => {
                                                         onChange={e => setImageFile(e.target.files?.[0] || null)}
                                                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                                                     />
-                                                    <div className="h-14 w-full rounded-2xl bg-slate-50 flex items-center px-4 border-2 border-dashed border-slate-200 group-hover:border-indigo-300 group-hover:bg-indigo-50/50 transition-all">
-                                                        <ImageIcon className="w-5 h-5 text-slate-400 mr-3" />
-                                                        <span className="text-xs font-black text-slate-500 truncate">
+                                                    <div className="h-14 w-full rounded-2xl bg-white flex items-center px-4 border border-dashed border-slate-200 group-hover:border-indigo-400 group-hover:bg-indigo-50/20 transition-all shadow-sm cursor-pointer">
+                                                        <ImageIcon className="w-5 h-5 text-slate-400 mr-3 group-hover:text-indigo-500 transition-colors" />
+                                                        <span className="text-xs font-black text-slate-500 group-hover:text-indigo-700 transition-colors truncate">
                                                             이미지 첨부
                                                         </span>
                                                     </div>
@@ -601,9 +610,9 @@ export const CustomerSupport = () => {
                                         </div>
                                         <div className="relative group">
                                             {logFile ? (
-                                                <div className="h-14 w-full rounded-2xl bg-indigo-50/30 border-2 border-indigo-200 flex items-center justify-between px-4 transition-all">
+                                                <div className="h-14 w-full rounded-2xl bg-indigo-50/30 border border-indigo-200 flex items-center justify-between px-4 transition-all">
                                                     <div className="flex items-center min-w-0 flex-1 mr-2">
-                                                        <FileText className="w-5 h-5 text-indigo-500 mr-3 flex-shrink-0" />
+                                                        <FileText className="w-5 h-5 text-indigo-600 mr-3 flex-shrink-0" />
                                                         <span className="text-xs font-black text-indigo-700 truncate">
                                                             {logFile.name}
                                                         </span>
@@ -624,9 +633,9 @@ export const CustomerSupport = () => {
                                                         onChange={e => setLogFile(e.target.files?.[0] || null)}
                                                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                                                     />
-                                                    <div className="h-14 w-full rounded-2xl bg-slate-50 flex items-center px-4 border-2 border-dashed border-slate-200 group-hover:border-indigo-300 group-hover:bg-indigo-50/50 transition-all">
-                                                        <FileText className="w-5 h-5 text-slate-400 mr-3" />
-                                                        <span className="text-xs font-black text-slate-500 truncate">
+                                                    <div className="h-14 w-full rounded-2xl bg-white flex items-center px-4 border border-dashed border-slate-200 group-hover:border-indigo-400 group-hover:bg-indigo-50/20 transition-all shadow-sm cursor-pointer">
+                                                        <FileText className="w-5 h-5 text-slate-400 mr-3 group-hover:text-indigo-500 transition-colors" />
+                                                        <span className="text-xs font-black text-slate-500 group-hover:text-indigo-700 transition-colors truncate">
                                                             로그 파일 첨부
                                                         </span>
                                                     </div>
@@ -637,7 +646,7 @@ export const CustomerSupport = () => {
 
                                     <Button 
                                         type="submit" 
-                                        className="w-full h-14 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-lg rounded-2xl shadow-indigo-100 shadow-xl transition-all" 
+                                        className="w-full h-14 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-black text-lg rounded-2xl shadow-[0_10px_25px_rgba(79,70,229,0.25)] hover:shadow-[0_15px_30px_rgba(79,70,229,0.35)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300" 
                                         isLoading={loading}
                                     >
                                         <UploadCloud className="mr-2 w-5 h-5" /> 문의 내용 전송하기
@@ -657,14 +666,14 @@ export const CustomerSupport = () => {
                                 value={searchTerm}
                                 onChange={e => setSearchTerm(e.target.value)}
                                 placeholder="이메일이나 내용으로 검색..."
-                                className="h-14 pl-14 bg-white border-none shadow-sm rounded-2xl font-bold placeholder:text-slate-300 focus:ring-2 focus:ring-indigo-100"
+                                className="h-14 pl-14 bg-white border border-slate-200 shadow-[0_8px_30px_rgb(0,0,0,0.02)] rounded-2xl font-bold placeholder:text-slate-300 focus:ring-4 focus:ring-indigo-100/50 focus:border-indigo-500 transition-all hover:border-slate-300"
                             />
                         </div>
                     </div>
 
-                    <div className="grid gap-4">
+                    <div className="grid gap-6">
                         {filteredTickets.length === 0 ? (
-                            <Card className="p-12 text-center bg-white border-none shadow-sm rounded-3xl">
+                            <Card className="p-12 text-center bg-white border border-slate-200/80 shadow-[0_8px_30px_rgb(0,0,0,0.03)] rounded-3xl">
                                 <p className="text-slate-400 font-bold">등록된 문의 내역이 없습니다.</p>
                             </Card>
                         ) : (
@@ -679,19 +688,24 @@ export const CustomerSupport = () => {
 
                                 return (
                                     <motion.div
-                                        initial={{ opacity: 0, y: 10 }}
+                                        initial={{ opacity: 0, y: 15 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: index * 0.05 }}
                                         key={ticket.id}
                                     >
                                         <Card className={cn(
-                                            "overflow-hidden border-none shadow-sm hover:shadow-xl transition-all duration-300 rounded-3xl",
-                                            isExpanded && "ring-2 ring-indigo-50"
+                                            "relative overflow-hidden border border-slate-200/80 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_15px_40px_rgb(0,0,0,0.06)] hover:-translate-y-0.5 transition-all duration-300 rounded-[2rem]",
+                                            isExpanded && "ring-2 ring-indigo-500/10 border-indigo-200"
                                         )}>
+                                            {/* Left Status Bar Indicator */}
+                                            <div className={cn(
+                                                "absolute left-0 top-0 bottom-0 w-1.5",
+                                                ticket.status === 'open' ? "bg-indigo-500" : "bg-emerald-500"
+                                            )} />
                                             <div 
                                                 className={cn(
-                                                    "flex items-center justify-between p-6 cursor-pointer group",
-                                                    isExpanded ? "bg-indigo-50/30" : "bg-white"
+                                                    "flex items-center justify-between p-6 pl-8 cursor-pointer group",
+                                                    isExpanded ? "bg-indigo-50/20" : "bg-white"
                                                 )}
                                                 onClick={() => canViewDetail && setExpandedTicketId(isExpanded ? null : ticket.id)}
                                             >
@@ -852,7 +866,7 @@ export const CustomerSupport = () => {
                                                                         placeholder="추가 문의사항이나 답변을 여기에 입력해주세요..."
                                                                         value={replyText}
                                                                         onChange={(e) => setReplyText(e.target.value)}
-                                                                        className="w-full min-h-[100px] rounded-2xl bg-slate-50 p-5 text-sm font-bold border-none outline-none focus:ring-2 focus:ring-indigo-100 transition-all resize-none placeholder:text-slate-350 text-slate-800"
+                                                                        className="w-full min-h-[100px] rounded-2xl bg-white border border-slate-200 p-5 text-sm font-bold outline-none focus:ring-4 focus:ring-indigo-100/50 focus:border-indigo-500 transition-all resize-none placeholder:text-slate-300 text-slate-800 hover:border-slate-300 shadow-sm"
                                                                     />
                                                                 </div>
 
@@ -865,9 +879,9 @@ export const CustomerSupport = () => {
                                                                             onChange={e => setReplyImage(e.target.files?.[0] || null)}
                                                                             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                                                                         />
-                                                                        <div className="h-10 px-4 rounded-xl bg-slate-50 hover:bg-indigo-50 border border-slate-150 hover:border-indigo-300 flex items-center transition-all">
-                                                                            <ImageIcon className="w-4 h-4 text-slate-400 mr-2 group-hover:text-indigo-500" />
-                                                                            <span className="text-xs font-black text-slate-500 truncate max-w-[150px]">
+                                                                        <div className="h-10 px-4 rounded-xl bg-white hover:bg-indigo-50/10 border border-slate-200 hover:border-indigo-400 flex items-center transition-all shadow-sm cursor-pointer">
+                                                                            <ImageIcon className="w-4 h-4 text-slate-400 mr-2 group-hover:text-indigo-500 transition-colors" />
+                                                                            <span className="text-xs font-black text-slate-500 group-hover:text-indigo-700 transition-colors truncate max-w-[150px]">
                                                                                 {replyImage ? replyImage.name : '사진 첨부'}
                                                                             </span>
                                                                             {replyImage && (
@@ -888,9 +902,9 @@ export const CustomerSupport = () => {
                                                                             onChange={e => setReplyLog(e.target.files?.[0] || null)}
                                                                             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                                                                         />
-                                                                        <div className="h-10 px-4 rounded-xl bg-slate-50 hover:bg-indigo-50 border border-slate-150 hover:border-indigo-300 flex items-center transition-all">
-                                                                            <FileText className="w-4 h-4 text-slate-400 mr-2 group-hover:text-indigo-500" />
-                                                                            <span className="text-xs font-black text-slate-500 truncate max-w-[150px]">
+                                                                        <div className="h-10 px-4 rounded-xl bg-white hover:bg-indigo-50/10 border border-slate-200 hover:border-indigo-400 flex items-center transition-all shadow-sm cursor-pointer">
+                                                                            <FileText className="w-4 h-4 text-slate-400 mr-2 group-hover:text-indigo-500 transition-colors" />
+                                                                            <span className="text-xs font-black text-slate-500 group-hover:text-indigo-700 transition-colors truncate max-w-[150px]">
                                                                                 {replyLog ? replyLog.name : '로그 파일 첨부'}
                                                                             </span>
                                                                             {replyLog && (
