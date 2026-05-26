@@ -15,8 +15,7 @@ import {
     ChevronUp, 
     ExternalLink,
     Plus,
-    Search,
-    Zap
+    Search
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { motion } from 'framer-motion';
@@ -495,7 +494,7 @@ export const CustomerSupport = () => {
                                     {/* 라이선스 보유 여부에 따른 2단 배치 분기 */}
                                     {purchasedLicenses.length > 0 ? (
                                         <div className="space-y-1.5">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
+                                            <label className="text-xs font-black text-slate-600 uppercase tracking-wider pl-1">
                                                 문의 대상 제품 (보유 라이선스) <span className="text-indigo-500 font-bold">*필수</span>
                                             </label>
                                             <div className="relative">
@@ -522,7 +521,7 @@ export const CustomerSupport = () => {
                                     ) : (
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <div className="space-y-1.5">
-                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
+                                                <label className="text-xs font-black text-slate-600 uppercase tracking-wider pl-1">
                                                     크몽 닉네임 <span className="text-indigo-500 font-bold">*2차 매칭용</span>
                                                 </label>
                                                 <Input
@@ -533,7 +532,7 @@ export const CustomerSupport = () => {
                                                 />
                                             </div>
                                             <div className="space-y-1.5">
-                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
+                                                <label className="text-xs font-black text-slate-600 uppercase tracking-wider pl-1">
                                                     문의 대상 제품 <span className="text-indigo-500 font-bold">*필수</span>
                                                 </label>
                                                 <div className="relative">
@@ -564,17 +563,14 @@ export const CustomerSupport = () => {
 
                                     <div className="space-y-1.5">
                                         <div className="flex items-center justify-between px-1">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">상세 증상 및 내용</label>
-                                            <div className="flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-600 rounded-md text-[9px] font-black border border-amber-100 shadow-sm">
-                                                <Zap className="w-2.5 h-2.5" /> 스샷 첨부 권장!
-                                            </div>
+                                            <label className="text-xs font-black text-slate-600 uppercase tracking-wider pl-1">상세 증상 및 내용</label>
                                         </div>
                                         <textarea
                                             required
                                             value={description}
                                             onChange={e => setDescription(e.target.value)}
                                             placeholder="문제 상황이나 증상을 최대한 자세히 적어주세요."
-                                            className="w-full min-h-[110px] rounded-xl bg-slate-100/90 border border-slate-300 hover:border-slate-400 focus:bg-white p-4 text-xs font-bold outline-none focus:ring-4 focus:ring-indigo-100/50 focus:border-indigo-500 transition-all resize-none shadow-inner"
+                                            className="w-full min-h-[160px] rounded-xl bg-slate-100/90 border border-slate-300 hover:border-slate-400 focus:bg-white p-4 text-xs font-bold outline-none focus:ring-4 focus:ring-indigo-100/50 focus:border-indigo-500 transition-all resize-none shadow-inner"
                                         />
                                     </div>
 
@@ -607,7 +603,7 @@ export const CustomerSupport = () => {
                                                     <div className="h-11 w-full rounded-xl bg-slate-100/90 flex items-center px-3 border border-dashed border-slate-300 group-hover:border-indigo-400 group-hover:bg-indigo-50/20 transition-all shadow-sm cursor-pointer">
                                                         <ImageIcon className="w-4 h-4 text-slate-400 mr-2 group-hover:text-indigo-500 transition-colors" />
                                                         <span className="text-[11px] font-black text-slate-500 group-hover:text-indigo-700 transition-colors truncate">
-                                                            이미지 첨부
+                                                            이미지 첨부 (스샷 권장)
                                                         </span>
                                                     </div>
                                                 </>
@@ -654,7 +650,7 @@ export const CustomerSupport = () => {
                                         className="w-full h-11 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-black text-sm rounded-xl shadow-[0_8px_20px_rgba(79,70,229,0.2)] hover:shadow-[0_12px_25px_rgba(79,70,229,0.3)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300" 
                                         isLoading={loading}
                                     >
-                                        <UploadCloud className="mr-1.5 w-4.5 h-4.5" /> 문의 전송하기
+                                        <UploadCloud className="mr-1.5 w-4.5 h-4.5" /> 문의 등록하기
                                     </Button>
                                 </form>
                             </div>
