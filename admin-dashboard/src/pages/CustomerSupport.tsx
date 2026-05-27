@@ -272,9 +272,10 @@ export const CustomerSupport = () => {
                 // Register standard buyer (instantly approved)
                 const buyerName = selectedLic.buyer_name || kmongNickname.trim() || verifiedEmail?.split('@')[0] || 'Unknown';
                 await supabase
-                    .from('buyers')
+                    .from('users')
                     .upsert({
                         email: contactEmail.toLowerCase(),
+                        role: 'buyer',
                         name: buyerName,
                         channel: 'Kmong',
                         created_at: new Date().toISOString()
@@ -282,9 +283,10 @@ export const CustomerSupport = () => {
             } else if (kmongNickname.trim()) {
                 // Register as pending for manual verification
                 await supabase
-                    .from('buyers')
+                    .from('users')
                     .upsert({
                         email: contactEmail.toLowerCase(),
+                        role: 'user',
                         name: kmongNickname.trim(),
                         channel: 'Kmong (Pending)',
                         created_at: new Date().toISOString()

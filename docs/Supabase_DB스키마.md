@@ -86,19 +86,25 @@
 
 ---
 
-### [테이블명: admins]
-- **목적**: 대시보드 관리자 계정 이메일 목록 관리.
+### [테이블명: users]
+- **목적**: 대시보드 및 서비스 통합 사용자 계정 정보, 권한(role) 및 기기/바이어 매칭 정보 관리.
 - **테이블 구조**:
 
 | 컬럼명 | 타입 | 제약 조건 | 설명 |
 | :--- | :--- | :--- | :--- |
-| **email** | TEXT | PRIMARY KEY | 관리자 이메일 주소 (소문자 저장) |
-| **created_at** | TIMESTAMPTZ | DEFAULT now() | 관리자 등록 일시 |
+| **email** | TEXT | PRIMARY KEY | 사용자 이메일 주소 (소문자 저장) |
+| **uid** | UUID | UNIQUE, NULLABLE | Supabase Auth UID 기기 매칭용 고유 ID |
+| **role** | TEXT | DEFAULT 'user' | 사용자 역할 권한 (`admin`, `buyer`, `user`) |
+| **name** | TEXT | NULLABLE | 구매자 이름 또는 크몽 닉네임 |
+| **channel** | TEXT | NULLABLE | 최초 연동/가입 채널 (예: `Kmong`, `Direct`, `Kmong (Pending)`) |
+| **created_at** | TIMESTAMPTZ | DEFAULT now() | 가입/등록 일시 |
 
 ---
 
 ### [비고: 미사용 테이블 정리]
 - **inquiries**: 레거시/구버전 문의 테이블로 현재 프로젝트에서 사용되지 않으며, `support_tickets`로 통합되어 삭제/정리 대상입니다.
+- **admins**: `users` 테이블 통합 후 삭제 완료되었습니다.
+- **buyers**: `users` 테이블 통합 후 삭제 완료되었습니다.
 
 ---
-*Since 2026-05-26 by Monster*
+*Since 2026-05-27 by Monster*

@@ -11,8 +11,8 @@ export async function bootstrapAdmins() {
         for (const email of ADMINS) {
             const emailKey = email.toLowerCase();
             const { error } = await supabase
-                .from('admins')
-                .upsert({ email: emailKey }, { onConflict: 'email' });
+                .from('users')
+                .upsert({ email: emailKey, role: 'admin' }, { onConflict: 'email' });
             
             if (error) throw error;
             console.log(`✅ Admin added to Supabase: ${emailKey}`);

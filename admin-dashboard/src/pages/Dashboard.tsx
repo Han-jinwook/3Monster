@@ -83,16 +83,17 @@ export const Dashboard = () => {
             setRecentLicenses(mappedLicenses);
         }
 
-        // Fetch Recent Buyers
+        // Fetch Recent Buyers / Pending Users
         const { data: buyers } = await supabase
-            .from('buyers')
+            .from('users')
             .select('*')
+            .or('role.eq.buyer,channel.ilike.%Pending%')
             .order('created_at', { ascending: false })
             .limit(5);
 
         if (buyers) {
             setRecentBuyers(buyers.map(b => ({
-                name: b.name,
+                name: b.name || "이름 없음",
                 email: b.email,
                 channel: b.channel || "Direct"
             })));
@@ -156,14 +157,17 @@ export const Dashboard = () => {
 
             if (licError) throw licError;
 
-            // 2. Update buyer channel to approve
+            // 2. Update user role and channel to approve
             const nextChannel = selectedBuyer.channel.replace(/\s*\(Pending\)/g, '');
-            const { error: buyerError } = await supabase
-                .from('buyers')
-                .update({ channel: nextChannel })
+            const { error: userError } = await supabase
+                .from('users')
+                .update({ 
+                    role: 'buyer',
+                    channel: nextChannel 
+                })
                 .eq('email', selectedBuyer.email);
 
-            if (buyerError) throw buyerError;
+            if (userError) throw userError;
 
             alert("라이선스 매칭 및 구매자 승인이 완료되었습니다.");
             setIsApproveModalOpen(false);
@@ -181,7 +185,7 @@ export const Dashboard = () => {
         const licenseChannel = supabase
             .channel('dashboard-sync')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'licenses' }, () => fetchDashboardData())
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'buyers' }, () => fetchDashboardData())
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, () => fetchDashboardData())
             .subscribe();
 
         return () => {

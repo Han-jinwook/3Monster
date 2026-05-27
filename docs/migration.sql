@@ -1,0 +1,104 @@
+-- 🔱 3Monster Supabase DB Migration Script (정책 의존성 해결 버전)
+-- - 목적: admins, buyers 테이블을 통합한 public.users 테이블 신설 및 기존 정책(Policy) 재설정
+
+-- ========================================================
+-- 1. 기존 admins 테이블에 의존하고 있는 RLS 정책 선제 제거
+-- ========================================================
+DROP POLICY IF EXISTS "Master admin access" ON public.licenses;
+DROP POLICY IF EXISTS "Enable read for owners and admins" ON public.support_tickets;
+DROP POLICY IF EXISTS "Enable update for admins" ON public.support_tickets;
+
+-- ========================================================
+-- 2. 통합 사용자 테이블(public.users) 생성
+-- ========================================================
+CREATE TABLE IF NOT EXISTS public.users (
+    email TEXT PRIMARY KEY,
+    uid UUID UNIQUE,
+    role TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('admin', 'buyer', 'user')),
+    name TEXT,
+    channel TEXT,
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- users 테이블 자체 RLS 설정
+ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow public read access to users table" ON public.users;
+CREATE POLICY "Allow public read access to users table" ON public.users
+    FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Allow authenticated upsert to users table" ON public.users;
+CREATE POLICY "Allow authenticated upsert to users table" ON public.users
+    FOR ALL USING (true) WITH CHECK (true);
+
+-- ========================================================
+-- 3. 기존 데이터 이관 (admins, buyers -> users)
+-- ========================================================
+
+-- 기존 admins 데이터 이관 (role = 'admin')
+INSERT INTO public.users (email, role)
+SELECT LOWER(email), 'admin'::text
+FROM public.admins
+ON CONFLICT (email) DO UPDATE 
+SET role = 'admin';
+
+-- 기존 buyers 데이터 이관
+-- channel 명에 'Pending'이 들어가 있는 경우 대기자이므로 'user' 역할로, 그 외는 'buyer' 역할로 분류 이관
+INSERT INTO public.users (email, role, name, channel, created_at)
+SELECT 
+    LOWER(email), 
+    CASE WHEN channel LIKE '%Pending%' THEN 'user'::text ELSE 'buyer'::text END, 
+    name, 
+    channel, 
+    created_at
+FROM public.buyers
+ON CONFLICT (email) DO UPDATE 
+SET 
+    role = EXCLUDED.role,
+    name = COALESCE(users.name, EXCLUDED.name),
+    channel = COALESCE(users.channel, EXCLUDED.channel);
+
+-- ========================================================
+-- 4. 구버전 테이블 삭제 (admins, buyers)
+-- ========================================================
+DROP TABLE public.admins;
+DROP TABLE public.buyers;
+
+-- 사용되지 않는 구버전 문의 테이블 inquiries가 존재한다면 함께 삭제 정리
+DROP TABLE IF EXISTS public.inquiries;
+
+-- ========================================================
+-- 5. 신규 users 테이블 기반으로 RLS 정책 재작성
+-- ========================================================
+
+-- 5-1. licenses 테이블의 관리자 RLS 정책 재설정
+CREATE POLICY "Master admin access" ON public.licenses
+    FOR ALL
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.users 
+            WHERE users.email = LOWER(auth.jwt()->>'email') AND users.role = 'admin'
+        )
+    );
+
+-- 5-2. support_tickets 테이블의 조회 RLS 정책 재설정 (본인 또는 관리자)
+CREATE POLICY "Enable read for owners and admins" ON public.support_tickets
+    FOR SELECT
+    USING (
+        auth.uid() = uid 
+        OR email = LOWER(auth.jwt()->>'email')
+        OR EXISTS (
+            SELECT 1 FROM public.users 
+            WHERE users.email = LOWER(auth.jwt()->>'email') AND users.role = 'admin'
+        )
+    );
+
+-- 5-3. support_tickets 테이블의 수정 RLS 정책 재설정 (관리자 전용)
+CREATE POLICY "Enable update for admins" ON public.support_tickets
+    FOR UPDATE
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.users 
+            WHERE users.email = LOWER(auth.jwt()->>'email') AND users.role = 'admin'
+        )
+    );

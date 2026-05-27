@@ -34,44 +34,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const checkRole = async (userEmail: string) => {
         try {
             console.log(`🔍 Checking role for: ${userEmail}`);
-            // 1. Check admins table
-            const { data: adminData, error: adminError } = await supabase
-                .from('admins')
-                .select('email')
+            // 1. Check users table
+            const { data: userData, error: userError } = await supabase
+                .from('users')
+                .select('role')
                 .eq('email', userEmail.toLowerCase())
                 .maybeSingle();
             
-            if (adminError) {
-                throw adminError;
+            if (userError) {
+                throw userError;
             }
 
-            if (adminData) {
-                console.log(`📊 Role result: admin`);
-                return 'admin';
+            if (userData) {
+                console.log(`📊 Role result: ${userData.role}`);
+                return userData.role as UserRole;
             }
 
-            // 2. Check buyers table
-            const { data: buyerData, error: buyerError } = await supabase
-                .from('buyers')
-                .select('email, channel')
-                .eq('email', userEmail.toLowerCase())
-                .maybeSingle();
-
-            if (buyerError) {
-                throw buyerError;
-            }
-
-            if (buyerData) {
-                const isPending = buyerData.channel && buyerData.channel.includes('Pending');
-                if (isPending) {
-                    console.log(`📊 Role result: user (Pending approval)`);
-                    return 'user';
-                }
-                console.log(`📊 Role result: buyer`);
-                return 'buyer';
-            }
-
-            // 3. Check licenses table
+            // 2. Check licenses table (fallback if not registered in users)
             const { data: licenseData, error: licenseError } = await supabase
                 .from('licenses')
                 .select('id')
@@ -87,7 +66,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 return 'buyer';
             }
 
-            console.log(`📊 Role result: user (Not a registered buyer)`);
+            console.log(`📊 Role result: user (Not a registered user)`);
             return 'user';
         } catch (error) {
             console.error('❌ Error checking role:', error);
@@ -99,8 +78,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const registerUserMapping = async (uid: string, userEmail: string) => {
         try {
             const emailKey = userEmail.toLowerCase();
-            // Supabase에서는 auth.users에 이미 매핑되지만, 메타데이터 관리를 위해 buyers나 별도 로그 테이블에 기록할 수 있음
-            console.log(`👤 User mapping logic moved to Supabase: ${uid} -> ${emailKey}`);
+            const { error } = await supabase
+                .from('users')
+                .upsert({
+                    email: emailKey,
+                    uid: uid
+                }, { onConflict: 'email' });
+
+            if (error) throw error;
+            console.log(`👤 User mapping registered: ${emailKey} -> ${uid}`);
         } catch (error: any) {
             console.error('❌ Error registering user mapping:', error);
         }
