@@ -7,6 +7,7 @@
 DROP POLICY IF EXISTS "Master admin access" ON public.licenses;
 DROP POLICY IF EXISTS "Enable read for owners and admins" ON public.support_tickets;
 DROP POLICY IF EXISTS "Enable update for admins" ON public.support_tickets;
+DROP POLICY IF EXISTS "Enable update for owners and admins" ON public.support_tickets;
 
 -- ========================================================
 -- 2. 통합 사용자 테이블(public.users) 생성
@@ -93,11 +94,13 @@ CREATE POLICY "Enable read for owners and admins" ON public.support_tickets
         )
     );
 
--- 5-3. support_tickets 테이블의 수정 RLS 정책 재설정 (관리자 전용)
-CREATE POLICY "Enable update for admins" ON public.support_tickets
+-- 5-3. support_tickets 테이블의 수정 RLS 정책 재설정 (본인 또는 관리자)
+CREATE POLICY "Enable update for owners and admins" ON public.support_tickets
     FOR UPDATE
     USING (
-        EXISTS (
+        auth.uid() = uid 
+        OR email = LOWER(auth.jwt()->>'email')
+        OR EXISTS (
             SELECT 1 FROM public.users 
             WHERE users.email = LOWER(auth.jwt()->>'email') AND users.role = 'admin'
         )

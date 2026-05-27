@@ -54,6 +54,8 @@ export const CustomerSupport = () => {
     const [selectedProduct, setSelectedProduct] = useState('PlaceDB');
 
     const [selectedTicketForDetail, setSelectedTicketForDetail] = useState<any | null>(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const [isSavingEdit, setIsSavingEdit] = useState(false);
 
     // Reply/Thread states
     const [replyText, setReplyText] = useState('');
@@ -204,6 +206,56 @@ export const CustomerSupport = () => {
             .getPublicUrl(filePath);
 
         return publicUrl;
+    };
+
+    const handleSaveEdit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!selectedTicketForDetail) return;
+        
+        setIsSavingEdit(true);
+        setError('');
+        
+        try {
+            const selectedLic = purchasedLicenses.find(l => l.id === selectedLicenseId);
+            let finalDescription = description;
+
+            if (selectedLic) {
+                finalDescription = `[문의 제품: ${selectedLic.product_id} (시리얼: ${selectedLic.serial_key})]\n${finalDescription}`;
+            } else {
+                finalDescription = `[문의 제품: ${selectedProduct}]\n${finalDescription}`;
+            }
+
+            if (kmongNickname.trim()) {
+                finalDescription = `[수동 구매 인증 요청: 크몽 닉네임 - ${kmongNickname.trim()}]\n${finalDescription}`;
+            }
+
+            const { error: updateError } = await supabase
+                .from('support_tickets')
+                .update({
+                    issue_type: issueType,
+                    description: finalDescription
+                })
+                .eq('id', selectedTicketForDetail.id);
+
+            if (updateError) throw updateError;
+
+            // Update local state ticket info
+            const updatedTicket = {
+                ...selectedTicketForDetail,
+                issue_type: issueType,
+                description: finalDescription
+            };
+            setSelectedTicketForDetail(updatedTicket);
+            setTickets(prev => prev.map(t => t.id === updatedTicket.id ? updatedTicket : t));
+            
+            setIsEditing(false);
+            alert("문의가 수정되었습니다.");
+        } catch (err: any) {
+            console.error("Error saving edit:", err);
+            setError(`수정 중 오류가 발생했습니다: ${err.message}`);
+        } finally {
+            setIsSavingEdit(false);
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -423,6 +475,15 @@ export const CustomerSupport = () => {
         return { product, typeLabel };
     };
 
+    const parseRawDescription = (desc: string) => {
+        if (!desc) return '';
+        return desc
+            .split('\n')
+            .filter(line => !line.startsWith('[문의 제품:') && !line.startsWith('[수동 구매 인증 요청:'))
+            .join('\n')
+            .trim();
+    };
+
 
     const isAdmin = role === 'admin';
     const userEmail = verifiedEmail || localStorage.getItem('user_email') || user?.email;
@@ -466,7 +527,7 @@ export const CustomerSupport = () => {
                             </h3>
                             <div className="relative min-w-[130px]">
                                 <select
-                                    disabled={!!selectedTicketForDetail}
+                                    disabled={!!selectedTicketForDetail && !isEditing}
                                     className="w-full h-8 rounded-lg bg-slate-50 border border-slate-200 hover:border-slate-300 focus:bg-white pl-2.5 pr-8 text-xs font-semibold outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 transition-all appearance-none cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
                                     value={issueType}
                                     onChange={e => setIssueType(e.target.value)}
@@ -527,7 +588,7 @@ export const CustomerSupport = () => {
                                             </label>
                                             <div className="relative">
                                                 <select
-                                                    disabled={!!selectedTicketForDetail}
+                                                    disabled={!!selectedTicketForDetail && !isEditing}
                                                     required
                                                     className="w-full h-9 rounded-lg bg-slate-50 border border-slate-200 hover:border-slate-300 focus:bg-white px-3 pr-8 text-xs font-medium outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 transition-all appearance-none cursor-pointer shadow-sm disabled:opacity-75 disabled:cursor-not-allowed"
                                                     value={selectedLicenseId}
@@ -554,7 +615,7 @@ export const CustomerSupport = () => {
                                                     크몽 닉네임 <span className="text-indigo-500 font-semibold">*2차 매칭용</span>
                                                 </label>
                                                 <Input
-                                                    disabled={!!selectedTicketForDetail}
+                                                    disabled={!!selectedTicketForDetail && !isEditing}
                                                     placeholder="수동 구매인증용 닉네임"
                                                     value={kmongNickname}
                                                     onChange={e => setKmongNickname(e.target.value)}
@@ -567,7 +628,7 @@ export const CustomerSupport = () => {
                                                 </label>
                                                 <div className="relative">
                                                     <select
-                                                        disabled={!!selectedTicketForDetail}
+                                                        disabled={!!selectedTicketForDetail && !isEditing}
                                                         required
                                                         className="w-full h-9 rounded-lg bg-slate-50 border border-slate-200 hover:border-slate-300 focus:bg-white px-3 pr-8 text-xs font-medium outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 transition-all appearance-none cursor-pointer shadow-sm disabled:opacity-75 disabled:cursor-not-allowed"
                                                         value={selectedProduct}
@@ -597,7 +658,7 @@ export const CustomerSupport = () => {
                                             <label className="text-[11px] font-bold text-slate-500 pl-0.5">상세 증상 및 내용</label>
                                         </div>
                                         <textarea
-                                            disabled={!!selectedTicketForDetail}
+                                            disabled={!!selectedTicketForDetail && !isEditing}
                                             required
                                             value={description}
                                             onChange={e => setDescription(e.target.value)}
@@ -706,20 +767,58 @@ export const CustomerSupport = () => {
                                             </Button>
                                         </>
                                     ) : (
-                                        <Button 
-                                            type="button" 
-                                            onClick={() => {
-                                                setSelectedTicketForDetail(null);
-                                                setExpandedTicketId(null);
-                                                setIssueType('bug');
-                                                setDescription('');
-                                                setKmongNickname('');
-                                                setSelectedLicenseId('');
-                                            }}
-                                            className="w-full h-9 bg-slate-100 hover:bg-slate-200 text-slate-650 font-semibold text-xs rounded-lg transition-all border border-slate-200 shadow-sm"
-                                        >
-                                            <Plus className="mr-1 w-3.5 h-3.5" /> 새 문의 작성하기
-                                        </Button>
+                                        <div className="flex gap-2">
+                                            <Button 
+                                                type="button" 
+                                                onClick={() => {
+                                                    setSelectedTicketForDetail(null);
+                                                    setExpandedTicketId(null);
+                                                    setIssueType('bug');
+                                                    setDescription('');
+                                                    setKmongNickname('');
+                                                    setSelectedLicenseId('');
+                                                    setIsEditing(false);
+                                                }}
+                                                className="flex-1 h-9 bg-slate-100 hover:bg-slate-200 text-slate-650 font-semibold text-xs rounded-lg transition-all border border-slate-200 shadow-sm"
+                                            >
+                                                <Plus className="mr-1 w-3.5 h-3.5" /> 새 문의 작성하기
+                                            </Button>
+                                            
+                                            {isEditing ? (
+                                                <>
+                                                    <Button 
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setIsEditing(false);
+                                                            if (selectedTicketForDetail) {
+                                                                setIssueType(selectedTicketForDetail.issue_type || 'bug');
+                                                                const rawDesc = selectedTicketForDetail.description ? parseRawDescription(selectedTicketForDetail.description) : '';
+                                                                setDescription(rawDesc);
+                                                            }
+                                                        }}
+                                                        className="h-9 bg-slate-100 hover:bg-slate-200 text-slate-650 border border-slate-200 rounded-lg px-4 text-xs font-semibold"
+                                                    >
+                                                        취소
+                                                    </Button>
+                                                    <Button 
+                                                        type="button"
+                                                        onClick={handleSaveEdit}
+                                                        isLoading={isSavingEdit}
+                                                        className="flex-1 h-9 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-bold shadow-sm transition-all duration-200"
+                                                    >
+                                                        수정 완료
+                                                    </Button>
+                                                </>
+                                            ) : (
+                                                <Button 
+                                                    type="button"
+                                                    onClick={() => setIsEditing(true)}
+                                                    className="flex-1 h-9 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-bold shadow-sm transition-all duration-200"
+                                                >
+                                                    ✏️ 문의 수정하기
+                                                </Button>
+                                            )}
+                                        </div>
                                     )}
                                 </form>
                             </div>
@@ -783,9 +882,29 @@ export const CustomerSupport = () => {
                                                         setExpandedTicketId(nextExpanded ? ticket.id : null);
                                                         setSelectedTicketForDetail(nextExpanded ? ticket : null);
                                                         if (nextExpanded) {
+                                                            setIsEditing(false);
                                                             setIssueType(ticket.issue_type || 'bug');
-                                                            setDescription(ticket.description || '');
                                                             
+                                                            const rawDesc = ticket.description ? parseRawDescription(ticket.description) : '';
+                                                            setDescription(rawDesc);
+                                                            
+                                                            const matchProd = ticket.description?.match(/\[문의 제품:\s*([^\]\s\()]+)/);
+                                                            if (matchProd && matchProd[1]) {
+                                                                setSelectedProduct(matchProd[1]);
+                                                            } else {
+                                                                setSelectedProduct('PlaceDB');
+                                                            }
+
+                                                            const matchSerial = ticket.description?.match(/\(시리얼:\s*([^\)]+)\)/);
+                                                            if (matchSerial && matchSerial[1]) {
+                                                                const lic = purchasedLicenses.find(l => l.serial_key === matchSerial[1]);
+                                                                if (lic) {
+                                                                    setSelectedLicenseId(lic.id);
+                                                                }
+                                                            } else {
+                                                                setSelectedLicenseId('');
+                                                            }
+
                                                             const matchKmong = ticket.description?.match(/\[수동 구매 인증 요청: 크몽 닉네임 - (.*?)\]/);
                                                             if (matchKmong && matchKmong[1]) {
                                                                 setKmongNickname(matchKmong[1]);
@@ -793,9 +912,11 @@ export const CustomerSupport = () => {
                                                                 setKmongNickname('');
                                                             }
                                                         } else {
+                                                            setIsEditing(false);
                                                             setIssueType('bug');
                                                             setDescription('');
                                                             setKmongNickname('');
+                                                            setSelectedLicenseId('');
                                                         }
                                                     }
                                                 }}
