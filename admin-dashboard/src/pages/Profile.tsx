@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { Card } from '../components/ui/Card';
@@ -33,21 +33,18 @@ export const Profile = () => {
     const userEmail = authEmail || localStorage.getItem('user_email') || '';
 
     const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
+    const [savingNickname, setSavingNickname] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
     // User Profile state
     const [name, setName] = useState('');
+    const [initialName, setInitialName] = useState('');
     const [signupDate, setSignupDate] = useState('');
-    const [channel, setChannel] = useState('');
     
-    // Notification toggles
-    const [emailNotify, setEmailNotify] = useState(() => {
-        return localStorage.getItem('notify_email') !== 'false';
-    });
-    const [updateNotify, setUpdateNotify] = useState(() => {
-        return localStorage.getItem('notify_updates') !== 'false';
+    // Notification toggle
+    const [notify, setNotify] = useState(() => {
+        return localStorage.getItem('notify_enabled') !== 'false';
     });
 
     // Purchase List state
@@ -70,7 +67,7 @@ export const Profile = () => {
 
                 if (userData) {
                     setName(userData.name || '');
-                    setChannel(userData.channel || 'Direct');
+                    setInitialName(userData.name || '');
                     if (userData.created_at) {
                         const date = new Date(userData.created_at);
                         setSignupDate(`${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`);
@@ -98,34 +95,29 @@ export const Profile = () => {
         fetchProfileData();
     }, [userEmail]);
 
-    const handleSaveProfile = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setSaving(true);
+    const handleSaveNickname = async () => {
+        if (!userEmail || name.trim() === initialName) return;
+        setSavingNickname(true);
         setErrorMessage('');
         setSuccessMessage('');
-
         try {
             const { error: updateError } = await supabase
                 .from('users')
                 .upsert({
                     email: userEmail.toLowerCase(),
-                    name: name.trim(),
-                    channel: channel
+                    name: name.trim()
                 }, { onConflict: 'email' });
 
             if (updateError) throw updateError;
 
-            // Save notifications setting locally
-            localStorage.setItem('notify_email', String(emailNotify));
-            localStorage.setItem('notify_updates', String(updateNotify));
-
-            setSuccessMessage("프로필 설정이 안전하게 업데이트되었습니다.");
-            setTimeout(() => setSuccessMessage(''), 3000);
+            setInitialName(name.trim());
+            setSuccessMessage("크몽 닉네임이 성공적으로 변경되었습니다.");
+            setTimeout(() => setSuccessMessage(''), 2000);
         } catch (err: any) {
-            console.error("Error saving profile details:", err);
-            setErrorMessage("설정 저장 중 에러가 발생했습니다: " + err.message);
+            console.error("Error saving nickname:", err);
+            setErrorMessage("저장 중 에러가 발생했습니다: " + err.message);
         } finally {
-            setSaving(false);
+            setSavingNickname(false);
         }
     };
 
@@ -271,7 +263,7 @@ export const Profile = () => {
 
                     {/* Right Column: Settings / Profile / Logout (5/12) */}
                     <div className="lg:col-span-5 space-y-4">
-                        <form onSubmit={handleSaveProfile} className="space-y-4">
+                        <div className="space-y-4">
                             <Card className="p-6 bg-white border border-slate-200 shadow-sm rounded-2xl space-y-6">
                                 
                                 {/* 1. Account details */}
@@ -310,26 +302,24 @@ export const Profile = () => {
                                         <h3 className="text-sm font-black text-slate-800">크몽 닉네임 (2차 인증 정보)</h3>
                                     </div>
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold text-slate-400">크몽 구매자 닉네임 (입력/수정 가능)</label>
-                                        <Input
-                                            type="text"
-                                            value={name}
-                                            onChange={e => setName(e.target.value)}
-                                            placeholder="크몽 닉네임을 입력해 주세요"
-                                            className="h-10 bg-slate-50 border-slate-200 focus-visible:bg-white rounded-lg text-xs"
-                                        />
-                                    </div>
-                                    <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold text-slate-400">가입 채널</label>
-                                        <select 
-                                            value={channel}
-                                            onChange={e => setChannel(e.target.value)}
-                                            className="w-full h-10 px-3 rounded-lg bg-slate-50 border border-slate-200 outline-none text-xs text-slate-700 font-bold"
-                                        >
-                                            <option value="Kmong">크몽 (Kmong)</option>
-                                            <option value="Direct">직접 가입 (Direct)</option>
-                                            <option value="Kmong (Pending)">크몽 승인 대기</option>
-                                        </select>
+                                        <label className="text-[10px] font-bold text-slate-400">크몽 구매자 닉네임</label>
+                                        <div className="flex gap-2">
+                                            <Input
+                                                type="text"
+                                                value={name}
+                                                onChange={e => setName(e.target.value)}
+                                                placeholder="크몽 닉네임을 입력해 주세요"
+                                                className="h-10 bg-slate-50 border-slate-200 focus-visible:bg-white rounded-lg text-xs flex-1"
+                                            />
+                                            <Button 
+                                                type="button"
+                                                onClick={handleSaveNickname}
+                                                disabled={name.trim() === initialName || savingNickname}
+                                                className="h-10 px-4 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg disabled:opacity-50 disabled:bg-slate-100 disabled:text-slate-450 transition-all shrink-0"
+                                            >
+                                                {savingNickname ? '저장중' : '저장'}
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -339,37 +329,24 @@ export const Profile = () => {
                                         <Bell className="w-5 h-5 text-indigo-600" />
                                         <h3 className="text-sm font-black text-slate-800">알림 설정</h3>
                                     </div>
-                                    <div className="space-y-3">
-                                        <label className="flex items-center gap-3 cursor-pointer select-none">
+                                    <div className="flex items-center justify-between py-1">
+                                        <span className="text-xs text-slate-650 font-bold">이메일 알림 및 서비스 소식 수신</span>
+                                        <label className="relative inline-flex items-center cursor-pointer select-none">
                                             <input 
                                                 type="checkbox" 
-                                                checked={emailNotify}
-                                                onChange={e => setEmailNotify(e.target.checked)}
-                                                className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300"
+                                                checked={notify}
+                                                onChange={e => {
+                                                    const val = e.target.checked;
+                                                    setNotify(val);
+                                                    localStorage.setItem('notify_enabled', String(val));
+                                                    setSuccessMessage("알림 수신 설정이 실시간 반영되었습니다.");
+                                                    setTimeout(() => setSuccessMessage(''), 2000);
+                                                }}
+                                                className="sr-only peer"
                                             />
-                                            <span className="text-xs text-slate-650 font-bold">인증 및 로그인 시 이메일 알림 받기</span>
-                                        </label>
-                                        <label className="flex items-center gap-3 cursor-pointer select-none">
-                                            <input 
-                                                type="checkbox" 
-                                                checked={updateNotify}
-                                                onChange={e => setUpdateNotify(e.target.checked)}
-                                                className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300"
-                                            />
-                                            <span className="text-xs text-slate-650 font-bold">프로그램 업데이트 및 점검 소식 메일 받기</span>
+                                            <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
                                         </label>
                                     </div>
-                                </div>
-
-                                {/* Actions: Save changes */}
-                                <div className="pt-2">
-                                    <Button 
-                                        type="submit" 
-                                        isLoading={saving}
-                                        className="w-full h-10 font-bold text-xs bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-lg shadow-indigo-600/10"
-                                    >
-                                        설정 변경사항 저장
-                                    </Button>
                                 </div>
 
                                 {/* 4. Logout (Bottom Right aligned) */}
@@ -383,7 +360,7 @@ export const Profile = () => {
                                     </Button>
                                 </div>
                             </Card>
-                        </form>
+                        </div>
                     </div>
 
                 </div>
