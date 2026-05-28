@@ -339,8 +339,6 @@ export const Profile = () => {
                                                     const val = e.target.checked;
                                                     setNotify(val);
                                                     localStorage.setItem('notify_enabled', String(val));
-                                                    setSuccessMessage("알림 수신 설정이 실시간 반영되었습니다.");
-                                                    setTimeout(() => setSuccessMessage(''), 2000);
                                                 }}
                                                 className="sr-only peer"
                                             />
@@ -353,8 +351,9 @@ export const Profile = () => {
                                 <div className="pt-4 border-t border-slate-100 flex justify-end">
                                     <Button 
                                         type="button"
+                                        variant="outline"
                                         onClick={logout}
-                                        className="h-9 px-4 text-[11px] font-bold border border-rose-200 text-rose-600 hover:bg-rose-50/50 rounded-lg flex items-center gap-1.5 transition-all"
+                                        className="h-9 px-4 text-[11px] font-bold border border-slate-200 hover:border-rose-200 text-slate-600 hover:text-rose-600 hover:bg-rose-50/30 rounded-lg flex items-center gap-1.5 transition-all shadow-sm bg-white"
                                     >
                                         <LogOut className="w-3.5 h-3.5" /> 로그아웃
                                     </Button>
