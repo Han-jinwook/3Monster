@@ -31,6 +31,8 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                     element.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }, 100);
             }
+        } else if (!location.hash) {
+            window.scrollTo(0, 0);
         }
     }, [location]);
 
@@ -40,7 +42,16 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
             <header className="sticky top-0 z-50 bg-white/80 backdrop-filter backdrop-blur-xl border-b border-slate-100">
                 <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
                     {/* Logo */}
-                    <Link to="/" className="flex items-center gap-3 group">
+                    <Link 
+                        to="/" 
+                        onClick={(e) => {
+                            if (location.pathname === '/') {
+                                e.preventDefault();
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }
+                        }}
+                        className="flex items-center gap-3 group"
+                    >
                         <img src="/logo.png" alt="Logo" className="h-10 w-auto object-contain group-hover:scale-105 transition-transform" />
                     </Link>
 
