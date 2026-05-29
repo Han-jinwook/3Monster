@@ -164,7 +164,7 @@ export const Profile = () => {
     }
 
     return (
-        <div className="w-full bg-gradient-to-br from-slate-50 via-slate-100 to-indigo-50/30 py-12 px-6 min-h-screen">
+        <div className="w-full bg-transparent py-12 px-6 min-h-screen">
             <div className="max-w-6xl mx-auto space-y-6">
                 
                 {/* Header title */}

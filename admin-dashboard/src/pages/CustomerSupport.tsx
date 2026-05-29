@@ -504,7 +504,7 @@ export const CustomerSupport = () => {
     });
 
     return (
-        <div className="w-full bg-gradient-to-br from-indigo-100/80 via-slate-200/90 to-purple-100/70 py-12 px-4 min-h-screen">
+        <div className="w-full bg-transparent py-12 px-4 min-h-screen">
             <div className="max-w-7xl mx-auto space-y-5 pb-10">
 
             {/* Main Content Layout */}
