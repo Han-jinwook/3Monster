@@ -10,8 +10,6 @@ import {
     Monitor, 
     MessageSquare, 
     ArrowRight,
-    ShieldCheck,
-    Zap,
     MapPin,
     MessageCircle,
     BellRing,
@@ -388,25 +386,12 @@ export const Showroom = () => {
     return (
         <div className="max-w-7xl mx-auto space-y-20 py-12 px-6">
             {/* Hero Banner Section */}
-            <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-slate-900 via-slate-950 to-indigo-950 p-12 lg:p-20 text-white shadow-2xl">
-                <div className="relative z-10 max-w-3xl space-y-6">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-xs font-black tracking-widest uppercase">
-                        <ShieldCheck className="w-4 h-4 text-emerald-400" /> 100% Reliable Marketing Suite
-                    </div>
-                    <h1 className="text-4xl lg:text-6xl font-black tracking-tight leading-tight">
-                        압도적인 마케팅 자동화<br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-emerald-400">
-                            3Monster 솔루션
-                        </span>
-                    </h1>
-                    <p className="text-slate-400 font-bold text-base lg:text-lg leading-relaxed max-w-2xl">
-                        타겟 고객 DB 수집부터 채널 활성화, 원격 제어까지 비즈니스 성장을 위한 올인원 솔루션을 만나보세요. 3Monster 패밀리 앱은 최고의 성능과 보안성을 보장합니다.
-                    </p>
-
-                </div>
-                {/* Background Decoration */}
-                <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-indigo-500/10 to-transparent pointer-events-none" />
-                <Zap className="absolute -bottom-16 -right-16 w-80 h-80 text-indigo-500/5 rotate-12" />
+            <div className="relative overflow-hidden rounded-[2.5rem] shadow-2xl bg-slate-950">
+                <img 
+                    src="/hero-banner.png" 
+                    alt="3Monster Hero Banner" 
+                    className="w-full h-auto object-cover block" 
+                />
             </div>
 
             {/* Product Category Groups */}
