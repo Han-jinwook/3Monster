@@ -37,81 +37,104 @@ const productCategories = [
     {
         id: 'marketing-monster',
         name: '마케팅 몬스터',
-        subtitle: '최고 품질의 타겟 고객 DB를 무제한으로 정밀 추출하는 데이터 수집 라인업',
+        subtitle: '잠자는 가망 고객 DB를 깨워 즉각적인 영업망을 구축합니다.',
+        actionCopy: '1,000원으로 가망 고객 100명 정보 직접 뽑아보기',
         products: [
             {
                 id: 'nplace-db',
-                title: "NPlace-DB Pro",
-                subtitle: "네이버 플레이스 정밀 수집기",
-                description: "국내 유일의 Apollo State 파싱 엔진 탑재. 이메일, 인스타그램, 블로그 등 마케팅에 필수적인 실시간 플레이스 DB를 광속으로 수집합니다.",
-                icon: Layers,
+                title: "N플레이스 DB 추출기",
+                subtitle: "원하는 지역/업종별 실시간 타겟 DB 수집",
+                description: "네이버 플레이스 상의 업체 연락처, 이메일, 홈페이지 주소를 포함한 고퀄리티 가망 고객 정보를 실시간 정밀 파싱하여 즉각 영업 가능한 DB로 변환합니다.",
+                icon: MapPin,
                 color: "from-blue-600 to-indigo-700",
                 badge: "Best Seller",
-                features: ["이메일/인스타 자동 추출", "실시간 중복 필터링", "무제한 Excel/CSV 저장"]
+                features: ["실시간 지도 데이터 수집", "영업 시간/연락처 자동 분류", "원클릭 Excel 내보내기"]
             },
             {
-                id: 'place-finder',
-                title: "지도 수집기 (Place Finder)",
-                subtitle: "지역/업종별 매칭 검색기",
-                description: "원하는 지역 and 키워드만 입력하면 네이버 지도의 위치 정보와 업체 정보를 한눈에 분석 가능한 깔끔한 형태로 재가공해 줍니다.",
-                icon: MapPin,
+                id: 'content-crawler',
+                title: "사이트 컨텐츠 크롤러",
+                subtitle: "유용한 웹 데이터 스크래핑 및 자산화",
+                description: "원하는 커뮤니티, 전문 블로그, 타겟 웹페이지의 주요 텍스트와 이미지 데이터를 정확히 긁어와 AI 및 마케팅용 핵심 데이터셋으로 가공해 줍니다.",
+                icon: Layers,
+                color: "from-indigo-500 to-purple-600",
+                badge: "AI Ready",
+                features: ["구조화된 웹 스크래핑 엔진", "게시글 및 댓글 본문 파싱", "CSV / JSON 포맷 저장"]
+            },
+            {
+                id: 'user-manager-plus',
+                title: "회원관리프로그램 확장팩",
+                subtitle: "AI 자연어 검색 & 무료 메시지 전송 시스템",
+                description: "AI 자연어로 회원 성향과 구매 내역을 정밀 검색하고, 필터링된 가망 고객들을 대상으로 SMS/이메일 자동 발송을 무료로 연동해 주는 통합 매니저입니다.",
+                icon: Monitor,
                 color: "from-blue-400 to-cyan-600",
-                badge: "Lightweight",
-                features: ["구역별 분할 수집", "영업 시간 및 예약 여부 집계", "초보자용 원버튼 구동"]
+                badge: "Featured",
+                features: ["AI 대화형 고객 검색 필터", "무료 SMS/Email 발송 연동", "가망 고객 타겟 그룹 관리"]
             }
         ]
     },
     {
         id: 'cafe-monster',
         name: '카페 몬스터',
-        subtitle: '네이버 카페 마케팅 채널 침투 및 소통을 자동화하는 고효율 에이전트',
+        subtitle: '11년의 세월이 담긴 카페 데이터를 완벽한 매출 무기로 전환합니다.',
+        actionCopy: '1,000원으로 내 카페의 진짜 활력지수 검증하기',
         products: [
             {
                 id: 'cafe-crawler',
-                title: "카페 크롤러 Pro",
-                subtitle: "전방위 카페 타겟 수집기",
-                description: "특정 네이버 카페 내 게시글과 작성자 목록, 실시간 새글 키워드를 추적하여 마케팅 효율을 비약적으로 증가시키는 최강의 파이프라인.",
+                title: "카페 게시글/댓글 크롤러",
+                subtitle: "카페 내 숨어있는 진성 회원 서사 수집",
+                description: "마케터가 타겟으로 삼은 카페의 전체 게시글, 실시간 새글, 작성자의 댓글 활동 내역까지 완벽 분석하여 핵심 유저층의 데이터셋을 빌드합니다.",
                 icon: Smartphone,
                 color: "from-orange-500 to-rose-600",
-                badge: "AI Powered",
-                features: ["신규 게시글 실시간 알림", "작성자 활동 패턴 통계", "타겟팅 DB 대량 수집"]
+                badge: "Hot Buy",
+                features: ["전체 히스토리 분석 수집", "진성 회원 식별 및 패턴 추적", "실시간 신규 알림 연동"]
             },
             {
-                id: 'stealth-comment',
-                title: "스텔스 댓글러 (Stealth Commenter)",
-                subtitle: "스마트 자동 소통 솔루션",
-                description: "봇 탐지 시스템을 우회하는 인간 행동 시뮬레이션 알고리즘을 탑재하여 타겟 글에 자연스러운 상호작용 댓글을 자동 작성합니다.",
-                icon: MessageCircle,
+                id: 'comment-stats',
+                title: "카페 댓글 수집 통계",
+                subtitle: "여론 흐름과 회원들의 실시간 반응 집계",
+                description: "작성되는 실시간 댓글을 분석하여 여론의 긍/부정 지수, 주요 키워드 트렌드, 커뮤니티 전반의 상호작용 피드백을 대시보드로 시각화해 줍니다.",
+                icon: FileText,
                 color: "from-pink-500 to-purple-600",
-                badge: "Hot",
-                features: ["랜덤 휴식 딜레이 시스템", "멀티 계정 순환 구동", "스마트 답변 키워드 룰"]
+                badge: "Analytics",
+                features: ["여론 감정선 시각 분석", "핵심 반응 키워드 분석", "실시간 대시보드 리포팅"]
+            },
+            {
+                id: 'event-activity-stats',
+                title: "이벤트 활동 통계 집계",
+                subtitle: "활동 지수 펌핑 및 카페 정밀 지표 분석",
+                description: "카페 활성화를 위한 이벤트 기여도, 회원별 참여 지수 등 정교한 지표 분석을 제공하여 실질적인 회원 행동량 성장을 유도할 수 있는 솔루션입니다.",
+                icon: BellRing,
+                color: "from-amber-500 to-orange-600",
+                badge: "Performance",
+                features: ["활동 활력 지표 진단", "이벤트 참여율 랭킹 산출", "맞춤형 활성화 솔루션 추천"]
             }
         ]
     },
     {
         id: 'app-monster',
         name: '앱 몬스터',
-        subtitle: '비즈니스의 안정성과 생산성을 향상시키는 고성능 유틸리티 솔루션',
+        subtitle: '일상의 소소한 불편함을 클릭 한 번으로 해결하는 편의 앱 팩토리',
+        actionCopy: '조건 없이 100% 무료로 일상의 가려운 곳 긁어보기',
         products: [
             {
-                id: 'paper-crawler',
-                title: "페이퍼 크롤러 (Paper Crawler)",
-                subtitle: "학술 및 전문 데이터 수집기",
-                description: "학술지, RISS, DBpia 등 지식 기반 전문 마케팅용 고난도 텍스트 데이터를 정교하게 크롤링하여 요약 파일로 자동 빌드합니다.",
-                icon: Monitor,
+                id: 'convenience-toolkit',
+                title: "일상 편의 툴킷",
+                subtitle: "결정 장애 해결, 유튜브 필터 등 편의 앱 허브",
+                description: "거창한 비즈니스 툴 대신, 이미지 일괄 리사이징, '오늘 뭐 먹지?', 유튜브 어그로 및 스팸 댓글 필터링 등 일상에서 바로 활용 가능한 미니 도구 모음입니다.",
+                icon: Zap,
                 color: "from-emerald-500 to-teal-600",
-                badge: "Professional",
-                features: ["학술 포털 최적화 스크래핑", "핵심 초록 AI 문맥 요약", "구조화된 데이터 추출"]
+                badge: "100% Free",
+                features: ["유튜브 광고/스팸 댓글 자동 필터", "원클릭 대용량 이미지 변환", "결정 장애 극복용 AI 추천"]
             },
             {
-                id: 'mobile-notifier',
-                title: "모바일 알림 몬스터",
-                subtitle: "작업 진행 상황 실시간 모니터링",
-                description: "구동 중인 모든 수집/발송 엔진의 예외 에러 및 일일 성과 통계를 사용자의 스마트폰 푸시 알림으로 24시간 실시간 전달하는 스마트 앱.",
-                icon: BellRing,
-                color: "from-amber-500 to-orange-600",
-                badge: "New Release",
-                features: ["텔레그램/슬랙 알림 동기화", "엔진 원격 중단 신호 감지", "일일 보고서 자동 발송"]
+                id: 'finance-assistant',
+                title: "AI 가계부 비서",
+                subtitle: "사진 한 장으로 끝내는 스마트 가계부 관리",
+                description: "소비 영수증이나 지출 내역서 이미지를 간편하게 전송하면, AI가 알아서 파싱하여 카테고리별 분석 및 스마트 소비 습관 보고서를 자동 생성해 줍니다.",
+                icon: MessageCircle,
+                color: "from-teal-500 to-emerald-600",
+                badge: "Easy Utility",
+                features: ["영수증 OCR 정밀 파싱", "카테고리 지출 자동 분류", "예산 관리 및 알림 비서"]
             }
         ]
     }
@@ -431,7 +454,16 @@ export const Showroom = () => {
                                         ))}
                                     </div>
 
-                                    <div className="pt-6 mt-auto flex gap-3">
+                                    <div className="pt-6 mt-auto flex flex-col gap-3">
+                                        <Link 
+                                            to="/support" 
+                                            className="w-full"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <Button className="w-full h-12 bg-slate-900 hover:bg-indigo-600 text-white rounded-xl font-bold transition-all flex items-center justify-center gap-2 text-xs sm:text-sm px-4">
+                                                {category.actionCopy} <ArrowRight className="w-4 h-4 shrink-0" />
+                                            </Button>
+                                        </Link>
                                         <Button 
                                             onClick={(e) => {
                                                 e.stopPropagation();
@@ -445,21 +477,12 @@ export const Showroom = () => {
                                             }}
                                             variant="outline"
                                             className={cn(
-                                                "flex-1 h-12 rounded-xl font-bold transition-all flex items-center justify-center gap-2 border-slate-200",
+                                                "w-full h-12 rounded-xl font-bold transition-all flex items-center justify-center gap-2 border-slate-200 text-xs sm:text-sm",
                                                 activeQnaProductId === product.id ? "bg-indigo-50 border-indigo-200 text-indigo-600 font-black" : "hover:bg-slate-50 text-slate-700"
                                             )}
                                         >
                                             <MessageSquare className="w-4 h-4" /> 질문/답변보기
                                         </Button>
-                                        <Link 
-                                            to="/support" 
-                                            className="flex-1"
-                                            onClick={(e) => e.stopPropagation()}
-                                        >
-                                            <Button className="w-full h-12 bg-slate-900 hover:bg-indigo-600 text-white rounded-xl font-bold transition-all flex items-center justify-center gap-2">
-                                                이용 및 도입 문의 <ArrowRight className="w-4 h-4" />
-                                            </Button>
-                                        </Link>
                                     </div>
                                 </div>
                                 
