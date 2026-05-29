@@ -39,8 +39,8 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
     return (
         <div className="min-h-screen bg-[#F8FAFC] flex flex-col font-sans">
             {/* Top Header */}
-            <header className="sticky top-0 z-50 bg-white/80 backdrop-filter backdrop-blur-xl border-b border-slate-100">
-                <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <header className="sticky top-0 z-50 bg-white/90 backdrop-filter backdrop-blur-xl border-b border-slate-100/80 shadow-sm">
+                <div className="max-w-7xl mx-auto px-6 h-28 flex items-center justify-between">
                     {/* Logo */}
                     <Link 
                         to="/" 
@@ -52,39 +52,39 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                         }}
                         className="flex items-center gap-3 group"
                     >
-                        <img src="/logo.png" alt="Logo" className="h-10 w-auto object-contain group-hover:scale-105 transition-transform" />
+                        <img src="/logo.png" alt="Logo" className="h-16 w-auto object-contain group-hover:scale-105 transition-transform duration-300" />
                     </Link>
 
                     {/* Desktop Navigation */}
-                    <nav className="hidden md:flex items-center gap-8">
+                    <nav className="hidden md:flex items-center gap-12">
                         <button 
                             onClick={() => scrollToSection('marketing-monster')}
-                            className="text-sm font-bold text-slate-500 hover:text-slate-900 transition-colors"
+                            className="text-lg font-black text-slate-600 hover:text-indigo-600 transition-all duration-300 relative py-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-indigo-600 hover:after:w-full after:transition-all after:duration-300"
                         >
                             마케팅 몬스터
                         </button>
                         <button 
                             onClick={() => scrollToSection('cafe-monster')}
-                            className="text-sm font-bold text-slate-500 hover:text-slate-900 transition-colors"
+                            className="text-lg font-black text-slate-600 hover:text-indigo-600 transition-all duration-300 relative py-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-indigo-600 hover:after:w-full after:transition-all after:duration-300"
                         >
                             카페 몬스터
                         </button>
                         <button 
                             onClick={() => scrollToSection('app-monster')}
-                            className="text-sm font-bold text-slate-500 hover:text-slate-900 transition-colors"
+                            className="text-lg font-black text-slate-600 hover:text-indigo-600 transition-all duration-300 relative py-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-indigo-600 hover:after:w-full after:transition-all after:duration-300"
                         >
                             앱 몬스터
                         </button>
                     </nav>
 
                     {/* Right Side Controls */}
-                    <div className="hidden md:flex items-center gap-4">
+                    <div className="hidden md:flex items-center gap-6">
                         <Link to="/support">
                             <Button 
                                 variant={location.pathname === '/support' ? 'default' : 'outline'}
-                                className="h-10 px-5 rounded-xl font-bold flex items-center gap-2 border-slate-200"
+                                className="h-14 px-8 rounded-2xl font-black text-sm flex items-center gap-2.5 border-slate-200 shadow-sm hover:shadow transition-all"
                             >
-                                <HelpCircle className="w-4 h-4" />
+                                <HelpCircle className="w-5 h-5" />
                                 {role === 'admin' ? '고객센터 관리' : (user && email ? '내 문의/답변' : '고객센터/문의')}
                             </Button>
                         </Link>
@@ -93,19 +93,19 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                             <Link to="/admin">
                                 <Button 
                                     variant="secondary"
-                                    className="h-10 px-5 rounded-xl font-bold flex items-center gap-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-100"
+                                    className="h-14 px-8 rounded-2xl font-black text-sm flex items-center gap-2.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 shadow-sm hover:shadow transition-all"
                                 >
-                                    <LayoutDashboard className="w-4 h-4" />
+                                    <LayoutDashboard className="w-5 h-5" />
                                     관리자 도구
                                 </Button>
                             </Link>
                         )}
 
                         {user && email && (
-                            <div className="flex items-center pl-2 border-l border-slate-200">
+                            <div className="flex items-center pl-4 border-l-2 border-slate-200">
                                 <Link 
                                     to="/profile" 
-                                    className="text-sm text-slate-700 font-black hover:text-indigo-600 transition-colors"
+                                    className="text-base text-slate-700 font-black hover:text-indigo-600 transition-all duration-200 bg-slate-50 hover:bg-indigo-50 px-4 py-2.5 rounded-xl border border-slate-100 hover:border-indigo-100"
                                     title="프로필 및 설정"
                                 >
                                     {email.split('@')[0]}
