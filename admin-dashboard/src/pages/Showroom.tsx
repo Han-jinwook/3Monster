@@ -401,9 +401,16 @@ export const Showroom = () => {
                     id={category.id} 
                     className="space-y-8 scroll-mt-24"
                 >
-                    <div className="border-l-4 border-indigo-600 pl-6 space-y-2">
-                        <h2 className="text-3xl font-black text-slate-900 tracking-tight">{category.name}</h2>
-                        <p className="text-slate-500 font-bold text-sm">{category.subtitle}</p>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-4 pl-6 border-l-4 border-indigo-600">
+                        <img 
+                            src={`/${category.id}-logo.png`} 
+                            alt={category.name} 
+                            className="h-12 w-auto object-contain shrink-0" 
+                        />
+                        <span className="hidden sm:inline text-slate-300 text-lg">|</span>
+                        <p className="text-slate-500 font-bold text-sm sm:text-base self-start sm:self-center">
+                            {category.subtitle}
+                        </p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
