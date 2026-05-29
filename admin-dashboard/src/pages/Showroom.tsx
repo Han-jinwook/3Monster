@@ -735,34 +735,38 @@ export const Showroom = () => {
                                                                                             
                                                                                             <div className="flex flex-wrap items-center justify-between gap-2">
                                                                                                 <div className="flex gap-1">
-                                                                                                    <div className="relative group">
-                                                                                                        <input
-                                                                                                            type="file"
-                                                                                                            accept="image/*"
-                                                                                                            onChange={e => setReplyImageMap(prev => ({ ...prev, [q.id]: e.target.files?.[0] || null }))}
-                                                                                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                                                                                        />
-                                                                                                        <div className="h-7 px-2 rounded-md bg-white hover:bg-slate-50 border border-slate-200 flex items-center transition-all">
-                                                                                                            <ImageIcon className="w-3 h-3 text-slate-400 mr-1" />
-                                                                                                            <span className="text-[9px] font-black text-slate-500 truncate max-w-[60px]">
-                                                                                                                {replyImageMap[q.id] ? replyImageMap[q.id]?.name : '사진'}
-                                                                                                            </span>
-                                                                                                        </div>
-                                                                                                    </div>
-                                                                                                    <div className="relative group">
-                                                                                                        <input
-                                                                                                            type="file"
-                                                                                                            accept=".log,.txt"
-                                                                                                            onChange={e => setReplyLogMap(prev => ({ ...prev, [q.id]: e.target.files?.[0] || null }))}
-                                                                                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                                                                                        />
-                                                                                                        <div className="h-7 px-2 rounded-md bg-white hover:bg-slate-50 border border-slate-200 flex items-center transition-all">
-                                                                                                            <FileText className="w-3 h-3 text-slate-400 mr-1" />
-                                                                                                            <span className="text-[9px] font-black text-slate-500 truncate max-w-[60px]">
-                                                                                                                {replyLogMap[q.id] ? replyLogMap[q.id]?.name : '로그'}
-                                                                                                            </span>
-                                                                                                        </div>
-                                                                                                    </div>
+                                                                                                    {isAdmin ? (
+                                                                                                        <>
+                                                                                                            <div className="relative group">
+                                                                                                                <input
+                                                                                                                    type="file"
+                                                                                                                    accept="image/*"
+                                                                                                                    onChange={e => setReplyImageMap(prev => ({ ...prev, [q.id]: e.target.files?.[0] || null }))}
+                                                                                                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                                                                                                />
+                                                                                                                <div className="h-7 px-2 rounded-md bg-white hover:bg-slate-50 border border-slate-200 flex items-center transition-all">
+                                                                                                                    <ImageIcon className="w-3 h-3 text-slate-400 mr-1" />
+                                                                                                                    <span className="text-[9px] font-black text-slate-500 truncate max-w-[60px]">
+                                                                                                                        {replyImageMap[q.id] ? replyImageMap[q.id]?.name : '사진'}
+                                                                                                                    </span>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                            <div className="relative group">
+                                                                                                                <input
+                                                                                                                    type="file"
+                                                                                                                    accept=".log,.txt"
+                                                                                                                    onChange={e => setReplyLogMap(prev => ({ ...prev, [q.id]: e.target.files?.[0] || null }))}
+                                                                                                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                                                                                                />
+                                                                                                                <div className="h-7 px-2 rounded-md bg-white hover:bg-slate-50 border border-slate-200 flex items-center transition-all">
+                                                                                                                    <FileText className="w-3 h-3 text-slate-400 mr-1" />
+                                                                                                                    <span className="text-[9px] font-black text-slate-500 truncate max-w-[60px]">
+                                                                                                                        {replyLogMap[q.id] ? replyLogMap[q.id]?.name : '로그'}
+                                                                                                                    </span>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </>
+                                                                                                    ) : null}
                                                                                                 </div>
                                                                                                 
                                                                                                 <div className="flex gap-2">
@@ -789,7 +793,7 @@ export const Showroom = () => {
                                                                                                         <Button 
                                                                                                             onClick={() => handleSubmitReply(q, 'open')}
                                                                                                             isLoading={submittingReplyId === q.id}
-                                                                                                            disabled={!(replyTextMap[q.id] || '').trim() && !replyImageMap[q.id] && !replyLogMap[q.id]}
+                                                                                                            disabled={!(replyTextMap[q.id] || '').trim()}
                                                                                                             className="h-7 px-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-[9px] font-black transition-all shadow-md shadow-indigo-100"
                                                                                                         >
                                                                                                             댓글 등록
