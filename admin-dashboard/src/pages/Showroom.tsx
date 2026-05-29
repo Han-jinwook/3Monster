@@ -387,12 +387,30 @@ export const Showroom = () => {
     return (
         <div className="max-w-7xl mx-auto space-y-20 py-12 px-6">
             {/* Hero Banner Section */}
-            <div className="relative overflow-hidden rounded-[2.5rem] shadow-2xl bg-slate-950">
+            <div className="relative overflow-hidden rounded-[2.5rem] shadow-2xl bg-slate-950 group">
                 <img 
                     src="/hero-banner.png" 
                     alt="3Monster Hero Banner" 
                     className="w-full h-auto object-cover block" 
                 />
+                {/* Clickable Overlay Regions */}
+                <div className="absolute inset-0 flex">
+                    <a 
+                        href="#marketing-monster" 
+                        className="w-1/3 h-full cursor-pointer hover:bg-white/5 transition-all duration-300"
+                        title="마케팅 몬스터 바로가기"
+                    />
+                    <a 
+                        href="#cafe-monster" 
+                        className="w-1/3 h-full cursor-pointer hover:bg-white/5 transition-all duration-300 border-x border-white/5"
+                        title="카페 몬스터 바로가기"
+                    />
+                    <a 
+                        href="#app-monster" 
+                        className="w-1/3 h-full cursor-pointer hover:bg-white/5 transition-all duration-300"
+                        title="앱 몬스터 바로가기"
+                    />
+                </div>
             </div>
             {/* Product Category Groups */}
             {productCategories.map((category) => {
