@@ -950,6 +950,40 @@ export const Showroom = () => {
                                             </p>
                                         </div>
 
+                                        {selectedProduct.id === 'nplace-db' && (
+                                            <>
+                                                <div className="space-y-3 pt-3">
+                                                    <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider">실제 구동 데모 영상</h4>
+                                                    <div className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-950 aspect-video shadow-inner">
+                                                        <video 
+                                                            src="/showroom/nplace/nplace-demo.mp4" 
+                                                            controls 
+                                                            className="w-full h-full object-contain"
+                                                            poster="/showroom/nplace/nplace-ui-1.png"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-3 pt-3">
+                                                    <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider">프로그램 스크린샷</h4>
+                                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                                        <a href="/showroom/nplace/nplace-ui-1.png" target="_blank" rel="noopener noreferrer" className="rounded-xl overflow-hidden border border-slate-200 hover:opacity-90 transition-opacity">
+                                                            <img src="/showroom/nplace/nplace-ui-1.png" alt="설정 화면" className="w-full h-24 object-cover" />
+                                                            <p className="text-[10px] text-center py-1 font-black text-slate-500 bg-slate-50 border-t border-slate-100">키워드 입력</p>
+                                                        </a>
+                                                        <a href="/showroom/nplace/nplace-ui-2.png" target="_blank" rel="noopener noreferrer" className="rounded-xl overflow-hidden border border-slate-200 hover:opacity-90 transition-opacity">
+                                                            <img src="/showroom/nplace/nplace-ui-2.png" alt="수집 진행" className="w-full h-24 object-cover" />
+                                                            <p className="text-[10px] text-center py-1 font-black text-slate-500 bg-slate-50 border-t border-slate-100">실시간 추출</p>
+                                                        </a>
+                                                        <a href="/showroom/nplace/nplace-excel.png" target="_blank" rel="noopener noreferrer" className="rounded-xl overflow-hidden border border-slate-200 hover:opacity-90 transition-opacity">
+                                                            <img src="/showroom/nplace/nplace-excel.png" alt="엑셀 출력" className="w-full h-24 object-cover" />
+                                                            <p className="text-[10px] text-center py-1 font-black text-slate-500 bg-slate-50 border-t border-slate-100">최종 엑셀 결과</p>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </>
+                                        )}
+
                                         <div className="space-y-3 pt-3">
                                             <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider">주요 기능 및 스펙</h4>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -971,7 +1005,18 @@ export const Showroom = () => {
                                             </ul>
                                         </div>
 
-                                        <div className="pt-6">
+                                        <div className="pt-6 space-y-3">
+                                            {selectedProduct.id === 'nplace-db' && (
+                                                <a 
+                                                    href="/showroom/nplace/nplace-sample.csv" 
+                                                    download="nplace-sample.csv"
+                                                    className="w-full block"
+                                                >
+                                                    <Button variant="outline" className="w-full h-12 border-2 border-indigo-200 hover:border-indigo-300 text-indigo-600 hover:bg-indigo-50/50 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 text-xs sm:text-sm">
+                                                        📄 실제 수집 엑셀 데이터 샘플 받기 (.csv)
+                                                    </Button>
+                                                </a>
+                                            )}
                                             <Link 
                                                 to="/support" 
                                                 className="w-full block"
