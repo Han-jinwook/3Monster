@@ -999,9 +999,18 @@ export const Showroom = () => {
                                         <div className="space-y-3 pt-3 border-t border-slate-100">
                                             <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider">상세 안내사항</h4>
                                             <ul className="list-disc list-inside text-xs text-slate-400 space-y-1.5 font-semibold">
-                                                <li>본 프로그램은 24시간 실시간 업데이트 및 모니터링을 제공합니다.</li>
-                                                <li>자세한 세팅 가이드 및 이용법은 로그인 후 마이페이지나 다운로드한 설명서를 참고해 주십시오.</li>
-                                                <li>기타 기능 개발 또는 연동 문의는 카드 하단 질문/답변 코너를 이용하면 담당 개발진이 빠르게 답변해 드립니다.</li>
+                                                {selectedProduct.id === 'nplace-db' ? (
+                                                    <>
+                                                        <li>네이버 N플레이스 차단 기준을 우회하기 위해 안전한 최적의 속도로 백그라운드 수집을 진행합니다. (퇴근하실 때 실행해 두시면 다음 날 아침 수천 건의 데이터 수집이 안전하게 완료됩니다.)</li>
+                                                        <li>자세한 사용 조작법은 프로그램 다운로드 패키지 내 동봉된 설명서를 참고해 주십시오.</li>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <li>본 프로그램은 실시간 업데이트 및 모니터링을 지원합니다.</li>
+                                                        <li>자세한 세팅 가이드 및 이용법은 다운로드 패키지 내 설명서를 참고해 주십시오.</li>
+                                                    </>
+                                                )}
+                                                <li>기타 커스텀 기능 개발 또는 연동 문의는 카드 하단 질문/답변 코너를 이용하면 담당 개발진이 빠르게 답변해 드립니다.</li>
                                             </ul>
                                         </div>
 
