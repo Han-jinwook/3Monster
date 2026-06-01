@@ -42,11 +42,11 @@ const productCategories = [
                 id: 'nplace-db',
                 title: "N플레이스 DB 추출기",
                 subtitle: "원하는 지역/업종별 실시간 타겟 DB 수집",
-                description: "네이버 플레이스 상의 업체 연락처, 이메일, 홈페이지 주소를 포함한 고퀄리티 가망 고객 정보를 실시간 정밀 파싱하여 즉각 영업 가능한 DB로 변환합니다.",
+                description: "네이버 N플레이스 상의 업체 연락처, 이메일, 홈페이지 주소를 포함한 고퀄리티 가망 고객 정보를 실시간 정밀 파싱하여 즉각 영업 가능한 DB로 변환합니다.",
                 icon: MapPin,
                 color: "from-blue-600 to-indigo-700",
                 badge: "26년 6월 출시",
-                features: ["실시간 지도 데이터 수집", "영업 시간/연락처 자동 분류", "원클릭 Excel 내보내기"]
+                features: ["실시간 N플레이스 정보 추출", "무료 인스타DM발송 & 무료 E-메일링 연동", "원클릭 Excel 내보내기"]
             },
             {
                 id: 'content-crawler',
@@ -168,6 +168,7 @@ export const Showroom = () => {
     const [questions, setQuestions] = useState<any[]>([]);
     const [loadingQuestions, setLoadingQuestions] = useState(false);
     const [qnaCounts, setQnaCounts] = useState<{[productId: string]: {questions: number, replies: number}}>({});
+    const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
 
     const fetchAllQnaCounts = async () => {
         try {
@@ -967,18 +968,27 @@ export const Showroom = () => {
                                                 <div className="space-y-3 pt-3">
                                                     <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider">프로그램 스크린샷</h4>
                                                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                                        <a href="/showroom/nplace/nplace-ui-1.png" target="_blank" rel="noopener noreferrer" className="rounded-xl overflow-hidden border border-slate-200 hover:opacity-90 transition-opacity">
+                                                        <div 
+                                                            onClick={() => setPreviewImageUrl("/showroom/nplace/nplace-ui-1.png")} 
+                                                            className="rounded-xl overflow-hidden border border-slate-200 hover:opacity-90 transition-opacity cursor-pointer"
+                                                        >
                                                             <img src="/showroom/nplace/nplace-ui-1.png" alt="설정 화면" className="w-full h-24 object-cover" />
                                                             <p className="text-[10px] text-center py-1 font-black text-slate-500 bg-slate-50 border-t border-slate-100">키워드 입력</p>
-                                                        </a>
-                                                        <a href="/showroom/nplace/nplace-ui-2.png" target="_blank" rel="noopener noreferrer" className="rounded-xl overflow-hidden border border-slate-200 hover:opacity-90 transition-opacity">
+                                                        </div>
+                                                        <div 
+                                                            onClick={() => setPreviewImageUrl("/showroom/nplace/nplace-ui-2.png")} 
+                                                            className="rounded-xl overflow-hidden border border-slate-200 hover:opacity-90 transition-opacity cursor-pointer"
+                                                        >
                                                             <img src="/showroom/nplace/nplace-ui-2.png" alt="수집 진행" className="w-full h-24 object-cover" />
                                                             <p className="text-[10px] text-center py-1 font-black text-slate-500 bg-slate-50 border-t border-slate-100">실시간 추출</p>
-                                                        </a>
-                                                        <a href="/showroom/nplace/nplace-excel.png" target="_blank" rel="noopener noreferrer" className="rounded-xl overflow-hidden border border-slate-200 hover:opacity-90 transition-opacity">
+                                                        </div>
+                                                        <div 
+                                                            onClick={() => setPreviewImageUrl("/showroom/nplace/nplace-excel.png")} 
+                                                            className="rounded-xl overflow-hidden border border-slate-200 hover:opacity-90 transition-opacity cursor-pointer"
+                                                        >
                                                             <img src="/showroom/nplace/nplace-excel.png" alt="엑셀 출력" className="w-full h-24 object-cover" />
                                                             <p className="text-[10px] text-center py-1 font-black text-slate-500 bg-slate-50 border-t border-slate-100">최종 엑셀 결과</p>
-                                                        </a>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </>
@@ -1052,6 +1062,48 @@ export const Showroom = () => {
                     </Button>
                 </Link>
             </div>
+
+            {/* Image Preview Lightbox Modal */}
+            <AnimatePresence>
+                {previewImageUrl && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-sm p-4 sm:p-8"
+                        onClick={() => setPreviewImageUrl(null)}
+                    >
+                        {/* Close button at top-left, large */}
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setPreviewImageUrl(null);
+                            }}
+                            className="absolute top-6 left-6 text-white/70 hover:text-white hover:scale-110 transition-all p-3 rounded-full hover:bg-white/10"
+                            aria-label="닫기"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+
+                        <motion.div
+                            initial={{ scale: 0.95, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.95, opacity: 0 }}
+                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                            className="relative max-w-5xl max-h-[85vh] rounded-2xl overflow-hidden shadow-2xl border border-white/10"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <img
+                                src={previewImageUrl}
+                                alt="확대된 스크린샷"
+                                className="w-full h-auto max-h-[85vh] object-contain rounded-2xl"
+                            />
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };
