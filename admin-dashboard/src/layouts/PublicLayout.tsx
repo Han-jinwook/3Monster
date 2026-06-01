@@ -56,44 +56,33 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
             return;
         }
 
-        const sections = ['marketing-monster', 'cafe-monster', 'app-monster'];
-
-        const observerOptions = {
-            root: null,
-            rootMargin: '-45% 0px -45% 0px',
-            threshold: 0
-        };
-
-        const observerCallback = (entries: IntersectionObserverEntry[]) => {
+        const handleScroll = () => {
             if (window.scrollY < 450) {
                 setActiveSection('');
                 return;
             }
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    setActiveSection(entry.target.id);
+
+            const sections = ['marketing-monster', 'cafe-monster', 'app-monster'];
+            let currentSection = '';
+            const triggerPoint = window.scrollY + window.innerHeight * 0.35;
+
+            for (const id of sections) {
+                const el = document.getElementById(id);
+                if (el) {
+                    const top = el.offsetTop;
+                    if (triggerPoint >= top) {
+                        currentSection = id;
+                    }
                 }
-            });
+            }
+
+            setActiveSection(currentSection);
         };
 
-        const observer = new IntersectionObserver(observerCallback, observerOptions);
-
-        sections.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) {
-                observer.observe(el);
-            }
-        });
-
-        const handleScroll = () => {
-            if (window.scrollY < 450) {
-                setActiveSection('');
-            }
-        };
         window.addEventListener('scroll', handleScroll);
+        handleScroll();
 
         return () => {
-            observer.disconnect();
             window.removeEventListener('scroll', handleScroll);
         };
     }, [location.pathname]);
