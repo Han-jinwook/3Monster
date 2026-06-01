@@ -996,13 +996,33 @@ export const Showroom = () => {
 
                                         <div className="space-y-3 pt-3">
                                             <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider">주요 기능 및 스펙</h4>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                                {selectedProduct.features.map((feature, idx) => (
-                                                    <div key={idx} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                                        <div className="w-2 h-2 rounded-full bg-indigo-500 shrink-0" />
-                                                        <span className="text-xs font-bold text-slate-700">{feature}</span>
+                                            <div className="grid grid-cols-1 gap-3">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                    {selectedProduct.features.map((feature, idx) => (
+                                                        <div key={idx} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                                            <div className="w-2 h-2 rounded-full bg-indigo-500 shrink-0" />
+                                                            <span className="text-xs font-bold text-slate-700">{feature}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                                {selectedProduct.id === 'nplace-db' && (
+                                                    <div className="p-3.5 bg-indigo-50/50 rounded-xl border border-indigo-100/50 space-y-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-[10px] font-black text-indigo-650 bg-indigo-100 px-2 py-0.5 rounded-md uppercase tracking-wider">엑셀 데이터 실전 100% 활용처</span>
+                                                        </div>
+                                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 text-[11px] font-bold text-slate-600">
+                                                            <div className="flex items-center gap-1.5 bg-white p-2 rounded-lg border border-slate-100">
+                                                                <span className="text-indigo-500">📞</span> 전화 TM 영업
+                                                            </div>
+                                                            <div className="flex items-center gap-1.5 bg-white p-2 rounded-lg border border-slate-100">
+                                                                <span className="text-indigo-500">✍️</span> 블로그 탐방 소통
+                                                            </div>
+                                                            <div className="flex items-center gap-1.5 bg-white p-2 rounded-lg border border-slate-100">
+                                                                <span className="text-indigo-500">✉️</span> 주소지 우편 발송
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                ))}
+                                                )}
                                             </div>
                                         </div>
                                         
@@ -1012,7 +1032,6 @@ export const Showroom = () => {
                                                 {selectedProduct.id === 'nplace-db' ? (
                                                     <>
                                                         <li>네이버 N플레이스 차단 기준을 우회하기 위해 안전한 최적의 속도로 백그라운드 수집을 진행합니다. (퇴근하실 때 실행해 두시면 다음 날 아침 수천 건의 데이터 수집이 안전하게 완료됩니다.)</li>
-                                                        <li>내보낸 엑셀(CSV) DB는 <strong>전화번호 텔레마케팅(TM), 네이버 블로그 직접 탐방/이웃 소통, 지오 타겟 기반 주소 카달로그 우편 발송</strong> 등 다양한 즉각 영업 활동에 즉시 100% 활용할 수 있습니다.</li>
                                                         <li>자세한 사용 조작법은 프로그램 다운로드 패키지 내 동봉된 설명서를 참고해 주십시오.</li>
                                                     </>
                                                 ) : (
