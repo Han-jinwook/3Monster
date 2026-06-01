@@ -624,7 +624,7 @@ export const Showroom = () => {
                                                 >
                                                     {/* 1. New Question Registration Form */}
                                                     {user ? (
-                                                        <form onSubmit={(e) => handleSubmitQuestion(product.id, e)} className="space-y-3 bg-white p-4 rounded-xl border border-indigo-50/50 shadow-sm text-left">
+                                                        <form onSubmit={(e) => handleSubmitQuestion(product.id, e)} className="space-y-3 bg-white p-4 rounded-xl border border-indigo-200 shadow-sm text-left">
                                                             <div className="flex justify-between items-center pb-1">
                                                                 <p className="text-[10px] font-black text-indigo-500 pl-1 uppercase tracking-wider flex items-center gap-1.5">
                                                                     <span>🙋‍♂️</span> 새 질문하기
@@ -642,7 +642,7 @@ export const Showroom = () => {
                                                                     placeholder="제품에 대해 궁금한 점을 적어주세요. 개발진이 직접 답변해 드립니다."
                                                                     value={newQuestionText}
                                                                     onChange={(e) => setNewQuestionText(e.target.value)}
-                                                                    className="w-full min-h-[75px] rounded-xl bg-slate-50 p-3 text-xs font-bold border-none outline-none focus:ring-2 focus:ring-indigo-100 transition-all resize-none placeholder:text-slate-400 text-slate-800"
+                                                                    className="w-full min-h-[75px] rounded-xl bg-slate-50 p-3 text-xs font-bold border border-slate-350 focus:border-indigo-500 outline-none focus:ring-2 focus:ring-indigo-100/50 transition-all resize-none placeholder:text-slate-500 text-slate-900"
                                                                 />
                                                             </div>
                                                         </form>
@@ -709,37 +709,41 @@ export const Showroom = () => {
                                                                         {isQExpanded && (
                                                                             <div className="p-4 bg-slate-50/20 space-y-4">
                                                                                 {/* Question Main Body */}
-                                                                                <div className="space-y-2">
-                                                                                    {(() => {
-                                                                                        const lines = q.description ? q.description.split('\n') : [];
-                                                                                        const bodyText = lines.slice(1).join('\n').trim();
-                                                                                        if (!bodyText) return null;
-                                                                                        return (
-                                                                                            <p className="text-xs text-slate-600 font-bold leading-relaxed whitespace-pre-wrap">
-                                                                                                {bodyText}
-                                                                                            </p>
-                                                                                        );
-                                                                                    })()}
-                                                                                    {(q.image_url || q.log_url) && (
-                                                                                        <div className="flex flex-wrap gap-2 pt-1">
-                                                                                            {q.image_url && (
-                                                                                                <a href={q.image_url} target="_blank" rel="noopener noreferrer" 
-                                                                                                   className="inline-flex items-center gap-1 px-2 py-1 bg-white hover:bg-slate-50 border border-slate-200/50 text-slate-700 rounded-lg text-[9px] font-black transition-all">
-                                                                                                    <ImageIcon className="w-3 h-3 text-slate-400" /> 스크린샷 보기
-                                                                                                </a>
+                                                                                {(() => {
+                                                                                    const lines = q.description ? q.description.split('\n') : [];
+                                                                                    const bodyText = lines.slice(1).join('\n').trim();
+                                                                                    const hasFiles = !!(q.image_url || q.log_url);
+                                                                                    if (!bodyText && !hasFiles) return null;
+                                                                                    return (
+                                                                                        <div className="space-y-2">
+                                                                                            {bodyText && (
+                                                                                                <p className="text-xs text-slate-600 font-bold leading-relaxed whitespace-pre-wrap">
+                                                                                                    {bodyText}
+                                                                                                </p>
                                                                                             )}
-                                                                                            {q.log_url && (
-                                                                                                <a href={q.log_url} target="_blank" rel="noopener noreferrer" 
-                                                                                                   className="inline-flex items-center gap-1 px-2 py-1 bg-white hover:bg-slate-50 border border-slate-200/50 text-slate-700 rounded-lg text-[9px] font-black transition-all">
-                                                                                                    <FileText className="w-3 h-3 text-slate-400" /> 로그 다운로드
-                                                                                                </a>
+                                                                                            {hasFiles && (
+                                                                                                <div className="flex flex-wrap gap-2 pt-1">
+                                                                                                    {q.image_url && (
+                                                                                                        <a href={q.image_url} target="_blank" rel="noopener noreferrer" 
+                                                                                                           className="inline-flex items-center gap-1 px-2 py-1 bg-white hover:bg-slate-50 border border-slate-200/50 text-slate-700 rounded-lg text-[9px] font-black transition-all">
+                                                                                                            <ImageIcon className="w-3 h-3 text-slate-400" /> 스크린샷 보기
+                                                                                                        </a>
+                                                                                                    )}
+                                                                                                    {q.log_url && (
+                                                                                                        <a href={q.log_url} target="_blank" rel="noopener noreferrer" 
+                                                                                                           className="inline-flex items-center gap-1 px-2 py-1 bg-white hover:bg-slate-50 border border-slate-200/50 text-slate-700 rounded-lg text-[9px] font-black transition-all">
+                                                                                                            <FileText className="w-3 h-3 text-slate-400" /> 로그 다운로드
+                                                                                                        </a>
+                                                                                                    )}
+                                                                                                </div>
                                                                                             )}
                                                                                         </div>
-                                                                                    )}
-                                                                                </div>
+                                                                                    );
+                                                                                })()}
 
                                                                                 {/* Thread Timeline Messages */}
-                                                                                <div className="space-y-3 pt-2.5 border-t border-slate-100 flex flex-col">
+                                                                                {thread.length > 0 && (
+                                                                                    <div className="space-y-3 pt-2.5 border-t border-slate-100 flex flex-col">
                                                                                     {thread.map((msg) => {
                                                                                             const isMsgAdmin = msg.sender === 'admin';
                                                                                             return (
@@ -788,7 +792,8 @@ export const Showroom = () => {
                                                                                                 </div>
                                                                                             );
                                                                                         })}
-                                                                                </div>
+                                                                                    </div>
+                                                                                )}
 
                                                                                 {/* Reply Form (Visible to Admin or Question Owner) */}
                                                                                 {canReply ? (
@@ -798,7 +803,7 @@ export const Showroom = () => {
                                                                                                 placeholder="추가 문의사항이나 답변을 입력해주세요..."
                                                                                                 value={replyTextMap[q.id] || ''}
                                                                                                 onChange={(e) => setReplyTextMap(prev => ({ ...prev, [q.id]: e.target.value }))}
-                                                                                                className="w-full min-h-[60px] rounded-lg bg-white p-2.5 text-xs font-bold border border-slate-200 outline-none focus:ring-2 focus:ring-indigo-100 transition-all resize-none text-slate-800 placeholder:text-slate-300"
+                                                                                                className="w-full min-h-[60px] rounded-lg bg-white p-2.5 text-xs font-bold border border-slate-350 focus:border-indigo-500 outline-none focus:ring-2 focus:ring-indigo-100/50 transition-all resize-none text-slate-900 placeholder:text-slate-500"
                                                                                             />
                                                                                             
                                                                                             <div className="flex flex-wrap items-center justify-between gap-2">
