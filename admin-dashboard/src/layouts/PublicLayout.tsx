@@ -60,11 +60,15 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
 
         const observerOptions = {
             root: null,
-            rootMargin: '-30% 0px -50% 0px',
+            rootMargin: '-45% 0px -45% 0px',
             threshold: 0
         };
 
         const observerCallback = (entries: IntersectionObserverEntry[]) => {
+            if (window.scrollY < 450) {
+                setActiveSection('');
+                return;
+            }
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     setActiveSection(entry.target.id);
@@ -82,7 +86,7 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
         });
 
         const handleScroll = () => {
-            if (window.scrollY < 150) {
+            if (window.scrollY < 450) {
                 setActiveSection('');
             }
         };
