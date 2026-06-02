@@ -226,7 +226,7 @@ export const CustomerSupport = () => {
             }
 
             if (kmongNickname.trim()) {
-                finalDescription = `[수동 구매 인증 요청: 크몽 닉네임 - ${kmongNickname.trim()}]\n${finalDescription}`;
+                finalDescription = `[수동 구매 인증 요청: 크몽 ID - ${kmongNickname.trim()}]\n${finalDescription}`;
             }
 
             const { error: updateError } = await supabase
@@ -287,7 +287,7 @@ export const CustomerSupport = () => {
             }
 
             if (kmongNickname.trim()) {
-                finalDescription = `[수동 구매 인증 요청: 크몽 닉네임 - ${kmongNickname.trim()}]\n${finalDescription}`;
+                finalDescription = `[수동 구매 인증 요청: 크몽 ID - ${kmongNickname.trim()}]\n${finalDescription}`;
             }
 
             const { error: insertError } = await supabase
@@ -612,11 +612,11 @@ export const CustomerSupport = () => {
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                             <div className="space-y-1.5">
                                                 <label className="text-[11px] font-bold text-slate-500 pl-0.5">
-                                                    크몽 닉네임 <span className="text-indigo-500 font-semibold">*2차 매칭용</span>
+                                                    크몽 ID (크몽 계정) <span className="text-indigo-500 font-semibold">*2차 매칭용</span>
                                                 </label>
                                                 <Input
                                                     disabled={!!selectedTicketForDetail && !isEditing}
-                                                    placeholder="수동 구매인증용 닉네임"
+                                                    placeholder="수동 구매인증용 크몽 ID"
                                                     value={kmongNickname}
                                                     onChange={e => setKmongNickname(e.target.value)}
                                                     className="h-9 bg-slate-50 border border-slate-200 hover:border-slate-300 focus:bg-white rounded-lg text-xs font-medium focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 transition-all disabled:opacity-75 disabled:cursor-not-allowed"
@@ -895,6 +895,13 @@ export const CustomerSupport = () => {
                                                                 setSelectedProduct('PlaceDB');
                                                             }
 
+                                                            const matchKmong = ticket.description?.match(/\[수동 구매 인증 요청: 크몽 (?:닉네임|ID) - (.*?)\]/);
+                                                            if (matchKmong && matchKmong[1]) {
+                                                                setKmongNickname(matchKmong[1]);
+                                                            } else {
+                                                                setKmongNickname('');
+                                                            }
+
                                                             const matchSerial = ticket.description?.match(/\(시리얼:\s*([^\)]+)\)/);
                                                             if (matchSerial && matchSerial[1]) {
                                                                 const lic = purchasedLicenses.find(l => l.serial_key === matchSerial[1]);
@@ -905,12 +912,7 @@ export const CustomerSupport = () => {
                                                                 setSelectedLicenseId('');
                                                             }
 
-                                                            const matchKmong = ticket.description?.match(/\[수동 구매 인증 요청: 크몽 닉네임 - (.*?)\]/);
-                                                            if (matchKmong && matchKmong[1]) {
-                                                                setKmongNickname(matchKmong[1]);
-                                                            } else {
-                                                                setKmongNickname('');
-                                                            }
+                                                            
                                                         } else {
                                                             setIsEditing(false);
                                                             setIssueType('bug');

@@ -111,7 +111,7 @@ export const Profile = () => {
             if (updateError) throw updateError;
 
             setInitialName(name.trim());
-            setSuccessMessage("크몽 닉네임이 성공적으로 변경되었습니다.");
+            setSuccessMessage("크몽 ID가 성공적으로 변경되었습니다.");
             setTimeout(() => setSuccessMessage(''), 2000);
         } catch (err: any) {
             console.error("Error saving nickname:", err);
@@ -299,16 +299,16 @@ export const Profile = () => {
                                 <div className="space-y-3.5 text-left">
                                     <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
                                         <User className="w-5 h-5 text-indigo-600" />
-                                        <h3 className="text-sm font-black text-slate-800">크몽 닉네임 (2차 인증 정보)</h3>
+                                        <h3 className="text-sm font-black text-slate-800">크몽 ID (2차 인증 정보)</h3>
                                     </div>
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold text-slate-400">크몽 구매자 닉네임</label>
+                                        <label className="text-[10px] font-bold text-slate-400">크몽 구매자 ID</label>
                                         <div className="flex gap-2">
                                             <Input
                                                 type="text"
                                                 value={name}
                                                 onChange={e => setName(e.target.value)}
-                                                placeholder="크몽 닉네임을 입력해 주세요"
+                                                placeholder="크몽 ID를 입력해 주세요"
                                                 className="h-10 bg-slate-50 border-slate-200 focus-visible:bg-white rounded-lg text-xs flex-1"
                                             />
                                             <Button 
