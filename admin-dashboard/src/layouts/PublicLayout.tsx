@@ -167,7 +167,7 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                             </Link>
                         )}
 
-                        {user && email && (
+                        {user && email ? (
                             <div className="flex items-center pl-4 border-l-2 border-slate-200">
                                 <Link 
                                     to="/profile" 
@@ -175,6 +175,16 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                                     title="프로필 및 설정"
                                 >
                                     {email.split('@')[0]}
+                                </Link>
+                            </div>
+                        ) : (
+                            <div className="flex items-center pl-4 border-l-2 border-slate-200">
+                                <Link 
+                                    to="/login" 
+                                    className="text-base text-indigo-650 font-black hover:text-indigo-800 transition-all duration-200 bg-indigo-55/10 hover:bg-indigo-55/20 px-5 py-2.5 rounded-xl border border-indigo-100/50"
+                                    title="로그인"
+                                >
+                                    로그인
                                 </Link>
                             </div>
                         )}
@@ -229,7 +239,7 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                                 </Link>
                             )}
 
-                            {user && email && (
+                            {user && email ? (
                                 <div className="space-y-3 pt-2">
                                     <Link 
                                         to="/profile" 
@@ -238,6 +248,17 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                                     >
                                         <p className="text-[10px] text-slate-400 font-bold uppercase">내 프로필 & 설정</p>
                                         <p className="text-sm text-slate-800 font-black mt-0.5">{email.split('@')[0]}</p>
+                                    </Link>
+                                </div>
+                            ) : (
+                                <div className="space-y-3 pt-2">
+                                    <Link 
+                                        to="/login" 
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="block bg-indigo-50 p-3 rounded-xl border border-indigo-100/50 text-left hover:bg-indigo-100/20 transition-colors"
+                                    >
+                                        <p className="text-[10px] text-indigo-500 font-bold uppercase">회원 서비스</p>
+                                        <p className="text-sm text-indigo-750 font-black mt-0.5">간편 로그인하기</p>
                                     </Link>
                                 </div>
                             )}
