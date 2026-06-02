@@ -177,19 +177,34 @@ export const Login = () => {
     }, [otp, otpStep]);
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-[#F4F6FB] px-4">
+        <div 
+            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/65 backdrop-blur-md p-4"
+            onClick={() => navigate('/')}
+        >
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="w-full max-w-[480px]"
+                className="w-full max-w-[460px] relative"
+                onClick={(e) => e.stopPropagation()}
             >
-                <Card className="p-12 shadow-premium border-none bg-white rounded-[2.5rem]">
-                    <div className="flex flex-col items-center text-center mb-10">
-                        <div className="h-20 w-auto flex items-center justify-center mb-6">
+                <Card className="p-10 md:p-12 shadow-2xl border border-slate-150 bg-white rounded-[2.5rem] relative">
+                    {/* Close Button */}
+                    <button 
+                        type="button"
+                        onClick={() => navigate('/')}
+                        className="absolute top-6 right-6 p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
+                        aria-label="닫기"
+                    >
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+
+                    <div className="flex flex-col items-center text-center mb-8">
+                        <div className="h-16 w-auto flex items-center justify-center mb-4">
                             <img src="/logo.png" alt="3Monster Logo" className="h-full object-contain" />
                         </div>
-                        <h1 className="text-3xl font-black text-slate-800 tracking-tight mb-2">3Monster</h1>
-                        <p className="text-slate-400 font-bold">서비스 이용을 위해 로그인해주세요.</p>
+                        <p className="text-slate-400 font-bold text-xs sm:text-sm">서비스 이용을 위해 로그인해주세요.</p>
                     </div>
 
                     <form onSubmit={handleLogin} className="space-y-6">
@@ -214,7 +229,7 @@ export const Login = () => {
                                         onChange={(e) => setEmail(e.target.value)}
                                         required
                                         disabled={otpStep === 2}
-                                        className="h-14 bg-slate-50 border-none focus-visible:bg-white"
+                                        className="h-14 bg-white border-2 border-slate-250 focus-visible:border-indigo-500 focus-visible:ring-0 transition-all font-bold"
                                     />
                                 </div>
                                 

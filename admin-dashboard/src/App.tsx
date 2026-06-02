@@ -40,8 +40,13 @@ function AppRoutes() {
                 </PublicLayout>
             } />
 
-            {/* Standalone Login page */}
-            <Route path="/login" element={<Login />} />
+            {/* Standalone Login page but with Showroom background */}
+            <Route path="/login" element={
+                <PublicLayout>
+                    <Showroom />
+                    <Login />
+                </PublicLayout>
+            } />
 
             {/* Restricted Admin Area */}
             <Route path="/admin" element={<AdminLayout />}>

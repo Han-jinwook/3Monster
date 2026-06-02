@@ -15,6 +15,8 @@ import {
     BellRing,
     ChevronDown,
     ChevronUp,
+    ChevronLeft,
+    ChevronRight,
     FileText,
     Image as ImageIcon
 } from 'lucide-react';
@@ -173,7 +175,12 @@ export const Showroom = () => {
     const [questions, setQuestions] = useState<any[]>([]);
     const [loadingQuestions, setLoadingQuestions] = useState(false);
     const [qnaCounts, setQnaCounts] = useState<{[productId: string]: {questions: number, replies: number}}>({});
-    const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
+    const [previewImageIndex, setPreviewImageIndex] = useState<number | null>(null);
+    const previewImages = [
+        "/showroom/nplace/nplace-ui-1.png",
+        "/showroom/nplace/nplace-ui-2.png",
+        "/showroom/nplace/nplace-excel.png"
+    ];
 
     const fetchAllQnaCounts = async () => {
         try {
@@ -974,21 +981,21 @@ export const Showroom = () => {
                                                     <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider">프로그램 스크린샷</h4>
                                                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                                         <div 
-                                                            onClick={() => setPreviewImageUrl("/showroom/nplace/nplace-ui-1.png")} 
+                                                            onClick={() => setPreviewImageIndex(0)} 
                                                             className="rounded-xl overflow-hidden border border-slate-200 hover:opacity-90 transition-opacity cursor-pointer"
                                                         >
                                                             <img src="/showroom/nplace/nplace-ui-1.png" alt="설정 화면" className="w-full h-24 object-cover" />
                                                             <p className="text-[10px] text-center py-1 font-black text-slate-500 bg-slate-50 border-t border-slate-100">키워드 입력</p>
                                                         </div>
                                                         <div 
-                                                            onClick={() => setPreviewImageUrl("/showroom/nplace/nplace-ui-2.png")} 
+                                                            onClick={() => setPreviewImageIndex(1)} 
                                                             className="rounded-xl overflow-hidden border border-slate-200 hover:opacity-90 transition-opacity cursor-pointer"
                                                         >
                                                             <img src="/showroom/nplace/nplace-ui-2.png" alt="수집 진행" className="w-full h-24 object-cover" />
                                                             <p className="text-[10px] text-center py-1 font-black text-slate-500 bg-slate-50 border-t border-slate-100">실시간 추출</p>
                                                         </div>
                                                         <div 
-                                                            onClick={() => setPreviewImageUrl("/showroom/nplace/nplace-excel.png")} 
+                                                            onClick={() => setPreviewImageIndex(2)} 
                                                             className="rounded-xl overflow-hidden border border-slate-200 hover:opacity-90 transition-opacity cursor-pointer"
                                                         >
                                                             <img src="/showroom/nplace/nplace-excel.png" alt="엑셀 출력" className="w-full h-24 object-cover" />
@@ -1093,19 +1100,19 @@ export const Showroom = () => {
 
             {/* Image Preview Lightbox Modal */}
             <AnimatePresence>
-                {previewImageUrl && (
+                {previewImageIndex !== null && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-sm p-4 sm:p-8"
-                        onClick={() => setPreviewImageUrl(null)}
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-sm p-4 sm:p-8 select-none"
+                        onClick={() => setPreviewImageIndex(null)}
                     >
                         {/* Close button at top-left, large */}
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
-                                setPreviewImageUrl(null);
+                                setPreviewImageIndex(null);
                             }}
                             className="absolute top-6 left-6 text-white/70 hover:text-white hover:scale-110 transition-all p-3 rounded-full hover:bg-white/10"
                             aria-label="닫기"
@@ -1115,16 +1122,40 @@ export const Showroom = () => {
                             </svg>
                         </button>
 
+                        {/* Navigation Arrows */}
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setPreviewImageIndex(previewImageIndex > 0 ? previewImageIndex - 1 : previewImages.length - 1);
+                            }}
+                            className="absolute left-6 top-1/2 -translate-y-1/2 text-white/70 hover:text-white hover:scale-105 transition-all p-4 rounded-full bg-slate-900/30 hover:bg-slate-900/60 border border-white/5 shadow-2xl z-10"
+                            aria-label="이전 이미지"
+                        >
+                            <ChevronLeft className="w-10 h-10" />
+                        </button>
+
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setPreviewImageIndex(previewImageIndex < previewImages.length - 1 ? previewImageIndex + 1 : 0);
+                            }}
+                            className="absolute right-6 top-1/2 -translate-y-1/2 text-white/70 hover:text-white hover:scale-105 transition-all p-4 rounded-full bg-slate-900/30 hover:bg-slate-900/60 border border-white/5 shadow-2xl z-10"
+                            aria-label="다음 이미지"
+                        >
+                            <ChevronRight className="w-10 h-10" />
+                        </button>
+
                         <motion.div
+                            key={previewImageIndex}
                             initial={{ scale: 0.95, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.95, opacity: 0 }}
-                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                            transition={{ type: "spring", damping: 28, stiffness: 280 }}
                             className="relative max-w-5xl max-h-[85vh] rounded-2xl overflow-hidden shadow-2xl border border-white/10"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <img
-                                src={previewImageUrl}
+                                src={previewImages[previewImageIndex]}
                                 alt="확대된 스크린샷"
                                 className="w-full h-auto max-h-[85vh] object-contain rounded-2xl"
                             />
