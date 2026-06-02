@@ -261,7 +261,6 @@ export const Showroom = () => {
     // Reply States (Mapped by ticket ID)
     const [replyTextMap, setReplyTextMap] = useState<{[ticketId: string]: string}>({});
     const [replyImageMap, setReplyImageMap] = useState<{[ticketId: string]: File | null}>({});
-    const [replyLogMap, setReplyLogMap] = useState<{[ticketId: string]: File | null}>({});
     const [submittingReplyId, setSubmittingReplyId] = useState<string | null>(null);
 
     // Expanded Q&A thread inside product Q&A list
@@ -390,7 +389,15 @@ export const Showroom = () => {
         try {
             const parsed = JSON.parse(ticket.reply);
             if (Array.isArray(parsed)) {
-                return parsed;
+                return parsed.filter(msg => msg && typeof msg === 'object').map((msg, index) => ({
+                    id: msg.id || `msg-${index}`,
+                    sender: msg.sender === 'admin' ? 'admin' : 'user',
+                    sender_email: msg.sender_email || 'unknown@3monster.net',
+                    text: msg.text || '',
+                    image_url: msg.image_url || null,
+                    log_url: msg.log_url || null,
+                    created_at: msg.created_at || new Date().toISOString()
+                }));
             }
         } catch (e) {
             // Fail silent
@@ -400,19 +407,18 @@ export const Showroom = () => {
             id: 'legacy',
             sender: 'admin',
             sender_email: 'admin@3monster.net',
-            text: ticket.reply,
+            text: typeof ticket.reply === 'string' ? ticket.reply : JSON.stringify(ticket.reply),
             image_url: null,
             log_url: null,
-            created_at: ticket.replied_at || ticket.created_at
+            created_at: ticket.replied_at || ticket.created_at || new Date().toISOString()
         }];
     };
 
     const handleSubmitReply = async (ticket: any, nextStatus: 'open' | 'closed') => {
         const replyText = replyTextMap[ticket.id] || '';
         const replyImage = replyImageMap[ticket.id] || null;
-        const replyLog = replyLogMap[ticket.id] || null;
 
-        if (!replyText.trim() && !replyImage && !replyLog) {
+        if (!replyText.trim() && !replyImage) {
             alert("댓글 내용을 입력하거나 파일을 첨부해주세요.");
             return;
         }
@@ -420,10 +426,8 @@ export const Showroom = () => {
         setSubmittingReplyId(ticket.id);
         try {
             let imageUrl = null;
-            let logUrl = null;
 
             if (replyImage) imageUrl = await handleUploadFile(replyImage, 'qna/replies/images');
-            if (replyLog) logUrl = await handleUploadFile(replyLog, 'qna/replies/logs');
 
             const currentThread = parseThread(ticket);
 
@@ -433,7 +437,7 @@ export const Showroom = () => {
                 sender_email: verifiedEmail || user?.email || 'unknown@3monster.net',
                 text: replyText,
                 image_url: imageUrl,
-                log_url: logUrl,
+                log_url: null,
                 created_at: new Date().toISOString()
             };
 
@@ -453,17 +457,20 @@ export const Showroom = () => {
             // Clear map states
             setReplyTextMap(prev => ({ ...prev, [ticket.id]: '' }));
             setReplyImageMap(prev => ({ ...prev, [ticket.id]: null }));
-            setReplyLogMap(prev => ({ ...prev, [ticket.id]: null }));
             setActiveReplyBoxQuestionId(null);
             
             if (activeQnaProductId) {
                 await fetchQuestions(activeQnaProductId);
             }
             
-            alert("댓글이 등록되었습니다.");
+            setTimeout(() => {
+                alert("댓글이 등록되었습니다.");
+            }, 100);
         } catch (err: any) {
             console.error("Error submitting reply:", err);
-            alert(`댓글 등록 중 오류가 발생했습니다: ${err.message}`);
+            setTimeout(() => {
+                alert(`댓글 등록 중 오류가 발생했습니다: ${err.message}`);
+            }, 100);
         } finally {
             setSubmittingReplyId(null);
         }
@@ -819,11 +826,10 @@ export const Showroom = () => {
                                                                                                 className="w-full min-h-[60px] rounded-lg bg-white p-2.5 text-xs font-bold border border-slate-350 focus:border-indigo-500 outline-none focus:ring-2 focus:ring-indigo-100/50 transition-all resize-none text-slate-900 placeholder:text-slate-500"
                                                                                             />
                                                                                             
-                                                                                            <div className="flex flex-wrap items-center justify-between gap-2">
-                                                                                                <div className="flex gap-1">
-                                                                                                    {isAdmin ? (
-                                                                                                        <>
-                                                                                                            <div className="relative group">
+                                                                                                <div className="flex flex-wrap items-center justify-between gap-2">
+                                                                                                    <div className="flex gap-1">
+                                                                                                        {isAdmin ? (
+                                                                                                            <div className="relative group w-fit">
                                                                                                                 <input
                                                                                                                     type="file"
                                                                                                                     accept="image/*"
@@ -837,56 +843,41 @@ export const Showroom = () => {
                                                                                                                     </span>
                                                                                                                 </div>
                                                                                                             </div>
-                                                                                                            <div className="relative group">
-                                                                                                                <input
-                                                                                                                    type="file"
-                                                                                                                    accept=".log,.txt"
-                                                                                                                    onChange={e => setReplyLogMap(prev => ({ ...prev, [q.id]: e.target.files?.[0] || null }))}
-                                                                                                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                                                                                                />
-                                                                                                                <div className="h-7 px-2 rounded-md bg-white hover:bg-slate-50 border border-slate-200 flex items-center transition-all">
-                                                                                                                    <FileText className="w-3 h-3 text-slate-400 mr-1" />
-                                                                                                                    <span className="text-[9px] font-black text-slate-500 truncate max-w-[60px]">
-                                                                                                                        {replyLogMap[q.id] ? replyLogMap[q.id]?.name : '로그'}
-                                                                                                                    </span>
-                                                                                                                </div>
-                                                                                                            </div>
-                                                                                                        </>
-                                                                                                    ) : null}
-                                                                                                </div>
-                                                                                                
-                                                                                                <div className="flex gap-2">
-                                                                                                    {isAdmin ? (
-                                                                                                        <>
+                                                                                                        ) : null}
+                                                                                                    </div>
+                                                                                                    
+                                                                                                    <div className="flex gap-2">
+                                                                                                        {isAdmin ? (
+                                                                                                            <>
+                                                                                                                <Button 
+                                                                                                                    onClick={() => handleSubmitReply(q, 'open')}
+                                                                                                                    isLoading={submittingReplyId === q.id}
+                                                                                                                    disabled={!(replyTextMap[q.id] || '').trim() && !replyImageMap[q.id]}
+                                                                                                                    className="h-7 px-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-[9px] font-black transition-all cursor-pointer"
+                                                                                                                >
+                                                                                                                    등록
+                                                                                                                </Button>
+                                                                                                                <Button 
+                                                                                                                    onClick={() => handleSubmitReply(q, 'closed')}
+                                                                                                                    isLoading={submittingReplyId === q.id}
+                                                                                                                    disabled={!(replyTextMap[q.id] || '').trim() && !replyImageMap[q.id]}
+                                                                                                                    className="h-7 px-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[9px] font-black transition-all shadow-md shadow-emerald-100 cursor-pointer"
+                                                                                                                >
+                                                                                                                    답변완료
+                                                                                                                </Button>
+                                                                                                            </>
+                                                                                                        ) : (
                                                                                                             <Button 
                                                                                                                 onClick={() => handleSubmitReply(q, 'open')}
                                                                                                                 isLoading={submittingReplyId === q.id}
-                                                                                                                disabled={!(replyTextMap[q.id] || '').trim() && !replyImageMap[q.id] && !replyLogMap[q.id]}
-                                                                                                                className="h-7 px-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-[9px] font-black transition-all"
+                                                                                                                disabled={!(replyTextMap[q.id] || '').trim()}
+                                                                                                                className="h-7 px-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-[9px] font-black transition-all shadow-md shadow-indigo-100 cursor-pointer"
                                                                                                             >
-                                                                                                                대기등록
+                                                                                                                댓글 등록
                                                                                                             </Button>
-                                                                                                            <Button 
-                                                                                                                onClick={() => handleSubmitReply(q, 'closed')}
-                                                                                                                isLoading={submittingReplyId === q.id}
-                                                                                                                disabled={!(replyTextMap[q.id] || '').trim() && !replyImageMap[q.id] && !replyLogMap[q.id]}
-                                                                                                                className="h-7 px-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[9px] font-black transition-all shadow-md shadow-emerald-100"
-                                                                                                            >
-                                                                                                                답변완료
-                                                                                                            </Button>
-                                                                                                        </>
-                                                                                                    ) : (
-                                                                                                        <Button 
-                                                                                                            onClick={() => handleSubmitReply(q, 'open')}
-                                                                                                            isLoading={submittingReplyId === q.id}
-                                                                                                            disabled={!(replyTextMap[q.id] || '').trim()}
-                                                                                                            className="h-7 px-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-[9px] font-black transition-all shadow-md shadow-indigo-100"
-                                                                                                        >
-                                                                                                            댓글 등록
-                                                                                                        </Button>
-                                                                                                    )}
+                                                                                                        )}
+                                                                                                    </div>
                                                                                                 </div>
-                                                                                            </div>
                                                                                         </div>
                                                                                     ) : (
                                                                                         <div className="pt-2 text-right">
