@@ -229,7 +229,7 @@ export const Login = () => {
                                         onChange={(e) => setEmail(e.target.value)}
                                         required
                                         disabled={otpStep === 2}
-                                        className="h-14 bg-white border-2 border-slate-250 focus-visible:border-indigo-500 focus-visible:ring-0 transition-all font-bold"
+                                        className="h-14 bg-white border-2 border-slate-400 focus:border-indigo-650 focus-visible:border-indigo-650 focus-visible:ring-4 focus-visible:ring-indigo-100 transition-all font-black text-slate-800"
                                     />
                                 </div>
                                 
