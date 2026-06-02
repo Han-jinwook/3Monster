@@ -1000,13 +1000,16 @@ export const Showroom = () => {
                                         )}
 
                                         <div className="space-y-3 pt-3">
-                                            <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider">주요 기능 및 스펙</h4>
+                                            <h4 className="text-sm font-black text-emerald-600 uppercase tracking-wider flex items-center gap-1.5">
+                                                <span className="w-1.5 h-3.5 bg-emerald-500 rounded-full" />
+                                                주요 기능 및 스펙
+                                            </h4>
                                             <div className="grid grid-cols-1 gap-3">
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                                     {selectedProduct.features.map((feature, idx) => (
-                                                        <div key={idx} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                                            <div className="w-2 h-2 rounded-full bg-indigo-500 shrink-0" />
-                                                            <span className="text-xs font-bold text-slate-700">{feature}</span>
+                                                        <div key={idx} className="flex items-center gap-3 p-3.5 bg-emerald-50/30 rounded-xl border border-emerald-100/50 hover:bg-emerald-50/60 transition-colors shadow-sm">
+                                                            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0 shadow-sm shadow-emerald-200" />
+                                                            <span className="text-sm font-extrabold text-slate-850">{feature}</span>
                                                         </div>
                                                     ))}
                                                 </div>
