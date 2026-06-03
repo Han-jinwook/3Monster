@@ -907,7 +907,7 @@ export const CustomerSupport = () => {
                                             )} />
                                             <div 
                                                 className={cn(
-                                                    "flex items-center justify-between p-2.5 px-3.5 cursor-pointer group select-none transition-colors",
+                                                    "flex items-center justify-between p-1.5 px-3 cursor-pointer group select-none transition-colors",
                                                     isExpanded ? "bg-slate-50/60" : "bg-white hover:bg-slate-50/30"
                                                 )}
                                                 onClick={() => {
@@ -993,46 +993,46 @@ export const CustomerSupport = () => {
                                             </div>
                                             
                                             {isExpanded && canViewDetail && (
-                                                <div className="border-t border-slate-100 bg-slate-50/15 p-2.5 space-y-2.5 animate-in fade-in duration-200">
+                                                <div className="border-t border-slate-100 bg-slate-50/15 p-2 pt-1 pb-1.5 space-y-1.5 animate-in fade-in duration-200">
                                                     {/* Thread History */}
                                                     {parseThread(ticket).length > 0 && (
-                                                        <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1 flex flex-col">
-                                                                                            {parseThread(ticket).map((msg) => {
-                                                                                                const isMsgAdmin = msg.sender === 'admin';
-                                                                                                const currentUserEmail = verifiedEmail || user?.email;
-                                                                                                const isMsgOwner = (msg.sender_email && currentUserEmail && msg.sender_email.toLowerCase() === currentUserEmail.toLowerCase()) || (msg.sender === 'admin' && isAdmin);
-                                                                                                return (
-                                                                                                    <div 
-                                                                                                        key={msg.id} 
-                                                                                                        className={cn(
-                                                                                                            "flex flex-col max-w-[85%] p-2 px-3 rounded-lg border transition-all duration-200 text-left",
-                                                                                                            isMsgAdmin 
-                                                                                                                ? "bg-emerald-50/40 border-emerald-100/50 ml-auto rounded-tr-none" 
-                                                                                                                : "bg-slate-100/60 border-slate-200/50 mr-auto rounded-tl-none"
-                                                                                                        )}
-                                                                                                    >
-                                                                                                        <div className="flex items-center gap-2 mb-1 justify-between">
-                                                                                                            <span className={cn(
-                                                                                                                "text-[10px] font-semibold",
-                                                                                                                isMsgAdmin ? "text-emerald-700" : "text-slate-650"
-                                                                                                            )}>
-                                                                                                                {isMsgAdmin ? "🛡️ 관리자" : `👤 ${maskEmail(msg.sender_email)}`}
-                                                                                                            </span>
-                                                                                                            <div className="flex items-center gap-1.5">
-                                                                                                                <span className="text-[9px] text-slate-400">
-                                                                                                                    {new Date(msg.created_at).toLocaleString()}
-                                                                                                                </span>
-                                                                                                                {isMsgOwner && (
-                                                                                                                    <button 
-                                                                                                                        onClick={() => handleDeleteReply(ticket, msg.id)}
-                                                                                                                        className="text-[9px] font-bold text-rose-500 hover:text-rose-700 transition-colors ml-1 cursor-pointer"
-                                                                                                                    >
-                                                                                                                        삭제
-                                                                                                                    </button>
-                                                                                                                )}
-                                                                                                            </div>
-                                                                                                        </div>
-                                                                        
+                                                        <div className="space-y-1 max-h-[300px] overflow-y-auto pr-1 flex flex-col">
+                                                            {parseThread(ticket).map((msg) => {
+                                                                const isMsgAdmin = msg.sender === 'admin';
+                                                                const currentUserEmail = verifiedEmail || user?.email;
+                                                                const isMsgOwner = (msg.sender_email && currentUserEmail && msg.sender_email.toLowerCase() === currentUserEmail.toLowerCase()) || (msg.sender === 'admin' && isAdmin);
+                                                                return (
+                                                                    <div 
+                                                                        key={msg.id} 
+                                                                        className={cn(
+                                                                            "flex flex-col max-w-[85%] py-1 px-2.5 rounded-lg border transition-all duration-200 text-left",
+                                                                            isMsgAdmin 
+                                                                                ? "bg-emerald-50/40 border-emerald-100/50 ml-auto rounded-tr-none" 
+                                                                                : "bg-slate-100/60 border-slate-200/50 mr-auto rounded-tl-none"
+                                                                        )}
+                                                                    >
+                                                                        <div className="flex items-center gap-2 mb-0.5 justify-between">
+                                                                            <span className={cn(
+                                                                                "text-[10px] font-semibold",
+                                                                                isMsgAdmin ? "text-emerald-700" : "text-slate-650"
+                                                                            )}>
+                                                                                {isMsgAdmin ? "🛡️ 관리자" : `👤 ${maskEmail(msg.sender_email)}`}
+                                                                            </span>
+                                                                            <div className="flex items-center gap-1.5">
+                                                                                <span className="text-[9px] text-slate-400">
+                                                                                    {new Date(msg.created_at).toLocaleString()}
+                                                                                </span>
+                                                                                {isMsgOwner && (
+                                                                                    <button 
+                                                                                        onClick={() => handleDeleteReply(ticket, msg.id)}
+                                                                                        className="text-[9px] font-bold text-rose-500 hover:text-rose-700 transition-colors ml-1 cursor-pointer"
+                                                                                    >
+                                                                                        삭제
+                                                                                    </button>
+                                                                                )}
+                                                                            </div>
+                                                                        </div>
+                                        
                                                                         <p className={cn(
                                                                             "text-xs font-normal leading-relaxed whitespace-pre-wrap",
                                                                             isMsgAdmin ? "text-emerald-950" : "text-slate-700"
@@ -1041,7 +1041,7 @@ export const CustomerSupport = () => {
                                                                         </p>
  
                                                                         {(msg.image_url || msg.log_url) && (
-                                                                            <div className="mt-2 pt-2 border-t border-slate-200/30 flex flex-wrap gap-1.5">
+                                                                            <div className="mt-1 pt-1 border-t border-slate-200/30 flex flex-wrap gap-1.5">
                                                                                 {msg.image_url && (
                                                                                     <a href={msg.image_url} target="_blank" rel="noopener noreferrer" 
                                                                                        className="inline-flex items-center gap-1 px-2 py-1 bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 rounded text-[10px] font-medium transition-all">
@@ -1068,14 +1068,14 @@ export const CustomerSupport = () => {
                                                         const isDisabledReply = !isAdmin && adminReplies.length === 0;
  
                                                         return (
-                                                            <div className="space-y-3 pt-3 border-t border-slate-150">
+                                                            <div className="space-y-1.5 pt-1.5 border-t border-slate-150">
                                                                 <div className="relative">
                                                                     <textarea
                                                                         disabled={isDisabledReply}
                                                                         placeholder={isDisabledReply ? "답변 대기 중에는 추가 문의(댓글)를 작성할 수 없습니다." : "추가 문의사항이나 답변을 입력해주세요..."}
                                                                         value={replyText}
                                                                         onChange={(e) => setReplyText(e.target.value)}
-                                                                        className="w-full min-h-[72px] rounded-lg bg-slate-50 border border-slate-200 hover:border-slate-350 focus:bg-white p-3 text-xs font-medium outline-none focus:ring-2 focus:ring-indigo-150 focus:border-indigo-500 transition-all resize-none placeholder:text-slate-400 text-slate-800 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
+                                                                        className="w-full min-h-[60px] rounded-lg bg-slate-50 border border-slate-200 hover:border-slate-350 focus:bg-white p-2 text-xs font-medium outline-none focus:ring-2 focus:ring-indigo-150 focus:border-indigo-500 transition-all resize-none placeholder:text-slate-400 text-slate-800 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
                                                                     />
                                                                 </div>
  
@@ -1132,7 +1132,7 @@ export const CustomerSupport = () => {
                                                                 )}
  
                                                                 {/* Action Buttons */}
-                                                                <div className="flex justify-end gap-2 pt-1.5">
+                                                                <div className="flex justify-end gap-2 pt-1">
                                                                     {isAdmin ? (
                                                                         <>
                                                                             <Button 
@@ -1147,7 +1147,7 @@ export const CustomerSupport = () => {
                                                                                 onClick={() => handleSubmitReply(ticket, 'closed')}
                                                                                 isLoading={isSubmittingReply}
                                                                                 disabled={!replyText.trim() && !replyImage && !replyLog}
-                                                                                className="bg-emerald-50 hover:bg-emerald-100 text-emerald-750 border border-emerald-200 rounded-lg px-4 h-8 text-xs font-bold transition-all"
+                                                                                className="bg-emerald-50 hover:bg-emerald-100 text-emerald-755 border border-emerald-200 rounded-lg px-4 h-8 text-xs font-bold transition-all"
                                                                             >
                                                                                 답변 완료 및 해결완료 처리
                                                                             </Button>

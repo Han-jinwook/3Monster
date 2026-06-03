@@ -778,11 +778,11 @@ export const Showroom = () => {
                                                                         <div 
                                                                             onClick={() => setExpandedQuestionId(isQExpanded ? null : q.id)}
                                                                             className={cn(
-                                                                                "p-4 cursor-pointer flex items-center justify-between gap-3 transition-all hover:bg-slate-50/50",
+                                                                                "p-1 px-2.5 cursor-pointer flex items-center justify-between gap-1.5 transition-all hover:bg-slate-50/50",
                                                                                 isQExpanded && "bg-slate-50/30 border-b border-slate-100/50"
                                                                             )}
                                                                         >
-                                                                            <div className="space-y-1 flex-1 min-w-0">
+                                                                            <div className="space-y-0.5 flex-1 min-w-0">
                                                                                 <div className="flex flex-wrap items-center gap-1.5">
                                                                                     <span className="text-[9px] font-black text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded uppercase tracking-wider">
                                                                                         {maskEmail(q.email)}
@@ -800,14 +800,14 @@ export const Showroom = () => {
                                                                                     {q.description ? q.description.split('\n')[0] : ''}
                                                                                 </p>
                                                                             </div>
-                                                                            <div className="w-6 h-6 rounded-md bg-slate-50 flex items-center justify-center text-slate-400 shrink-0">
+                                                                            <div className="w-5 h-5 rounded-md bg-slate-50 flex items-center justify-center text-slate-400 shrink-0">
                                                                                 {isQExpanded ? <ChevronUp className="w-3.5 h-3.5 text-indigo-500" /> : <ChevronDown className="w-3.5 h-3.5 text-slate-350" />}
                                                                             </div>
                                                                         </div>
 
                                                                         {/* Question Detail & Reply Thread */}
                                                                         {isQExpanded && (
-                                                                            <div className="p-3 bg-slate-50/15 space-y-3">
+                                                                            <div className="p-1 bg-slate-50/15 space-y-1">
                                                                                 {/* Question Main Body */}
                                                                                 {(() => {
                                                                                     const lines = q.description ? q.description.split('\n') : [];
@@ -815,14 +815,14 @@ export const Showroom = () => {
                                                                                     const hasFiles = !!(q.image_url || q.log_url);
                                                                                     if (!bodyText && !hasFiles) return null;
                                                                                     return (
-                                                                                        <div className="space-y-2">
+                                                                                        <div className="space-y-0.5">
                                                                                             {bodyText && (
                                                                                                 <p className="text-xs text-slate-600 font-bold leading-relaxed whitespace-pre-wrap">
                                                                                                     {bodyText}
                                                                                                 </p>
                                                                                             )}
                                                                                             {hasFiles && (
-                                                                                                <div className="flex flex-wrap gap-2 pt-1">
+                                                                                                <div className="flex flex-wrap gap-1 pt-0.5">
                                                                                                     {q.image_url && (
                                                                                                         <a href={q.image_url} target="_blank" rel="noopener noreferrer" 
                                                                                                            className="inline-flex items-center gap-1 px-2 py-1 bg-white hover:bg-slate-50 border border-slate-200/50 text-slate-700 rounded-lg text-[9px] font-black transition-all">
@@ -844,13 +844,13 @@ export const Showroom = () => {
                                                                                 {/* Thread Timeline Messages */}
                                                                                 {thread.length > 0 && (
                                                                                     <div className={cn(
-                                                                                        "space-y-2 flex flex-col",
+                                                                                        "space-y-1 flex flex-col",
                                                                                         (() => {
                                                                                             const lines = q.description ? q.description.split('\n') : [];
                                                                                             const bodyText = lines.slice(1).join('\n').trim();
                                                                                             const hasFiles = !!(q.image_url || q.log_url);
                                                                                             return (bodyText || hasFiles);
-                                                                                        })() && "pt-2 border-t border-slate-100"
+                                                                                        })() && "pt-1 border-t border-slate-100"
                                                                                     )}>
                                                                                             {thread.map((msg) => {
                                                                                                     const isMsgAdmin = msg.sender === 'admin';
@@ -860,13 +860,13 @@ export const Showroom = () => {
                                                                                                         <div 
                                                                                                             key={msg.id} 
                                                                                                             className={cn(
-                                                                                                                "flex flex-col max-w-[85%] p-2 px-3 rounded-lg shadow-xs border transition-all duration-300",
+                                                                                                                "flex flex-col max-w-[85%] py-1 px-2.5 rounded-lg shadow-xs border transition-all duration-300",
                                                                                                                 isMsgAdmin 
                                                                                                                     ? "bg-emerald-50/50 border-emerald-100/50 ml-auto rounded-tr-none" 
                                                                                                                     : "bg-indigo-50/40 border-indigo-100/30 mr-auto rounded-tl-none"
                                                                                                             )}
                                                                                                         >
-                                                                                                            <div className="flex items-center gap-1.5 mb-1 justify-between">
+                                                                                                            <div className="flex items-center gap-1.5 mb-0.5 justify-between">
                                                                                                                 <span className={cn(
                                                                                                                     "text-[9px] font-black",
                                                                                                                     isMsgAdmin ? "text-emerald-700" : "text-indigo-700"
@@ -894,7 +894,7 @@ export const Showroom = () => {
                                                                                                         {msg.text}
                                                                                                     </p>
                                                                                                     {(msg.image_url || msg.log_url) && (
-                                                                                                        <div className="mt-1.5 pt-1.5 border-t border-slate-100/50 flex gap-1">
+                                                                                                        <div className="mt-1 pt-1 border-t border-slate-100/50 flex gap-1">
                                                                                                             {msg.image_url && (
                                                                                                                 <a href={msg.image_url} target="_blank" rel="noopener noreferrer" 
                                                                                                                    className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-white hover:bg-slate-50 border border-slate-100 rounded text-[9px] font-black">
@@ -918,12 +918,12 @@ export const Showroom = () => {
                                                                                 {/* Reply Form (Visible to Admin or Question Owner) */}
                                                                                 {canReply ? (
                                                                                     activeReplyBoxQuestionId === q.id ? (
-                                                                                        <div className="pt-3 border-t border-slate-100 space-y-2">
+                                                                                        <div className="pt-1 border-t border-slate-100 space-y-1">
                                                                                             <textarea
                                                                                                 placeholder="추가 문의사항이나 답변을 입력해주세요..."
                                                                                                 value={replyTextMap[q.id] || ''}
                                                                                                 onChange={(e) => setReplyTextMap(prev => ({ ...prev, [q.id]: e.target.value }))}
-                                                                                                className="w-full min-h-[60px] rounded-lg bg-white p-2.5 text-xs font-bold border border-slate-350 focus:border-indigo-500 outline-none focus:ring-2 focus:ring-indigo-100/50 transition-all resize-none text-slate-900 placeholder:text-slate-500"
+                                                                                                className="w-full min-h-[45px] rounded-lg bg-white p-1.5 text-xs font-bold border border-slate-350 focus:border-indigo-500 outline-none focus:ring-2 focus:ring-indigo-100/50 transition-all resize-none text-slate-900 placeholder:text-slate-500"
                                                                                             />
                                                                                             
                                                                                             <div className="flex flex-wrap items-center justify-between gap-2">
@@ -970,7 +970,7 @@ export const Showroom = () => {
                                                                                             </div>
                                                                                         </div>
                                                                                     ) : (
-                                                                                        <div className="pt-2 text-right">
+                                                                                        <div className="pt-1 text-right">
                                                                                             <button 
                                                                                                 onClick={() => {
                                                                                                     setActiveReplyBoxQuestionId(q.id);
@@ -986,7 +986,7 @@ export const Showroom = () => {
                                                                                         </div>
                                                                                     )
                                                                                 ) : (
-                                                                                    <p className="text-[9px] text-slate-400 text-center italic pt-3 border-t border-slate-100">
+                                                                                    <p className="text-[9px] text-slate-400 text-center italic pt-1 border-t border-slate-100">
                                                                                         질문 작성자 및 관리자만 대댓글을 달 수 있습니다.
                                                                                     </p>
                                                                                 )}
