@@ -417,16 +417,20 @@ export const CustomerSupport = () => {
 
             const updatedThread = [...currentThread, newMessage];
             
-            const { error: updateError } = await supabase
+            const { data, error: updateError } = await supabase
                 .from('support_tickets')
                 .update({
                     reply: JSON.stringify(updatedThread),
                     status: nextStatus,
                     replied_at: new Date().toISOString()
                 })
-                .eq('id', ticket.id);
+                .eq('id', ticket.id)
+                .select();
 
             if (updateError) throw updateError;
+            if (!data || data.length === 0) {
+                throw new Error("데이터베이스 저장 권한이 없습니다. (RLS 제한)");
+            }
 
             setReplyText('');
             setReplyImage(null);
