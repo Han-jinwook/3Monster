@@ -1,8 +1,8 @@
 # 🗄 Supabase 전역 DB 스키마 명세서
 
 - **문서 번호**: 3M-DOC-002
-- **버전**: v1.1
-- **갱신 일시**: 2026-05-26
+- **버전**: v1.2
+- **갱신 일시**: 2026-06-03
 - **관리 주체**: Monster 총괄 AI (Hub AI)
 
 ---
@@ -12,7 +12,7 @@
 ## 1. 데이터베이스 개요
 - **플랫폼**: Supabase Cloud DB
 - **종류**: PostgreSQL
-- **용도**: 라이선스 인증, 기기 바인딩(HWID), 앱 최신 버전 갱신 관리
+- **용도**: 라이선스 인증, 기기 바인딩(HWID), 앱 최신 버전 갱신 관리, Q&A 및 알림 관리
 
 ## 2. 테이블 상세 명세
 
@@ -22,17 +22,21 @@
 
 | 컬럼명 | 타입 | 제약 조건 | 설명 |
 | :--- | :--- | :--- | :--- |
-| **serial_key** | TEXT | PRIMARY KEY | 라이선스 고유 시리얼 키 (예: `CM-XXXX-XXXX-XXXX` 또는 `TEST-XXXX-XXXX`) |
-| **bound_value** | TEXT | NULLABLE | 최초 등록 또는 바인딩된 PC의 HWID |
-| **status** | TEXT | DEFAULT 'unused' | 키 상태 (`active`, `used`, `unused`, `blocked`, `expired`) |
-| **expire_date** | TIMESTAMPTZ | - | 라이선스 만료 일시 (ISO 8601) |
-| **collection_limit**| INTEGER | NULLABLE | 1회/기간 내 최대 수집 제한 건수 (체험판/테스트 키용) |
-| **product_id** | TEXT | - | 적용 대상 제품 식별자 (예: `NPlace-DB`, `CafeCrawler`) |
-| **buyer_name** | TEXT | NULLABLE | 구매자 성함 또는 상호명 |
-| **contact** | TEXT | NULLABLE | 구매자 연락처 |
-| **price_sold** | NUMERIC | DEFAULT 0 | 실제 판매 가격 |
+| **id** | BIGINT | PRIMARY KEY (Identity) | 라이선스 고유 순번 ID |
+| **serial_key** | TEXT | NOT NULL | 라이선스 고유 시리얼 키 (예: `CM-XXXX-XXXX-XXXX`) |
+| **product_id** | TEXT | NOT NULL | 적용 대상 제품 식별자 (예: `NPlace-DB`, `CafeCrawler`) |
+| **license_type** | TEXT | NOT NULL | 라이선스 유형 |
+| **buyer_name** | TEXT | NOT NULL | 구매자 성함 또는 상호명 |
+| **contact** | TEXT | NULLABLE | 구매자 연락처 (이메일 등) |
+| **channel** | TEXT | NULLABLE | 판매/유입 채널 |
+| **price_sold** | INTEGER | DEFAULT 0 | 실제 판매 가격 |
 | **memo** | TEXT | NULLABLE | 특이사항 기록용 메모 |
+| **expire_date** | TIMESTAMPTZ | NOT NULL | 라이선스 만료 일시 (ISO 8601) |
+| **collection_limit**| INTEGER | NULLABLE | 1회/기간 내 최대 수집 제한 건수 (체험판/테스트 키용) |
+| **status** | TEXT | DEFAULT 'unused' | 키 상태 (`active`, `used`, `unused`, `blocked`, `expired`) |
+| **bound_value** | TEXT | NULLABLE | 최초 등록 또는 바인딩된 PC의 HWID |
 | **created_at** | TIMESTAMPTZ | DEFAULT now() | 발행 일시 |
+| **constraint_type** | TEXT | NULLABLE | 기능 제약 등 세부 타입 속성 |
 
 ---
 
@@ -42,11 +46,12 @@
 
 | 컬럼명 | 타입 | 제약 조건 | 설명 |
 | :--- | :--- | :--- | :--- |
-| **id** | BIGINT | PRIMARY KEY (Identity)| 버전 등록 고유 번호 |
-| **product_id** | TEXT | - | 해당 제품 식별자 (예: `NPlace-DB`, `CafeCrawler`) |
-| **version** | TEXT | - | 버전 명칭 (예: `1.0.0`, `1.0.1`) |
-| **download_url** | TEXT | - | 바이너리 파일 다운로드 경로 (Supabase Storage 또는 CDN 주소) |
+| **id** | BIGINT | PRIMARY KEY (Identity) | 버전 등록 고유 번호 |
+| **product_id** | TEXT | NOT NULL | 해당 제품 식별자 (예: `NPlace-DB`, `CafeCrawler`) |
+| **version** | TEXT | NOT NULL | 버전 명칭 (예: `1.0.0`, `1.0.1`) |
+| **download_url** | TEXT | NOT NULL | 바이너리 파일 다운로드 경로 (Supabase Storage 또는 CDN 주소) |
 | **release_notes** | TEXT | NULLABLE | 이번 업데이트의 패치 노트 내용 |
+| **is_critical** | BOOLEAN | DEFAULT false | 필수/강제 업데이트 여부 |
 | **created_at** | TIMESTAMPTZ | DEFAULT now() | 버전 배포 일시 |
 
 ---
@@ -58,10 +63,10 @@
 | 컬럼명 | 타입 | 제약 조건 | 설명 |
 | :--- | :--- | :--- | :--- |
 | **id** | BIGINT | PRIMARY KEY (Identity) | 문의 티켓 고유 ID |
-| **uid** | UUID | NULLABLE (Foreign Key) | 작성자의 Supabase Auth UID (비로그인 시 NULL) |
-| **email** | TEXT | - | 답변을 받을 작성자 이메일 주소 |
-| **issue_type** | TEXT | - | 문의 유형 (`bug`, `suggestion`, `qna_{product_id}` 등) |
-| **description** | TEXT | - | 문의 내용 본문 |
+| **uid** | UUID | NOT NULL | 작성자의 Supabase Auth UID |
+| **email** | TEXT | NOT NULL | 답변을 받을 작성자 이메일 주소 |
+| **issue_type** | TEXT | NOT NULL | 문의 유형 (`bug`, `suggestion`, `qna_{product_id}` 등) |
+| **description** | TEXT | NOT NULL | 문의 내용 본문 |
 | **image_url** | TEXT | NULLABLE | 첨부 이미지 URL (Supabase Storage 경로) |
 | **log_url** | TEXT | NULLABLE | 첨부 로그 파일 URL (Supabase Storage 경로) |
 | **status** | TEXT | DEFAULT 'open' | 티켓 진행 상태 (`open`, `in_progress`, `resolved`, `closed`) |
@@ -99,6 +104,8 @@
 | **channel** | TEXT | NULLABLE | 최초 연동/가입 채널 (예: `Kmong`, `Direct`, `Kmong (Pending)`) |
 | **created_at** | TIMESTAMPTZ | DEFAULT now() | 가입/등록 일시 |
 
+---
+
 ### [테이블명: notifications]
 - **목적**: 마이페이지 '알림' 토글이 활성화된 사용자들을 대상으로 하는 전체 공지 및 개별 권한별 알림 메시지 관리.
 - **테이블 구조**:
@@ -114,11 +121,23 @@
 
 ---
 
+### [테이블명: otps]
+- **목적**: 이메일 로그인 시 생성되는 인증번호 저장 및 유효성 검증 관리.
+- **테이블 구조**:
+
+| 컬럼명 | 타입 | 제약 조건 | 설명 |
+| :--- | :--- | :--- | :--- |
+| **email** | TEXT | PRIMARY KEY | 대상 사용자 이메일 주소 |
+| **code** | TEXT | NOT NULL | 발송된 6자리 인증번호 |
+| **expires_at** | TIMESTAMPTZ | NOT NULL | 인증번호 유효기간 만료 일시 |
+| **created_at** | TIMESTAMPTZ | DEFAULT now() | 인증번호 생성 일시 |
+
+---
+
 ### [비고: 미사용 테이블 정리]
 - **inquiries**: 레거시/구버전 문의 테이블로 현재 프로젝트에서 사용되지 않으며, `support_tickets`로 통합되어 삭제/정리 대상입니다.
 - **admins**: `users` 테이블 통합 후 삭제 완료되었습니다.
 - **buyers**: `users` 테이블 통합 후 삭제 완료되었습니다.
 
 ---
-*Since 2026-05-28 by Monster*
-
+*Updated on 2026-06-03 by Monster*
