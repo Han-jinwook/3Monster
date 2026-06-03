@@ -102,6 +102,30 @@ except Exception as e:
 
 ---
 
+### D. 데이터 내보내기 & 탐색기 포커싱 (`라이브러리.exporter`)
+- **역할**: 모든 엑셀/CSV 데이터 내보내기를 시스템 '다운로드' 폴더로 일원화하고, 중복을 방지하기 위한 간소화된 날짜 포맷(`MMDD_HHMM`) 파일명 빌딩 및 내보내기 완료 시 해당 파일을 탐색기에서 자동 포커싱하는 기능을 제공합니다.
+- **예제 연동 코드**:
+
+```python
+from 라이브러리.exporter import MonsterExporter
+
+# 1. 파일 내보내기 최종 경로 생성 (식별자 prefix: 제품ID 또는 사용자정의 이벤트명 설정 가능)
+# 예: nplace.naver.com_0603_1426.xlsx 또는 강남네일샵_0603_1426.xlsx
+prefix = "nplace.naver.com"  # 혹은 "강남네일샵"
+export_path = MonsterExporter.get_export_filepath(prefix=prefix, extension="xlsx")
+
+# 2. 개별 앱의 데이터 내보내기 로직 실행 (예: pandas / openpyxl 활용)
+df.to_excel(export_path, index=False)
+
+# 3. 내보내기 완료 후 윈도우 탐색기(Explorer)를 실행하여 해당 경로에 파일을 포커싱/하이라이트 처리
+success = MonsterExporter.open_in_explorer(export_path)
+
+if success:
+    show_success_popup(f"다운로드 폴더에 성공적으로 저장되었습니다:\n{os.path.basename(export_path)}")
+```
+
+---
+
 ## 3. 후속 AI 연동 시 준수할 5대 수칙
 
 1. **난독화 필수**: 개별 앱 빌드 배포(`build.bat` 등을 통한 PyInstaller 작업) 전, 반드시 `라이브러리/` 패키지를 난독화 컴파일하여 빌드에 포함시켜야 합니다. (Supabase Anon Key 유출 방지 및 라이선스 Bypass 무력화).
