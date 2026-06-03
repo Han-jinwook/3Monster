@@ -524,6 +524,38 @@ export const Showroom = () => {
         }
     };
 
+    const handleDeleteReply = async (ticket: any, msgId: string) => {
+        if (!confirm("정말 이 댓글을 삭제하시겠습니까?")) return;
+        
+        try {
+            const currentThread = parseThread(ticket);
+            const updatedThread = currentThread.filter(msg => msg.id !== msgId);
+            
+            const { data, error: updateError } = await supabase
+                .from('support_tickets')
+                .update({
+                    reply: JSON.stringify(updatedThread),
+                    replied_at: new Date().toISOString()
+                })
+                .eq('id', ticket.id)
+                .select();
+
+            if (updateError) throw updateError;
+            if (!data || data.length === 0) {
+                throw new Error("데이터베이스 저장 권한이 없습니다. (RLS 제한)");
+            }
+            
+            if (activeQnaProductId) {
+                await fetchQuestions(activeQnaProductId);
+            }
+            
+            alert("댓글이 삭제되었습니다.");
+        } catch (err: any) {
+            console.error("Error deleting reply:", err);
+            alert(`댓글 삭제 중 오류가 발생했습니다: ${err.message}`);
+        }
+    };
+
     return (
         <div className="max-w-7xl mx-auto space-y-20 py-12 px-6">
             {/* Hero Banner Section */}
@@ -812,29 +844,41 @@ export const Showroom = () => {
                                                                                 {/* Thread Timeline Messages */}
                                                                                 {thread.length > 0 && (
                                                                                     <div className="space-y-3 pt-2.5 border-t border-slate-100 flex flex-col">
-                                                                                    {thread.map((msg) => {
-                                                                                            const isMsgAdmin = msg.sender === 'admin';
-                                                                                            return (
-                                                                                                <div 
-                                                                                                    key={msg.id} 
-                                                                                                    className={cn(
-                                                                                                        "flex flex-col max-w-[85%] p-3 rounded-lg shadow-xs border transition-all duration-300",
-                                                                                                        isMsgAdmin 
-                                                                                                            ? "bg-emerald-50/50 border-emerald-100/50 ml-auto rounded-tr-none" 
-                                                                                                            : "bg-indigo-50/40 border-indigo-100/30 mr-auto rounded-tl-none"
-                                                                                                    )}
-                                                                                                >
-                                                                                                    <div className="flex items-center gap-1.5 mb-1 justify-between">
-                                                                                                        <span className={cn(
-                                                                                                            "text-[9px] font-black",
-                                                                                                            isMsgAdmin ? "text-emerald-700" : "text-indigo-700"
-                                                                                                        )}>
-                                                                                                            {isMsgAdmin ? "🛡️ 관리자" : `👤 ${maskEmail(msg.sender_email)}`}
-                                                                                                        </span>
-                                                                                                        <span className="text-[8px] font-bold text-slate-400">
-                                                                                                            {new Date(msg.created_at).toLocaleString()}
-                                                                                                        </span>
-                                                                                                    </div>
+                                                                                            {thread.map((msg) => {
+                                                                                                    const isMsgAdmin = msg.sender === 'admin';
+                                                                                                    const currentUserEmail = verifiedEmail || user?.email;
+                                                                                                    const isMsgOwner = (msg.sender_email && currentUserEmail && msg.sender_email.toLowerCase() === currentUserEmail.toLowerCase()) || (msg.sender === 'admin' && isAdmin);
+                                                                                                    return (
+                                                                                                        <div 
+                                                                                                            key={msg.id} 
+                                                                                                            className={cn(
+                                                                                                                "flex flex-col max-w-[85%] p-3 rounded-lg shadow-xs border transition-all duration-300",
+                                                                                                                isMsgAdmin 
+                                                                                                                    ? "bg-emerald-50/50 border-emerald-100/50 ml-auto rounded-tr-none" 
+                                                                                                                    : "bg-indigo-50/40 border-indigo-100/30 mr-auto rounded-tl-none"
+                                                                                                            )}
+                                                                                                        >
+                                                                                                            <div className="flex items-center gap-1.5 mb-1 justify-between">
+                                                                                                                <span className={cn(
+                                                                                                                    "text-[9px] font-black",
+                                                                                                                    isMsgAdmin ? "text-emerald-700" : "text-indigo-700"
+                                                                                                                )}>
+                                                                                                                    {isMsgAdmin ? "🛡️ 관리자" : `👤 ${maskEmail(msg.sender_email)}`}
+                                                                                                                </span>
+                                                                                                                <div className="flex items-center gap-1.5">
+                                                                                                                    <span className="text-[8px] font-bold text-slate-400">
+                                                                                                                        {new Date(msg.created_at).toLocaleString()}
+                                                                                                                    </span>
+                                                                                                                    {isMsgOwner && (
+                                                                                                                        <button 
+                                                                                                                            onClick={() => handleDeleteReply(q, msg.id)}
+                                                                                                                            className="text-[8px] font-bold text-rose-500 hover:text-rose-700 transition-colors ml-1 cursor-pointer"
+                                                                                                                        >
+                                                                                                                            삭제
+                                                                                                                        </button>
+                                                                                                                    )}
+                                                                                                                </div>
+                                                                                                            </div>
                                                                                                     <p className={cn(
                                                                                                         "text-xs font-semibold leading-relaxed whitespace-pre-wrap",
                                                                                                         isMsgAdmin ? "text-emerald-900" : "text-slate-755"
