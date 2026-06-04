@@ -197,19 +197,7 @@ export const Dashboard = () => {
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
             {/* Middle Content Column (8 Units) */}
             <div className="xl:col-span-8 space-y-10">
-                {/* Welcome Banner */}
-                <Card className="banner-gradient p-0 overflow-hidden text-white relative h-64 shadow-premium">
-                    <div className="p-10 flex flex-col justify-center h-full max-w-md relative z-10">
-                        <h2 className="text-3xl font-black mb-3">좋은 아침입니다, 관리자님!</h2>
-                        <p className="text-white/80 font-medium mb-6 leading-relaxed">라이선스 현황과 신규 구매자 내역을 한눈에 확인하세요.</p>
-                        <Button variant="secondary" className="w-fit px-8 h-12 bg-white text-indigo-600" onClick={() => window.location.hash = '#/licenses'}>요청 내역 보기</Button>
-                    </div>
-                    <img
-                        src="/dashboard_banner_illustration.webp"
-                        alt="Welcome"
-                        className="absolute right-0 bottom-0 h-[110%] object-contain pointer-events-none opacity-90"
-                    />
-                </Card>
+
 
                 {/* Categories Section */}
                 <div className="space-y-6">

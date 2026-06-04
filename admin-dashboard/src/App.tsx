@@ -49,7 +49,7 @@ function AppRoutes() {
             } />
 
             {/* Restricted Admin Area */}
-            <Route path="/admin" element={<AdminLayout />}>
+            <Route path="/admin" element={<PublicLayout><AdminLayout /></PublicLayout>}>
                 <Route index element={<Dashboard />} />
                 <Route path="generator" element={<LicenseGenerator />} />
                 <Route path="licenses" element={<LicenseList />} />

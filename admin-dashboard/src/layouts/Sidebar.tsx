@@ -1,4 +1,4 @@
-import { NavLink, Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, Key, Users, LogOut, HelpCircle, Bell } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useAuth } from '../context/AuthContext';
@@ -21,15 +21,8 @@ export const Sidebar = () => {
 
     const navItems = role === 'admin' ? adminNavItems : buyerNavItems;
     return (
-        <aside className="fixed inset-y-0 left-0 z-40 w-72 transform bg-white transition-transform duration-300 lg:translate-x-0 border-r border-slate-100">
-            {/* Logo Area */}
-            <div className="flex h-24 items-center px-8">
-                <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                    <img src="/logo.png" alt="Logo" className="h-10 w-auto object-contain" />
-                </Link>
-            </div>
-
-            <div className="flex flex-col h-[calc(100%-6rem)] py-8 px-6">
+        <aside className="fixed top-20 bottom-0 left-0 z-40 w-72 transform bg-white transition-transform duration-300 lg:translate-x-0 border-r border-slate-100">
+            <div className="flex flex-col h-full py-6 px-6">
                 <nav className="flex-1 space-y-2">
                     {navItems.map((item) => (
                         <NavLink
