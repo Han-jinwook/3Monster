@@ -25,7 +25,7 @@ export const AdminLayout = () => {
     }
 
     return (
-        <div className="flex min-h-screen bg-[#F4F6FB]">
+        <div className="flex min-h-screen bg-transparent">
             {/* Admin Sidebar */}
             <Sidebar />
 
