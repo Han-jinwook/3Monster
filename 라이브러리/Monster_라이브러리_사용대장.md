@@ -1,8 +1,8 @@
 # 📋 Monster 공통 라이브러리 사용대장
 
 - **문서 번호**: 3M-DOC-004
-- **버전**: v1.1
-- **갱신 일시**: 2026-06-04
+- **버전**: v1.2
+- **갱신 일시**: 2026-06-08
 - **관리 주체**: Monster 총괄 AI (Hub AI)
 
 ---
@@ -27,7 +27,11 @@
 - **주입 범위**:
   - [x] `라이브러리/` 표준 패키지 이식 (`auth`, `updater`, `logger`, `exporter` 전체 이식 완료)
   - [x] `sb_auth_manager.py` 브릿지 리팩토링 (supabase-py 무의존성 직접 호출 최적화)
-  - [x] `exporter.py` 표준 엑셀/CSV 다운로드 경로 일원화 (Downloads 폴더 저장 및 MMDD_HHMM 명명 규칙, 저장 완료 시 윈도우 탐색기 자동 열기 및 파일 포커싱 적용)
+  - [x] `exporter.py` v1.2 표준 CSV 내보내기 적용
+    - 브라우저 `st.download_button` 제거 → `📥 엑셀(CSV) 내보내기 및 폴더 열기` 버튼으로 교체
+    - 파일명 prefix 3단계 전략: ① 사용자 검색 키워드(최우선) → ② 앱 기본값(`N플레이스`) → ③ fallback
+    - 저장 완료 시 Windows 탐색기 자동 열기 및 파일 포커싱 적용
+    - 파일명 예시: `설렁탕집_0608_1459.csv`
   - [x] `config.py` persistent 로컬 저장소 규정 반영 (%APPDATA%/NPlace-DB/ 및 `user_settings.json` 단일 세팅 표준 준수)
   - [x] `auth_gui.py` 로그인 모달 화면 정중앙(Center) 배치 준수
   - [x] `NPlace_DB_Launcher.py` 및 `gui_main_basic.py` 메인 윈도우 실행 시 좌상단 1cm 오프셋(`geometry("900x700+40+40")`) 배치 준수

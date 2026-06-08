@@ -102,26 +102,64 @@ except Exception as e:
 
 ---
 
-### D. 데이터 내보내기 & 탐색기 포커싱 (`라이브러리.exporter`)
-- **역할**: 모든 엑셀/CSV 데이터 내보내기를 시스템 '다운로드' 폴더로 일원화하고, 중복을 방지하기 위한 간소화된 날짜 포맷(`MMDD_HHMM`) 파일명 빌딩 및 내보내기 완료 시 해당 파일을 탐색기에서 자동 포커싱하는 기능을 제공합니다.
-- **예제 연동 코드**:
+### D. 데이터 내보내기 & 탐색기 포커싱 (`라이브러리.exporter`) — v1.2
+
+- **역할**: 모든 엑셀/CSV 데이터 내보내기를 시스템 '다운로드' 폴더로 일원화합니다.  
+  파일명은 **`[키워드]_MMDD_HHMM.csv`** 규칙을 따르며, 키워드는 아래 3단계 우선순위로 결정됩니다.  
+  내보내기 완료 후 해당 파일을 탐색기에서 자동 선택(포커싱)합니다.
+
+#### 📌 파일명 prefix 3단계 전략
+
+| 우선순위 | 설명 | 예시 |
+|:---:|---|---|
+| **1. custom_prefix** | 호출부에서 사용자 입력 키워드를 직접 전달 | `설렁탕집`, `강남헬스장` |
+| **2. default_prefix** | 앱 고유 기본 키워드 (앱별 1회 정의) | `N플레이스`, `카페크롤러` |
+| **3. fallback** | 위 둘 다 없을 때 자동 적용 | `Monster_export` |
+
+> ⚠️ **`nplace.naver.com` 같은 도메인명을 prefix로 사용하는 것은 금지.**  
+> 사용자가 파일을 검색·식별할 수 없는 무의미한 이름이므로 반드시 의미 있는 한글 키워드를 사용합니다.
+
+#### 📌 앱별 기본 prefix 등록 방법
+
+신규 개별 앱 개발 시, Hub AI와 협의 후 `exporter.py` 내 `APP_DEFAULT_PREFIX` 테이블에 등록합니다.
+
+```python
+APP_DEFAULT_PREFIX = {
+    "nplace-db":     "N플레이스",
+    "cafecrawler":   "카페크롤러",
+    "autocommenter": "자동댓글",
+    # 신규 앱 추가 시 Hub AI와 상의 후 등록
+}
+```
+
+#### 📌 예제 연동 코드
 
 ```python
 from 라이브러리.exporter import MonsterExporter
 
-# 1. 파일 내보내기 최종 경로 생성 (식별자 prefix: 제품ID 또는 사용자정의 이벤트명 설정 가능)
-# 예: nplace.naver.com_0603_1426.xlsx 또는 강남네일샵_0603_1426.xlsx
-prefix = "nplace.naver.com"  # 혹은 "강남네일샵"
-export_path = MonsterExporter.get_export_filepath(prefix=prefix, extension="xlsx")
+# ── 케이스 1: 사용자 입력 키워드가 있는 경우 (최우선) ──────────────────
+user_keyword = "설렁탕집"  # 앱에서 수집한 실제 검색어
+export_path = MonsterExporter.get_export_filepath(
+    custom_prefix=user_keyword,  # → 설렁탕집_0608_1459.csv
+    extension="csv"
+)
 
-# 2. 개별 앱의 데이터 내보내기 로직 실행 (예: pandas / openpyxl 활용)
-df.to_excel(export_path, index=False)
+# ── 케이스 2: 앱 고유 기본 키워드 사용 (키워드 입력 없는 경우) ─────────
+export_path = MonsterExporter.get_export_filepath(
+    product_id="nplace-db",  # APP_DEFAULT_PREFIX 테이블 조회 → N플레이스
+    extension="csv"
+)
 
-# 3. 내보내기 완료 후 윈도우 탐색기(Explorer)를 실행하여 해당 경로에 파일을 포커싱/하이라이트 처리
-success = MonsterExporter.open_in_explorer(export_path)
+# ── 케이스 3: 호출부에서 직접 기본값 명시 ─────────────────────────────
+export_path = MonsterExporter.get_export_filepath(
+    default_prefix="N플레이스",
+    extension="xlsx"
+)
 
-if success:
-    show_success_popup(f"다운로드 폴더에 성공적으로 저장되었습니다:\n{os.path.basename(export_path)}")
+# 공통: 데이터 저장 후 탐색기에서 파일 포커싱
+df.to_csv(export_path, index=False, encoding='utf-8-sig')
+MonsterExporter.open_in_explorer(export_path)
+# → Windows 탐색기가 열리며 해당 파일이 선택(하이라이트)됩니다.
 ```
 
 ---
@@ -130,9 +168,10 @@ if success:
 
 1. **난독화 필수**: 개별 앱 빌드 배포(`build.bat` 등을 통한 PyInstaller 작업) 전, 반드시 `라이브러리/` 패키지를 난독화 컴파일하여 빌드에 포함시켜야 합니다. (Supabase Anon Key 유출 방지 및 라이선스 Bypass 무력화).
 2. **0.5초 네트워크 타임아웃**: Supabase 및 외부 네트워크 요청(Check Updates, Auth 등) 시 타임아웃은 **최대 0.5초**로 한정하여, 서버 먹통 상황에서 개별 앱의 GUI가 멈춘 것처럼(Deadlock) 보이는 현상을 원천 방지하십시오.
-3. **체험 키(TEST-) 특수 처리**: `TEST-`로 시작하는 시리얼 키 감증 성공 시, 라이브러리는 `verify_license` 결과값으로 체험용 건수 한도(`collection_limit` 등)를 반환해야 하며, 개별 앱 UI는 이에 맞춰 작동 한도를 설정해야 합니다.
+3. **체험 키(TEST-) 특수 처리**: `TEST-`로 시작하는 시리얼 키 검증 성공 시, 라이브러리는 `verify_license` 결과값으로 체험용 건수 한도(`collection_limit` 등)를 반환해야 하며, 개별 앱 UI는 이에 맞춰 작동 한도를 설정해야 합니다.
 4. **로컬 SQLite 독립화**: 개별 앱의 로컬 SQLite는 라이브러리 영역이 아니라 개별 앱 고유의 SQLite DB 파일을 사용하여 읽고 써야 합니다. 공통 라이브러리 소스에는 어떠한 로컬 DB 관련 하드코딩도 삽입하지 마십시오.
 5. **로그 파일 상한**: `app_debug.log` 파일은 단일 파일 크기가 5MB를 초과하지 않도록 회전 로깅(Rotating File Handler) 규칙을 강제 적용하십시오.
 
 ---
-*Since 2026-05-18 by Monster*
+*Since 2026-05-18 by Monster | 최종 갱신: 2026-06-08 (exporter v1.2 - 3단계 파일명 prefix 전략 반영)*
+
