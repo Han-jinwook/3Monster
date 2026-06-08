@@ -570,11 +570,11 @@ export const CustomerSupport = () => {
         <div className="w-full bg-transparent py-12 px-4 min-h-screen">
             <div className="max-w-7xl mx-auto space-y-5 pb-10">
 
-            {/* Main Content Layout - 관리자는 목록만 전체 너비, 일반 유저는 2열 */}
-            <div className={`grid grid-cols-1 gap-6 items-start ${!isAdmin ? 'lg:grid-cols-2' : ''}`}>
+            {/* Main Content Layout - 관리자는 목록만 전체 너비, 일반 유저는 2열 (또는 관리자가 티켓을 선택했을 때) */}
+            <div className={`grid grid-cols-1 gap-6 items-start ${(!isAdmin || selectedTicketForDetail) ? 'lg:grid-cols-2' : ''}`}>
                 
-                {/* Left side: 일반 유저만 표시 (관리자는 문의 폼 불필요) */}
-                {!isAdmin && (
+                {/* Left side: 일반 유저는 항상 노출, 관리자는 문의 선택 시 노출 */}
+                {(!isAdmin || selectedTicketForDetail) && (
                 <div className="space-y-4">
                     <Card className="p-5 bg-white border border-slate-200 shadow-sm rounded-xl transition-all duration-300">
                         <div className="flex items-center justify-between mb-4 pb-2 border-b border-slate-150">
@@ -589,20 +589,22 @@ export const CustomerSupport = () => {
                                     </>
                                 )}
                             </h3>
-                            <div className="relative min-w-[130px]">
-                                <select
-                                    disabled={!!selectedTicketForDetail && !isEditing}
-                                    className="w-full h-8 rounded-lg bg-slate-50 border border-slate-200 hover:border-slate-300 focus:bg-white pl-2.5 pr-8 text-xs font-semibold outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 transition-all appearance-none cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
-                                    value={issueType}
-                                    onChange={e => setIssueType(e.target.value)}
-                                >
-                                    <option value="bug">버그/오류 신고</option>
-                                    <option value="feature">기능 제안/문의</option>
-                                    <option value="license">라이선스 관련</option>
-                                    <option value="other">기타</option>
-                                </select>
-                                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500 pointer-events-none" />
-                            </div>
+                            {(!selectedTicketForDetail || isEditing) && (
+                                <div className="relative min-w-[130px]">
+                                    <select
+                                        disabled={!!selectedTicketForDetail && !isEditing}
+                                        className="w-full h-8 rounded-lg bg-slate-50 border border-slate-200 hover:border-slate-300 focus:bg-white pl-2.5 pr-8 text-xs font-semibold outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 transition-all appearance-none cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
+                                        value={issueType}
+                                        onChange={e => setIssueType(e.target.value)}
+                                    >
+                                        <option value="bug">버그/오류 신고</option>
+                                        <option value="feature">기능 제안/문의</option>
+                                        <option value="license">라이선스 관련</option>
+                                        <option value="other">기타</option>
+                                    </select>
+                                    <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500 pointer-events-none" />
+                                </div>
+                            )}
                         </div>
 
                         <div className="space-y-4">
@@ -619,7 +621,97 @@ export const CustomerSupport = () => {
                                     </div>
                                 )}
 
-                                <form onSubmit={handleSubmit} className="space-y-3.5 text-left">
+                            {selectedTicketForDetail && !isEditing ? (
+                                <div className="space-y-4 text-left">
+                                    {/* Category & Status Headers */}
+                                    <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">구분</span>
+                                            <span className="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-xs font-bold border border-indigo-100">
+                                                {selectedTicketForDetail.issue_type === 'bug' ? '버그/오류 신고' :
+                                                 selectedTicketForDetail.issue_type === 'feature' ? '기능 제안/문의' :
+                                                 selectedTicketForDetail.issue_type === 'license' ? '라이선스 관련' : '기타'}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">상태</span>
+                                            <span className={cn(
+                                                "px-2 py-0.5 rounded text-xs font-bold border",
+                                                selectedTicketForDetail.status === 'open' 
+                                                    ? "bg-amber-50 text-amber-700 border-amber-200" 
+                                                    : "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                            )}>
+                                                {selectedTicketForDetail.status === 'open' ? '처리 대기중' : '진행 완료'}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* Raw content viewer preserving newlines */}
+                                    <div className="space-y-1.5">
+                                        <label className="text-[11px] font-bold text-slate-500 pl-0.5">문의 내용 (원문)</label>
+                                        <div className="w-full bg-slate-50 rounded-lg border border-slate-200 p-3.5 text-xs font-medium text-slate-700 whitespace-pre-wrap leading-relaxed min-h-[150px]">
+                                            {selectedTicketForDetail.description}
+                                        </div>
+                                    </div>
+
+                                    {/* Attached files */}
+                                    {(selectedTicketForDetail.image_url || selectedTicketForDetail.log_url) && (
+                                        <div className="pt-2.5 border-t border-slate-100 flex flex-wrap gap-2">
+                                            {selectedTicketForDetail.image_url && (
+                                                <a href={selectedTicketForDetail.image_url} target="_blank" rel="noopener noreferrer" 
+                                                className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-50 hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 rounded border border-slate-200 text-[10px] font-semibold transition-all">
+                                                    <ImageIcon className="w-3.5 h-3.5" /> 첨부 이미지 보기
+                                                </a>
+                                            )}
+                                            {selectedTicketForDetail.log_url && (
+                                                <a href={selectedTicketForDetail.log_url} target="_blank" rel="noopener noreferrer" 
+                                                className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-50 hover:bg-slate-150 text-slate-600 rounded border border-slate-200 text-[10px] font-semibold transition-all">
+                                                    <FileText className="w-3.5 h-3.5" /> 첨부 로그 다운로드
+                                                </a>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* Buttons for Read-Only mode */}
+                                    <div className="flex gap-2 pt-2 border-t border-slate-100">
+                                        <Button 
+                                            type="button" 
+                                            onClick={() => {
+                                                setSelectedTicketForDetail(null);
+                                                setExpandedTicketId(null);
+                                                setIssueType('bug');
+                                                setDescription('');
+                                                setKmongNickname('');
+                                                setSelectedLicenseId('');
+                                                setIsEditing(false);
+                                            }}
+                                            className="flex-1 h-9 bg-slate-100 hover:bg-slate-200 text-slate-650 font-semibold text-xs rounded-lg transition-all border border-slate-200 shadow-sm"
+                                        >
+                                            <Plus className="mr-1 w-3.5 h-3.5" /> 새 문의 작성하기
+                                        </Button>
+                                        
+                                        <div className="flex gap-2 w-full flex-1">
+                                            <Button 
+                                                type="button"
+                                                onClick={() => setIsEditing(true)}
+                                                className="flex-1 h-9 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-bold shadow-sm transition-all duration-200"
+                                            >
+                                                ✏️ 문의 수정하기
+                                            </Button>
+                                            {selectedTicketForDetail && (!selectedTicketForDetail.reply || parseThread(selectedTicketForDetail).length === 0) && (
+                                                <Button 
+                                                    type="button"
+                                                    onClick={() => handleDeleteTicket(selectedTicketForDetail.id)}
+                                                    className="flex-1 h-9 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-lg text-xs font-bold shadow-sm transition-all duration-200"
+                                                >
+                                                    🗑️ 문의 삭제하기
+                                                </Button>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <form onSubmit={isEditing ? handleSaveEdit : handleSubmit} className="space-y-3.5 text-left">
                                     
                                     {/* 이메일 기반 라이선스 인증 상태 헤더 표시 */}
                                     <div className="flex items-center justify-between bg-slate-50 border border-slate-150 rounded-lg px-3 py-1.5 text-[11px]">
@@ -833,71 +925,32 @@ export const CustomerSupport = () => {
                                     ) : (
                                         <div className="flex gap-2">
                                             <Button 
-                                                type="button" 
+                                                type="button"
                                                 onClick={() => {
-                                                    setSelectedTicketForDetail(null);
-                                                    setExpandedTicketId(null);
-                                                    setIssueType('bug');
-                                                    setDescription('');
-                                                    setKmongNickname('');
-                                                    setSelectedLicenseId('');
                                                     setIsEditing(false);
+                                                    if (selectedTicketForDetail) {
+                                                        setIssueType(selectedTicketForDetail.issue_type || 'bug');
+                                                        const rawDesc = selectedTicketForDetail.description ? parseRawDescription(selectedTicketForDetail.description) : '';
+                                                        setDescription(rawDesc);
+                                                    }
                                                 }}
-                                                className="flex-1 h-9 bg-slate-100 hover:bg-slate-200 text-slate-650 font-semibold text-xs rounded-lg transition-all border border-slate-200 shadow-sm"
+                                                className="flex-1 h-9 bg-slate-100 hover:bg-slate-200 text-slate-650 border border-slate-200 rounded-lg px-4 text-xs font-semibold"
                                             >
-                                                <Plus className="mr-1 w-3.5 h-3.5" /> 새 문의 작성하기
+                                                취소
                                             </Button>
-                                            
-                                            {isEditing ? (
-                                                <>
-                                                    <Button 
-                                                        type="button"
-                                                        onClick={() => {
-                                                            setIsEditing(false);
-                                                            if (selectedTicketForDetail) {
-                                                                setIssueType(selectedTicketForDetail.issue_type || 'bug');
-                                                                const rawDesc = selectedTicketForDetail.description ? parseRawDescription(selectedTicketForDetail.description) : '';
-                                                                setDescription(rawDesc);
-                                                            }
-                                                        }}
-                                                        className="h-9 bg-slate-100 hover:bg-slate-200 text-slate-650 border border-slate-200 rounded-lg px-4 text-xs font-semibold"
-                                                    >
-                                                        취소
-                                                    </Button>
-                                                    <Button 
-                                                        type="button"
-                                                        onClick={handleSaveEdit}
-                                                        isLoading={isSavingEdit}
-                                                        className="flex-1 h-9 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-bold shadow-sm transition-all duration-200"
-                                                    >
-                                                        수정 완료
-                                                    </Button>
-                                                </>
-                                            ) : (
-                                                <div className="flex gap-2 w-full flex-1">
-                                                    <Button 
-                                                        type="button"
-                                                        onClick={() => setIsEditing(true)}
-                                                        className="flex-1 h-9 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-bold shadow-sm transition-all duration-200"
-                                                    >
-                                                        ✏️ 문의 수정하기
-                                                    </Button>
-                                                    {selectedTicketForDetail && (!selectedTicketForDetail.reply || parseThread(selectedTicketForDetail).length === 0) && (
-                                                        <Button 
-                                                            type="button"
-                                                            onClick={() => handleDeleteTicket(selectedTicketForDetail.id)}
-                                                            className="flex-1 h-9 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-lg text-xs font-bold shadow-sm transition-all duration-200"
-                                                        >
-                                                            🗑️ 문의 삭제하기
-                                                        </Button>
-                                                    )}
-                                                </div>
-                                            )}
+                                            <Button 
+                                                type="submit"
+                                                isLoading={isSavingEdit}
+                                                className="flex-1 h-9 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-bold shadow-sm transition-all duration-200"
+                                            >
+                                                수정 완료
+                                            </Button>
                                         </div>
                                     )}
                                 </form>
-                            </div>
-                        </Card>
+                            )}
+                        </div>
+                    </Card>
                 </div>
                 )}
 
