@@ -121,12 +121,16 @@ export const NotificationManager = () => {
         if (!confirm("정말 이 알림을 삭제하시겠습니까? 수신자의 알림 내역에서도 제거됩니다.")) return;
         
         try {
-            const { error } = await supabase
+            const { data, error } = await supabase
                 .from('notifications')
                 .delete()
-                .eq('id', id);
+                .eq('id', id)
+                .select();
 
             if (error) throw error;
+            if (!data || data.length === 0) {
+                throw new Error("삭제 권한이 없거나 이미 삭제된 알림입니다. (RLS 제한)");
+            }
             
             setSuccessMessage("알림이 성공적으로 삭제되었습니다.");
             setTimeout(() => setSuccessMessage(''), 2500);

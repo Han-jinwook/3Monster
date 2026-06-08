@@ -11,10 +11,11 @@ import {
     FileText, 
     Image as ImageIcon, 
     ChevronDown, 
-    ChevronUp, 
+     
     Plus,
     Search,
-    Shield
+    Shield,
+    MessageSquare
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { motion } from 'framer-motion';
@@ -481,12 +482,16 @@ export const CustomerSupport = () => {
         if (!confirm("정말 이 문의를 삭제하시겠습니까?")) return;
         
         try {
-            const { error } = await supabase
+            const { data, error } = await supabase
                 .from('support_tickets')
                 .delete()
-                .eq('id', ticketId);
+                .eq('id', ticketId)
+                .select();
                 
             if (error) throw error;
+            if (!data || data.length === 0) {
+                throw new Error("삭제 권한이 없거나 이미 삭제된 문의입니다. (RLS 제한)");
+            }
             
             alert("문의가 삭제되었습니다.");
             
@@ -674,40 +679,238 @@ export const CustomerSupport = () => {
 
                                     {/* Buttons for Read-Only mode */}
                                     <div className="flex gap-2 pt-2 border-t border-slate-100">
-                                        <Button 
-                                            type="button" 
-                                            onClick={() => {
-                                                setSelectedTicketForDetail(null);
-                                                setExpandedTicketId(null);
-                                                setIssueType('bug');
-                                                setDescription('');
-                                                setKmongNickname('');
-                                                setSelectedLicenseId('');
-                                                setIsEditing(false);
-                                            }}
-                                            className="flex-1 h-9 bg-slate-100 hover:bg-slate-200 text-slate-650 font-semibold text-xs rounded-lg transition-all border border-slate-200 shadow-sm"
-                                        >
-                                            <Plus className="mr-1 w-3.5 h-3.5" /> 새 문의 작성하기
-                                        </Button>
+                                        {isAdmin ? (
+                                            <Button 
+                                                type="button" 
+                                                onClick={() => {
+                                                    setSelectedTicketForDetail(null);
+                                                    setExpandedTicketId(null);
+                                                    setIsEditing(false);
+                                                }}
+                                                className="flex-1 h-9 bg-slate-150 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition-all border border-slate-300 shadow-sm"
+                                            >
+                                                닫기
+                                            </Button>
+                                        ) : (
+                                            <Button 
+                                                type="button" 
+                                                onClick={() => {
+                                                    setSelectedTicketForDetail(null);
+                                                    setExpandedTicketId(null);
+                                                    setIssueType('bug');
+                                                    setDescription('');
+                                                    setKmongNickname('');
+                                                    setSelectedLicenseId('');
+                                                    setIsEditing(false);
+                                                }}
+                                                className="flex-1 h-9 bg-slate-100 hover:bg-slate-200 text-slate-650 font-semibold text-xs rounded-lg transition-all border border-slate-200 shadow-sm"
+                                            >
+                                                <Plus className="mr-1 w-3.5 h-3.5" /> 새 문의 작성하기
+                                            </Button>
+                                        )}
                                         
                                         <div className="flex gap-2 w-full flex-1">
-                                            <Button 
-                                                type="button"
-                                                onClick={() => setIsEditing(true)}
-                                                className="flex-1 h-9 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-bold shadow-sm transition-all duration-200"
-                                            >
-                                                ✏️ 문의 수정하기
-                                            </Button>
-                                            {selectedTicketForDetail && (!selectedTicketForDetail.reply || parseThread(selectedTicketForDetail).length === 0) && (
+                                            {!isAdmin && (
+                                                <Button 
+                                                    type="button"
+                                                    onClick={() => setIsEditing(true)}
+                                                    className="flex-1 h-9 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-bold shadow-sm transition-all duration-200"
+                                                >
+                                                    ✏️ 문의 수정하기
+                                                </Button>
+                                            )}
+                                            {(isAdmin || !selectedTicketForDetail.reply || parseThread(selectedTicketForDetail).length === 0) && (
                                                 <Button 
                                                     type="button"
                                                     onClick={() => handleDeleteTicket(selectedTicketForDetail.id)}
-                                                    className="flex-1 h-9 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-lg text-xs font-bold shadow-sm transition-all duration-200"
+                                                    className="flex-1 h-9 bg-rose-50 hover:bg-rose-100 text-rose-650 border border-rose-200 rounded-lg text-xs font-bold shadow-sm transition-all duration-200"
                                                 >
                                                     🗑️ 문의 삭제하기
                                                 </Button>
                                             )}
                                         </div>
+                                    </div>
+
+                                    {/* Thread History & Reply Form in left panel */}
+                                    <div className="pt-4 mt-4 border-t border-slate-200 space-y-4">
+                                        <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                                            <MessageSquare className="w-4 h-4 text-indigo-500" /> 답변 및 댓글 기록
+                                        </h4>
+                                        
+                                        {/* Thread History */}
+                                        {parseThread(selectedTicketForDetail).length > 0 ? (
+                                            <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1 flex flex-col gap-1.5">
+                                                {parseThread(selectedTicketForDetail).map((msg) => {
+                                                    const isMsgAdmin = msg.sender === 'admin';
+                                                    const currentUserEmail = verifiedEmail || user?.email;
+                                                    const isMsgOwner = (msg.sender_email && currentUserEmail && msg.sender_email.toLowerCase() === currentUserEmail.toLowerCase()) || (msg.sender === 'admin' && isAdmin);
+                                                    return (
+                                                        <div 
+                                                            key={msg.id} 
+                                                            className={cn(
+                                                                "flex flex-col max-w-[85%] py-1.5 px-2.5 rounded-lg border transition-all duration-200 text-left",
+                                                                isMsgAdmin 
+                                                                    ? "bg-emerald-50/40 border-emerald-100/50 ml-auto rounded-tr-none" 
+                                                                    : "bg-slate-100/60 border-slate-200/50 mr-auto rounded-tl-none"
+                                                            )}
+                                                        >
+                                                            <div className="flex items-center gap-2 mb-0.5 justify-between">
+                                                                <span className={cn(
+                                                                    "text-[10px] font-semibold",
+                                                                    isMsgAdmin ? "text-emerald-700" : "text-slate-655"
+                                                                )}>
+                                                                    {isMsgAdmin ? "🛡️ 관리자" : `👤 ${maskEmail(msg.sender_email)}`}
+                                                                </span>
+                                                                <div className="flex items-center gap-1.5">
+                                                                    <span className="text-[9px] text-slate-400">
+                                                                        {new Date(msg.created_at).toLocaleString()}
+                                                                    </span>
+                                                                    {isMsgOwner && (
+                                                                        <button 
+                                                                            onClick={() => handleDeleteReply(selectedTicketForDetail, msg.id)}
+                                                                            className="text-[9px] font-bold text-rose-500 hover:text-rose-700 transition-colors ml-1 cursor-pointer"
+                                                                        >
+                                                                            삭제
+                                                                        </button>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                            
+                                                            <p className={cn(
+                                                                "text-xs font-normal leading-relaxed whitespace-pre-wrap",
+                                                                isMsgAdmin ? "text-emerald-950" : "text-slate-700"
+                                                            )}>
+                                                                {msg.text}
+                                                            </p>
+                                    
+                                                            {(msg.image_url || msg.log_url) && (
+                                                                <div className="mt-1 pt-1 border-t border-slate-200/30 flex flex-wrap gap-1.5">
+                                                                    {msg.image_url && (
+                                                                        <a href={msg.image_url} target="_blank" rel="noopener noreferrer" 
+                                                                           className="inline-flex items-center gap-1 px-2 py-1 bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 rounded text-[10px] font-medium transition-all">
+                                                                            <ImageIcon className="w-3 h-3 text-slate-400" /> 스크린샷 보기
+                                                                        </a>
+                                                                    )}
+                                                                    {msg.log_url && (
+                                                                        <a href={msg.log_url} target="_blank" rel="noopener noreferrer" 
+                                                                           className="inline-flex items-center gap-1 px-2 py-1 bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 rounded text-[10px] font-medium transition-all">
+                                                                            <FileText className="w-3 h-3 text-slate-400" /> 로그 보기
+                                                                        </a>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        ) : (
+                                            <p className="text-[11px] text-slate-400 font-medium pl-1 italic">등록된 답변이나 댓글이 없습니다.</p>
+                                        )}
+
+                                        {/* Comment / Reply Form */}
+                                        {(() => {
+                                            const adminReplies = parseThread(selectedTicketForDetail).filter(msg => msg.sender === 'admin');
+                                            const isDisabledReply = !isAdmin && adminReplies.length === 0;
+
+                                            return (
+                                                <div className="space-y-1.5 pt-2.5 border-t border-slate-150">
+                                                    <div className="relative">
+                                                        <textarea
+                                                            disabled={isDisabledReply}
+                                                            placeholder={isDisabledReply ? "답변 대기 중에는 추가 문의(댓글)를 작성할 수 없습니다." : "추가 문의사항이나 답변을 입력해주세요..."}
+                                                            value={replyText}
+                                                            onChange={(e) => setReplyText(e.target.value)}
+                                                            className="w-full min-h-[70px] rounded-lg bg-slate-50 border border-slate-200 hover:border-slate-350 focus:bg-white p-2.5 text-xs font-medium outline-none focus:ring-2 focus:ring-indigo-150 focus:border-indigo-500 transition-all resize-none placeholder:text-slate-400 text-slate-800 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
+                                                        />
+                                                    </div>
+
+                                                    {/* Attachment status inside input form */}
+                                                    {!isDisabledReply && (
+                                                        <div className="flex flex-wrap gap-2">
+                                                            <div className="relative group">
+                                                                <input
+                                                                    type="file"
+                                                                    accept="image/*"
+                                                                    onChange={e => setReplyImage(e.target.files?.[0] || null)}
+                                                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                                                />
+                                                                <div className="h-8 px-3 rounded-lg bg-slate-50 hover:bg-indigo-50/10 border border-slate-200 hover:border-indigo-300 flex items-center transition-all cursor-pointer">
+                                                                    <ImageIcon className="w-3.5 h-3.5 text-slate-400 mr-1.5 group-hover:text-indigo-500 transition-colors" />
+                                                                    <span className="text-[10px] font-medium text-slate-500 group-hover:text-indigo-700 transition-colors truncate max-w-[120px]">
+                                                                        {replyImage ? replyImage.name : '사진 첨부'}
+                                                                    </span>
+                                                                    {replyImage && (
+                                                                        <button 
+                                                                            type="button"
+                                                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setReplyImage(null); }}
+                                                                            className="ml-1.5 text-slate-400 hover:text-rose-500 font-semibold text-[10px] z-20"
+                                                                        >
+                                                                            ✕
+                                                                        </button>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                            <div className="relative group">
+                                                                <input
+                                                                    type="file"
+                                                                    accept=".log,.txt"
+                                                                    onChange={e => setReplyLog(e.target.files?.[0] || null)}
+                                                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                                                />
+                                                                <div className="h-8 px-3 rounded-lg bg-slate-50 hover:bg-indigo-50/10 border border-slate-200 hover:border-indigo-300 flex items-center transition-all cursor-pointer">
+                                                                    <FileText className="w-3.5 h-3.5 text-slate-400 mr-1.5 group-hover:text-indigo-500 transition-colors" />
+                                                                    <span className="text-[10px] font-semibold text-slate-500 group-hover:text-indigo-700 transition-colors truncate max-w-[120px]">
+                                                                        {replyLog ? replyLog.name : '로그 첨부'}
+                                                                    </span>
+                                                                    {replyLog && (
+                                                                        <button 
+                                                                            type="button"
+                                                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setReplyLog(null); }}
+                                                                            className="ml-1.5 text-slate-400 hover:text-rose-500 font-semibold text-[10px] z-20"
+                                                                        >
+                                                                            ✕
+                                                                        </button>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Action Buttons */}
+                                                    <div className="flex justify-end gap-2 pt-1.5">
+                                                        {isAdmin ? (
+                                                            <>
+                                                                <Button 
+                                                                    onClick={() => handleSubmitReply(selectedTicketForDetail, 'open')}
+                                                                    isLoading={isSubmittingReply}
+                                                                    disabled={!replyText.trim() && !replyImage && !replyLog}
+                                                                    className="bg-slate-100 hover:bg-slate-200 text-slate-650 rounded-lg px-4 h-8 text-xs font-semibold border border-slate-200 transition-all"
+                                                                >
+                                                                    댓글 등록 (대기유지)
+                                                                </Button>
+                                                                <Button 
+                                                                    onClick={() => handleSubmitReply(selectedTicketForDetail, 'closed')}
+                                                                    isLoading={isSubmittingReply}
+                                                                    disabled={!replyText.trim() && !replyImage && !replyLog}
+                                                                    className="bg-emerald-50 hover:bg-emerald-100 text-emerald-755 border border-emerald-200 rounded-lg px-4 h-8 text-xs font-bold transition-all"
+                                                                >
+                                                                    답변 완료 및 해결완료 처리
+                                                                </Button>
+                                                            </>
+                                                        ) : (
+                                                            <Button 
+                                                                onClick={() => handleSubmitReply(selectedTicketForDetail, 'open')}
+                                                                isLoading={isSubmittingReply}
+                                                                disabled={isDisabledReply || (!replyText.trim() && !replyImage && !replyLog)}
+                                                                className="bg-indigo-50 hover:bg-indigo-100 text-indigo-750 border border-indigo-200 rounded-lg px-5 h-8 text-xs font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                                            >
+                                                                댓글 등록하기
+                                                            </Button>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })()}
                                     </div>
                                 </div>
                             ) : (
@@ -1109,191 +1312,9 @@ export const CustomerSupport = () => {
                                                              : 'N/A'
                                                          }
                                                      </span>
-                                                     {canViewDetail && (
-                                                         <div className="w-5 h-5 rounded bg-slate-50 flex items-center justify-center group-hover:bg-indigo-50 transition-colors">
-                                                             {isExpanded ? <ChevronUp className="w-3 h-3 text-indigo-500" /> : <ChevronDown className="w-3 h-3 text-slate-400 group-hover:text-indigo-500" />}
-                                                         </div>
-                                                     )}
                                                  </div>
                                             </div>
                                             
-                                            {isExpanded && canViewDetail && (
-                                                <div className="border-t border-slate-100 bg-slate-50/15 p-1 px-1.5 pt-1 pb-1.5 space-y-1.5 animate-in fade-in duration-200">
-                                                    {/* Thread History */}
-                                                    {parseThread(ticket).length > 0 && (
-                                                        <div className="space-y-1 max-h-[300px] overflow-y-auto pr-1 flex flex-col">
-                                                            {parseThread(ticket).map((msg) => {
-                                                                const isMsgAdmin = msg.sender === 'admin';
-                                                                const currentUserEmail = verifiedEmail || user?.email;
-                                                                const isMsgOwner = (msg.sender_email && currentUserEmail && msg.sender_email.toLowerCase() === currentUserEmail.toLowerCase()) || (msg.sender === 'admin' && isAdmin);
-                                                                return (
-                                                                    <div 
-                                                                        key={msg.id} 
-                                                                        className={cn(
-                                                                            "flex flex-col max-w-[85%] py-1 px-2.5 rounded-lg border transition-all duration-200 text-left",
-                                                                            isMsgAdmin 
-                                                                                ? "bg-emerald-50/40 border-emerald-100/50 ml-auto rounded-tr-none" 
-                                                                                : "bg-slate-100/60 border-slate-200/50 mr-auto rounded-tl-none"
-                                                                        )}
-                                                                    >
-                                                                        <div className="flex items-center gap-2 mb-0.5 justify-between">
-                                                                            <span className={cn(
-                                                                                "text-[10px] font-semibold",
-                                                                                isMsgAdmin ? "text-emerald-700" : "text-slate-650"
-                                                                            )}>
-                                                                                {isMsgAdmin ? "🛡️ 관리자" : `👤 ${maskEmail(msg.sender_email)}`}
-                                                                            </span>
-                                                                            <div className="flex items-center gap-1.5">
-                                                                                <span className="text-[9px] text-slate-400">
-                                                                                    {new Date(msg.created_at).toLocaleString()}
-                                                                                </span>
-                                                                                {isMsgOwner && (
-                                                                                    <button 
-                                                                                        onClick={() => handleDeleteReply(ticket, msg.id)}
-                                                                                        className="text-[9px] font-bold text-rose-500 hover:text-rose-700 transition-colors ml-1 cursor-pointer"
-                                                                                    >
-                                                                                        삭제
-                                                                                    </button>
-                                                                                )}
-                                                                            </div>
-                                                                        </div>
-                                        
-                                                                        <p className={cn(
-                                                                            "text-xs font-normal leading-relaxed whitespace-pre-wrap",
-                                                                            isMsgAdmin ? "text-emerald-950" : "text-slate-700"
-                                                                        )}>
-                                                                            {msg.text}
-                                                                        </p>
- 
-                                                                        {(msg.image_url || msg.log_url) && (
-                                                                            <div className="mt-1 pt-1 border-t border-slate-200/30 flex flex-wrap gap-1.5">
-                                                                                {msg.image_url && (
-                                                                                    <a href={msg.image_url} target="_blank" rel="noopener noreferrer" 
-                                                                                       className="inline-flex items-center gap-1 px-2 py-1 bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 rounded text-[10px] font-medium transition-all">
-                                                                                        <ImageIcon className="w-3 h-3 text-slate-400" /> 스크린샷 보기
-                                                                                    </a>
-                                                                                )}
-                                                                                {msg.log_url && (
-                                                                                    <a href={msg.log_url} target="_blank" rel="noopener noreferrer" 
-                                                                                       className="inline-flex items-center gap-1 px-2 py-1 bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 rounded text-[10px] font-medium transition-all">
-                                                                                        <FileText className="w-3 h-3 text-slate-400" /> 로그 보기
-                                                                                    </a>
-                                                                                )}
-                                                                            </div>
-                                                                        )}
-                                                                    </div>
-                                                                );
-                                                            })}
-                                                        </div>
-                                                    )}
- 
-                                                    {/* Comment / Reply Form */}
-                                                    {(() => {
-                                                        const adminReplies = parseThread(ticket).filter(msg => msg.sender === 'admin');
-                                                        const isDisabledReply = !isAdmin && adminReplies.length === 0;
- 
-                                                        return (
-                                                            <div className="space-y-1.5 pt-1.5 border-t border-slate-150">
-                                                                <div className="relative">
-                                                                    <textarea
-                                                                        disabled={isDisabledReply}
-                                                                        placeholder={isDisabledReply ? "답변 대기 중에는 추가 문의(댓글)를 작성할 수 없습니다." : "추가 문의사항이나 답변을 입력해주세요..."}
-                                                                        value={replyText}
-                                                                        onChange={(e) => setReplyText(e.target.value)}
-                                                                        className="w-full min-h-[60px] rounded-lg bg-slate-50 border border-slate-200 hover:border-slate-350 focus:bg-white p-2 text-xs font-medium outline-none focus:ring-2 focus:ring-indigo-150 focus:border-indigo-500 transition-all resize-none placeholder:text-slate-400 text-slate-800 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
-                                                                    />
-                                                                </div>
- 
-                                                                {/* Attachment status inside input form */}
-                                                                {!isDisabledReply && (
-                                                                    <div className="flex flex-wrap gap-2">
-                                                                        <div className="relative group">
-                                                                            <input
-                                                                                type="file"
-                                                                                accept="image/*"
-                                                                                onChange={e => setReplyImage(e.target.files?.[0] || null)}
-                                                                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                                                            />
-                                                                            <div className="h-8 px-3 rounded-lg bg-slate-50 hover:bg-indigo-50/10 border border-slate-200 hover:border-indigo-300 flex items-center transition-all cursor-pointer">
-                                                                                <ImageIcon className="w-3.5 h-3.5 text-slate-400 mr-1.5 group-hover:text-indigo-500 transition-colors" />
-                                                                                <span className="text-[10px] font-medium text-slate-500 group-hover:text-indigo-700 transition-colors truncate max-w-[120px]">
-                                                                                    {replyImage ? replyImage.name : '사진 첨부'}
-                                                                                </span>
-                                                                                {replyImage && (
-                                                                                    <button 
-                                                                                        type="button"
-                                                                                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setReplyImage(null); }}
-                                                                                        className="ml-1.5 text-slate-400 hover:text-rose-500 font-semibold text-[10px] z-20"
-                                                                                    >
-                                                                                        ✕
-                                                                                    </button>
-                                                                                )}
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="relative group">
-                                                                            <input
-                                                                                type="file"
-                                                                                accept=".log,.txt"
-                                                                                onChange={e => setReplyLog(e.target.files?.[0] || null)}
-                                                                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                                                            />
-                                                                            <div className="h-8 px-3 rounded-lg bg-slate-50 hover:bg-indigo-50/10 border border-slate-200 hover:border-indigo-300 flex items-center transition-all cursor-pointer">
-                                                                                <FileText className="w-3.5 h-3.5 text-slate-400 mr-1.5 group-hover:text-indigo-500 transition-colors" />
-                                                                                <span className="text-[10px] font-medium text-slate-500 group-hover:text-indigo-700 transition-colors truncate max-w-[120px]">
-                                                                                    {replyLog ? replyLog.name : '로그 첨부'}
-                                                                                </span>
-                                                                                {replyLog && (
-                                                                                    <button 
-                                                                                        type="button"
-                                                                                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setReplyLog(null); }}
-                                                                                        className="ml-1.5 text-slate-400 hover:text-rose-500 font-semibold text-[10px] z-20"
-                                                                                    >
-                                                                                        ✕
-                                                                                    </button>
-                                                                                )}
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                )}
- 
-                                                                {/* Action Buttons */}
-                                                                <div className="flex justify-end gap-2 pt-1">
-                                                                    {isAdmin ? (
-                                                                        <>
-                                                                            <Button 
-                                                                                onClick={() => handleSubmitReply(ticket, 'open')}
-                                                                                isLoading={isSubmittingReply}
-                                                                                disabled={!replyText.trim() && !replyImage && !replyLog}
-                                                                                className="bg-slate-100 hover:bg-slate-200 text-slate-650 rounded-lg px-4 h-8 text-xs font-semibold border border-slate-200 transition-all"
-                                                                            >
-                                                                                댓글 등록 (대기유지)
-                                                                            </Button>
-                                                                            <Button 
-                                                                                onClick={() => handleSubmitReply(ticket, 'closed')}
-                                                                                isLoading={isSubmittingReply}
-                                                                                disabled={!replyText.trim() && !replyImage && !replyLog}
-                                                                                className="bg-emerald-50 hover:bg-emerald-100 text-emerald-755 border border-emerald-200 rounded-lg px-4 h-8 text-xs font-bold transition-all"
-                                                                            >
-                                                                                답변 완료 및 해결완료 처리
-                                                                            </Button>
-                                                                        </>
-                                                                    ) : (
-                                                                        <Button 
-                                                                            onClick={() => handleSubmitReply(ticket, 'open')}
-                                                                            isLoading={isSubmittingReply}
-                                                                            disabled={isDisabledReply || (!replyText.trim() && !replyImage && !replyLog)}
-                                                                            className="bg-indigo-50 hover:bg-indigo-100 text-indigo-750 border border-indigo-200 rounded-lg px-5 h-8 text-xs font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                                                        >
-                                                                            댓글 등록하기
-                                                                        </Button>
-
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                        );
-                                                    })()}
-                                                </div>
-                                            )}
                                         </Card>
                                     </motion.div>
                                 );
