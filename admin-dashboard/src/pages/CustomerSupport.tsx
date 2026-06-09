@@ -854,9 +854,7 @@ export const CustomerSupport = () => {
                                                     );
                                                 })}
                                             </div>
-                                        ) : (
-                                            <p className="text-[11px] text-slate-400 font-medium pl-1 italic">등록된 답변이나 댓글이 없습니다.</p>
-                                        )}
+                                        ) : null}
 
                                         {/* Comment / Reply Form */}
                                         {(() => {
@@ -930,24 +928,14 @@ export const CustomerSupport = () => {
                                                     {/* Action Buttons */}
                                                     <div className="flex justify-end gap-2 pt-1.5">
                                                         {isAdmin ? (
-                                                            <>
-                                                                <Button 
-                                                                    onClick={() => handleSubmitReply(selectedTicketForDetail, 'open')}
-                                                                    isLoading={isSubmittingReply}
-                                                                    disabled={!replyText.trim() && !replyImage && !replyLog}
-                                                                    className="bg-slate-100 hover:bg-slate-200 text-slate-650 rounded-lg px-4 h-8 text-xs font-semibold border border-slate-200 transition-all"
-                                                                >
-                                                                    댓글 등록 (대기유지)
-                                                                </Button>
-                                                                <Button 
-                                                                    onClick={() => handleSubmitReply(selectedTicketForDetail, 'closed')}
-                                                                    isLoading={isSubmittingReply}
-                                                                    disabled={!replyText.trim() && !replyImage && !replyLog}
-                                                                    className="bg-emerald-50 hover:bg-emerald-100 text-emerald-755 border border-emerald-200 rounded-lg px-4 h-8 text-xs font-bold transition-all"
-                                                                >
-                                                                    답변 완료 및 해결완료 처리
-                                                                </Button>
-                                                            </>
+                                                            <Button 
+                                                                onClick={() => handleSubmitReply(selectedTicketForDetail, 'closed')}
+                                                                isLoading={isSubmittingReply}
+                                                                disabled={!replyText.trim() && !replyImage && !replyLog}
+                                                                className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg px-5 h-8 text-xs font-semibold shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                                            >
+                                                                등록
+                                                            </Button>
                                                         ) : (
                                                             <Button 
                                                                 onClick={() => handleSubmitReply(selectedTicketForDetail, 'open')}
