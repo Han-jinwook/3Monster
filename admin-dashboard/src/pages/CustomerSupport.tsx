@@ -15,7 +15,8 @@ import {
     Plus,
     Search,
     Shield,
-    MessageSquare
+    MessageSquare,
+    X
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { motion } from 'framer-motion';
@@ -620,6 +621,24 @@ export const CustomerSupport = () => {
                                     </>
                                 )}
                             </h3>
+                            {selectedTicketForDetail && !isEditing && (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setSelectedTicketForDetail(null);
+                                        setExpandedTicketId(null);
+                                        setIssueType('bug');
+                                        setDescription('');
+                                        setKmongNickname('');
+                                        setSelectedLicenseId('');
+                                        setIsEditing(false);
+                                    }}
+                                    className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-650 transition-colors cursor-pointer"
+                                    title="상세 닫기"
+                                >
+                                    <X className="w-4.5 h-4.5" />
+                                </button>
+                            )}
                             {(!selectedTicketForDetail || isEditing) && (
                                 <div className="relative min-w-[130px]">
                                     <select
@@ -698,7 +717,19 @@ export const CustomerSupport = () => {
 
                                     {/* Raw content viewer preserving newlines */}
                                     <div className="space-y-1.5">
-                                        <label className="text-[11px] font-bold text-slate-500 pl-0.5">문의 내용 (원문)</label>
+                                        <div className="flex items-center justify-between pl-0.5 pr-0.5">
+                                            <label className="text-[11px] font-bold text-slate-500">문의 내용 (원문)</label>
+                                            {(isAdmin || !selectedTicketForDetail.reply || parseThread(selectedTicketForDetail).length === 0) && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleDeleteTicket(selectedTicketForDetail.id)}
+                                                    className="text-[10px] font-bold text-rose-500 hover:text-rose-700 hover:underline cursor-pointer transition-colors"
+                                                    title="문의글 삭제"
+                                                >
+                                                    삭제
+                                                </button>
+                                            )}
+                                        </div>
                                         <div className="w-full bg-slate-50 rounded-lg border border-slate-200 p-3.5 text-xs font-medium text-slate-700 whitespace-pre-wrap leading-relaxed min-h-[150px]">
                                             {selectedTicketForDetail.description}
                                         </div>
@@ -723,20 +754,8 @@ export const CustomerSupport = () => {
                                     )}
 
                                     {/* Buttons for Read-Only mode */}
-                                    <div className="flex gap-2 pt-2 border-t border-slate-100">
-                                        {isAdmin ? (
-                                            <Button 
-                                                type="button" 
-                                                onClick={() => {
-                                                    setSelectedTicketForDetail(null);
-                                                    setExpandedTicketId(null);
-                                                    setIsEditing(false);
-                                                }}
-                                                className="flex-1 h-9 bg-slate-150 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition-all border border-slate-300 shadow-sm"
-                                            >
-                                                닫기
-                                            </Button>
-                                        ) : (
+                                    {!isAdmin && (
+                                        <div className="flex gap-2 pt-2 border-t border-slate-100">
                                             <Button 
                                                 type="button" 
                                                 onClick={() => {
@@ -752,29 +771,16 @@ export const CustomerSupport = () => {
                                             >
                                                 <Plus className="mr-1 w-3.5 h-3.5" /> 새 문의 작성하기
                                             </Button>
-                                        )}
-                                        
-                                        <div className="flex gap-2 w-full flex-1">
-                                            {!isAdmin && (
-                                                <Button 
-                                                    type="button"
-                                                    onClick={() => setIsEditing(true)}
-                                                    className="flex-1 h-9 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-bold shadow-sm transition-all duration-200"
-                                                >
-                                                    ✏️ 문의 수정하기
-                                                </Button>
-                                            )}
-                                            {(isAdmin || !selectedTicketForDetail.reply || parseThread(selectedTicketForDetail).length === 0) && (
-                                                <Button 
-                                                    type="button"
-                                                    onClick={() => handleDeleteTicket(selectedTicketForDetail.id)}
-                                                    className="flex-1 h-9 bg-rose-50 hover:bg-rose-100 text-rose-650 border border-rose-200 rounded-lg text-xs font-bold shadow-sm transition-all duration-200"
-                                                >
-                                                    🗑️ 문의 삭제하기
-                                                </Button>
-                                            )}
+                                            
+                                            <Button 
+                                                type="button"
+                                                onClick={() => setIsEditing(true)}
+                                                className="flex-1 h-9 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-bold shadow-sm transition-all duration-200"
+                                            >
+                                                ✏️ 문의 수정하기
+                                            </Button>
                                         </div>
-                                    </div>
+                                    )}
 
                                     {/* Thread History & Reply Form in left panel */}
                                     <div className="pt-4 mt-4 border-t border-slate-200 space-y-4">
