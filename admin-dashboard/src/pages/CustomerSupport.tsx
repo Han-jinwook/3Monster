@@ -39,6 +39,8 @@ export const CustomerSupport = () => {
         setToast({ message, type });
         setTimeout(() => setToast(null), 3000);
     };
+    const [editingReplyId, setEditingReplyId] = useState<string | null>(null);
+    const [editingReplyText, setEditingReplyText] = useState<string>('');
 
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -490,6 +492,44 @@ export const CustomerSupport = () => {
         }
     };
 
+        const handleEditReply = async (ticket: any, replyId: string, newText: string) => {
+        if (!newText.trim()) {
+            showToast("수정할 내용을 입력해주세요.", "error");
+            return;
+        }
+
+        try {
+            const currentThread = parseThread(ticket);
+            const updatedThread = currentThread.map(msg => 
+                msg.id === replyId ? { ...msg, text: newText } : msg
+            );
+
+            const { data, error: updateError } = await supabase
+                .from('support_tickets')
+                .update({
+                    reply: JSON.stringify(updatedThread)
+                })
+                .eq('id', ticket.id)
+                .select();
+
+            if (updateError) throw updateError;
+            if (!data || data.length === 0) {
+                throw new Error("데이터베이스 저장 권한이 없습니다. (RLS 제한)");
+            }
+
+            if (data && data[0]) {
+                setSelectedTicketForDetail(data[0]);
+            }
+            await fetchTickets();
+            showToast("댓글이 수정되었습니다.");
+            setEditingReplyId(null);
+            setEditingReplyText('');
+        } catch (err: any) {
+            console.error('Error editing reply:', err);
+            showToast(`댓글 수정 중 오류가 발생했습니다: ${err.message}`, "error");
+        }
+    };
+
     const handleDeleteReply = async (ticket: any, msgId: string) => {
         if (!confirm("정말 이 댓글을 삭제하시겠습니까?")) return;
         
@@ -511,6 +551,9 @@ export const CustomerSupport = () => {
                 throw new Error("데이터베이스 저장 권한이 없습니다. (RLS 제한)");
             }
             
+            if (data && data[0]) {
+                setSelectedTicketForDetail(data[0]);
+            }
             await fetchTickets();
             
             showToast("댓글이 삭제되었습니다.");
@@ -832,22 +875,61 @@ export const CustomerSupport = () => {
                                                                         {new Date(msg.created_at).toLocaleString()}
                                                                     </span>
                                                                     {isMsgOwner && (
-                                                                        <button 
-                                                                            onClick={() => handleDeleteReply(selectedTicketForDetail, msg.id)}
-                                                                            className="text-[9px] font-bold text-rose-500 hover:text-rose-700 transition-colors ml-1 cursor-pointer"
-                                                                        >
-                                                                            삭제
-                                                                        </button>
+                                                                        <div className="flex items-center gap-1.5 ml-1">
+                                                                            <button 
+                                                                                onClick={() => {
+                                                                                    setEditingReplyId(msg.id);
+                                                                                    setEditingReplyText(msg.text);
+                                                                                }}
+                                                                                className="text-[9px] font-bold text-indigo-500 hover:text-indigo-700 transition-colors cursor-pointer"
+                                                                            >
+                                                                                수정
+                                                                            </button>
+                                                                            <span className="text-[8px] text-slate-350 select-none">|</span>
+                                                                            <button 
+                                                                                onClick={() => handleDeleteReply(selectedTicketForDetail, msg.id)}
+                                                                                className="text-[9px] font-bold text-rose-500 hover:text-rose-700 transition-colors cursor-pointer"
+                                                                            >
+                                                                                삭제
+                                                                            </button>
+                                                                        </div>
                                                                     )}
                                                                 </div>
                                                             </div>
                                             
-                                                            <p className={cn(
-                                                                "text-xs font-normal leading-relaxed whitespace-pre-wrap",
-                                                                isMsgAdmin ? "text-emerald-950" : "text-slate-700"
-                                                            )}>
-                                                                {msg.text}
-                                                            </p>
+                                                            {editingReplyId === msg.id ? (
+                                                                 <div className="mt-1 space-y-1.5">
+                                                                     <textarea
+                                                                         value={editingReplyText}
+                                                                         onChange={e => setEditingReplyText(e.target.value)}
+                                                                         className="w-full min-h-[50px] p-1.5 text-xs rounded border border-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 bg-white text-slate-800 resize-none font-medium"
+                                                                     />
+                                                                     <div className="flex justify-end gap-1.5">
+                                                                         <button
+                                                                             onClick={() => {
+                                                                                 setEditingReplyId(null);
+                                                                                 setEditingReplyText('');
+                                                                             }}
+                                                                             className="px-2 py-0.5 text-[10px] font-semibold text-slate-500 hover:bg-slate-100 rounded border border-slate-200 transition-colors cursor-pointer"
+                                                                         >
+                                                                             취소
+                                                                         </button>
+                                                                         <button
+                                                                             onClick={() => handleEditReply(selectedTicketForDetail, msg.id, editingReplyText)}
+                                                                             className="px-2 py-0.5 text-[10px] font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded transition-colors cursor-pointer"
+                                                                         >
+                                                                             저장
+                                                                         </button>
+                                                                     </div>
+                                                                 </div>
+                                                             ) : (
+                                                                 <p className={cn(
+                                                                     "text-xs font-normal leading-relaxed whitespace-pre-wrap",
+                                                                     isMsgAdmin ? "text-emerald-950" : "text-slate-700"
+                                                                 )}>
+                                                                     {msg.text}
+                                                                 </p>
+                                                             )}
                                     
                                                             {(msg.image_url || msg.log_url) && (
                                                                 <div className="mt-1 pt-1 border-t border-slate-200/30 flex flex-wrap gap-1.5">
