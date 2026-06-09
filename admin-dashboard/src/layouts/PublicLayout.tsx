@@ -6,6 +6,16 @@ import { supabase } from '../lib/supabase';
 import { Button } from '../components/ui/Button';
 import { cn } from '../lib/utils';
 
+const parseThread = (reply: any): any[] => {
+    if (!reply) return [];
+    if (Array.isArray(reply)) return reply;
+    try {
+        const parsed = JSON.parse(reply);
+        if (Array.isArray(parsed)) return parsed;
+    } catch (e) {}
+    return [];
+};
+
 export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
     const { user, email, role } = useAuth();
     const navigate = useNavigate();
@@ -16,6 +26,22 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
     const [bellDropdownOpen, setBellDropdownOpen] = React.useState(false);
     const dropdownRef = React.useRef<HTMLDivElement>(null);
 
+    const unreadCount = React.useMemo(() => {
+        if (role === 'admin') {
+            return notifications.length;
+        }
+        return notifications.filter(notif => {
+            const thread = parseThread(notif.reply);
+            if (thread.length === 0) return false;
+            const lastMsg = thread[thread.length - 1];
+            if (lastMsg && lastMsg.sender === 'admin') {
+                const readId = localStorage.getItem(`read_ticket_${notif.id}`);
+                return readId !== lastMsg.id;
+            }
+            return false;
+        }).length;
+    }, [notifications, role]);
+
     const fetchQnaNotifications = React.useCallback(async () => {
         if (!user && !email) {
             setNotifications([]);
@@ -24,7 +50,7 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
 
         let query = supabase
             .from('support_tickets')
-            .select('id, email, uid, issue_type, description, status, created_at')
+            .select('id, email, uid, issue_type, description, status, created_at, reply')
             .like('issue_type', 'qna_%');
 
         if (role !== 'admin') {
@@ -69,9 +95,15 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
         };
         document.addEventListener('mousedown', handleOutsideClick);
 
+        const handleTicketRead = () => {
+            fetchQnaNotifications();
+        };
+        window.addEventListener('qna-ticket-read', handleTicketRead);
+
         return () => {
             supabase.removeChannel(channel);
             document.removeEventListener('mousedown', handleOutsideClick);
+            window.removeEventListener('qna-ticket-read', handleTicketRead);
         };
     }, [fetchQnaNotifications]);
 
@@ -217,9 +249,9 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                                     title="질문 알림"
                                 >
                                     <Bell className="w-5 h-5" />
-                                    {notifications.length > 0 && (
+                                    {unreadCount > 0 && (
                                         <span className="absolute top-1 right-1 w-5 h-5 rounded-full bg-rose-500 text-white text-[10px] font-black flex items-center justify-center border-2 border-white animate-pulse">
-                                            {notifications.length}
+                                            {unreadCount}
                                         </span>
                                     )}
                                 </button>
@@ -231,7 +263,7 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                                                 {role === 'admin' ? '🛡️ 미답변 질문 목록' : '🙋‍♂️ 내 질문 목록'}
                                             </span>
                                             <span className="text-[10px] text-slate-400 font-bold">
-                                                최근 {notifications.length}개
+                                                {role === 'admin' ? `최근 ${notifications.length}개` : `미읽음 ${unreadCount}개`}
                                             </span>
                                         </div>
                                         
@@ -245,19 +277,46 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                                                     const prodId = notif.issue_type.replace('qna_', '');
                                                     const title = notif.description ? notif.description.split('\n')[0] : '내용 없음';
                                                     
+                                                    const thread = parseThread(notif.reply);
+                                                    const isUnread = role !== 'admin' && thread.length > 0 && (() => {
+                                                        const lastMsg = thread[thread.length - 1];
+                                                        if (lastMsg && lastMsg.sender === 'admin') {
+                                                            const readId = localStorage.getItem(`read_ticket_${notif.id}`);
+                                                            return readId !== lastMsg.id;
+                                                        }
+                                                        return false;
+                                                    })();
+
                                                     return (
                                                         <button
                                                             key={notif.id}
                                                             onClick={() => {
+                                                                if (isUnread) {
+                                                                    const lastMsg = thread[thread.length - 1];
+                                                                    if (lastMsg) {
+                                                                        localStorage.setItem(`read_ticket_${notif.id}`, lastMsg.id);
+                                                                        window.dispatchEvent(new Event('qna-ticket-read'));
+                                                                    }
+                                                                }
                                                                 setBellDropdownOpen(false);
                                                                 navigate(`/?qna_product=${prodId}&ticket_id=${notif.id}`);
                                                             }}
-                                                            className="w-full text-left p-2 hover:bg-slate-50 rounded-xl transition-colors border border-transparent hover:border-slate-100 flex flex-col gap-1 cursor-pointer"
+                                                            className={cn(
+                                                                "w-full text-left p-2 hover:bg-slate-50 rounded-xl transition-colors border flex flex-col gap-1 cursor-pointer",
+                                                                isUnread 
+                                                                    ? "bg-rose-50/25 border-rose-100/50 hover:border-rose-200" 
+                                                                    : "border-transparent hover:border-slate-100"
+                                                            )}
                                                         >
                                                             <div className="flex items-center justify-between gap-2">
-                                                                <span className="bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider">
-                                                                    {prodId}
-                                                                </span>
+                                                                <div className="flex items-center gap-1.5">
+                                                                    <span className="bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider">
+                                                                        {prodId}
+                                                                    </span>
+                                                                    {isUnread && (
+                                                                        <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+                                                                    )}
+                                                                </div>
                                                                 <span className="text-[9px] text-slate-400 font-bold">
                                                                     {new Date(notif.created_at).toLocaleDateString()}
                                                                 </span>

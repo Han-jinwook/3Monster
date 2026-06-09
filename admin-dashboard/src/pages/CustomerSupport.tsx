@@ -401,6 +401,22 @@ export const CustomerSupport = () => {
         }];
     };
 
+    React.useEffect(() => {
+        if (selectedTicketForDetail && role !== 'admin') {
+            const thread = parseThread(selectedTicketForDetail);
+            if (thread.length > 0) {
+                const lastMsg = thread[thread.length - 1];
+                if (lastMsg && lastMsg.sender === 'admin') {
+                    const readId = localStorage.getItem(`read_ticket_${selectedTicketForDetail.id}`);
+                    if (readId !== lastMsg.id) {
+                        localStorage.setItem(`read_ticket_${selectedTicketForDetail.id}`, lastMsg.id);
+                        window.dispatchEvent(new Event('qna-ticket-read'));
+                    }
+                }
+            }
+        }
+    }, [selectedTicketForDetail, role]);
+
     const handleSubmitReply = async (ticket: any, nextStatus: 'open' | 'closed') => {
         if (!replyText.trim() && !replyImage && !replyLog) {
             alert("내용을 입력하거나 파일을 첨부해주세요.");
@@ -660,6 +676,25 @@ export const CustomerSupport = () => {
                                             </span>
                                         </div>
                                     </div>
+
+                                    {isAdmin && (
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">등록자 이메일</span>
+                                                <span className="text-xs font-bold text-slate-700">
+                                                    {selectedTicketForDetail.email}
+                                                </span>
+                                            </div>
+                                            {selectedTicketForDetail.uid && (
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">UID</span>
+                                                    <span className="text-[10px] font-mono text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
+                                                        {selectedTicketForDetail.uid}
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
 
                                     {/* Raw content viewer preserving newlines */}
                                     <div className="space-y-1.5">

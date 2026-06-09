@@ -459,6 +459,25 @@ export const Showroom = () => {
         }];
     };
 
+    useEffect(() => {
+        if (expandedQuestionId && questions.length > 0) {
+            const currentQ = questions.find(q => q.id === expandedQuestionId);
+            if (currentQ) {
+                const thread = parseThread(currentQ);
+                if (thread.length > 0) {
+                    const lastMsg = thread[thread.length - 1];
+                    if (lastMsg && lastMsg.sender === 'admin') {
+                        const readId = localStorage.getItem(`read_ticket_${currentQ.id}`);
+                        if (readId !== lastMsg.id) {
+                            localStorage.setItem(`read_ticket_${currentQ.id}`, lastMsg.id);
+                            window.dispatchEvent(new Event('qna-ticket-read'));
+                        }
+                    }
+                }
+            }
+        }
+    }, [expandedQuestionId, questions]);
+
     const handleSubmitReply = async (ticket: any, nextStatus: 'open' | 'closed') => {
         const replyText = replyTextMap[ticket.id] || '';
         const replyImage = replyImageMap[ticket.id] || null;
