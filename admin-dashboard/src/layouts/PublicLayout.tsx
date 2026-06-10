@@ -367,7 +367,10 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                                                                     {categoryBadge}
                                                                     {subBadge}
                                                                     {isUnread && (
-                                                                        <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+                                                                        <span className="bg-rose-50 text-rose-600 border border-rose-200/60 text-[9px] font-black px-1.5 py-0.5 rounded flex items-center gap-1 shrink-0 select-none animate-pulse">
+                                                                            <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                                                                            {role === 'admin' ? '미답변' : '새답변'}
+                                                                        </span>
                                                                     )}
                                                                 </div>
                                                                 <span className="text-[9px] text-slate-400 font-bold">

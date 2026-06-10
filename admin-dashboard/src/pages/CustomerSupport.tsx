@@ -44,6 +44,7 @@ export const CustomerSupport = () => {
     };
     const [editingReplyId, setEditingReplyId] = useState<string | null>(null);
     const [editingReplyText, setEditingReplyText] = useState<string>('');
+    const [activeTab, setActiveTab] = useState<'qna' | 'support'>('support');
 
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -111,6 +112,8 @@ export const CustomerSupport = () => {
             if (found) {
                 setExpandedTicketId(found.id);
                 setSelectedTicketForDetail(found);
+                const isQna = found.issue_type && found.issue_type.startsWith('qna_');
+                setActiveTab(isQna ? 'qna' : 'support');
                 setIsEditing(false);
                 setIssueType(found.issue_type || 'bug');
                 
@@ -160,6 +163,8 @@ export const CustomerSupport = () => {
             const found = tickets.find(t => String(t.id) === String(ticketId));
             if (found) {
                 setSelectedTicketForDetail(found);
+                const isQna = found.issue_type && found.issue_type.startsWith('qna_');
+                setActiveTab(isQna ? 'qna' : 'support');
                 setIsEditing(false);
                 setIssueType(found.issue_type || 'bug');
                 const rawDesc = found.description ? parseRawDescription(found.description) : '';
@@ -721,7 +726,8 @@ export const CustomerSupport = () => {
         
         // Q&A 형식의 상품 질문글은 고객센터 메인 목록에서 제외시킵니다. (이후 상품 전용 Q&A 섹션에 노출되도록 함)
         const isProductQna = t.issue_type && t.issue_type.startsWith('qna_');
-        if (isProductQna) return false;
+        if (activeTab === 'qna' && !isProductQna) return false;
+        if (activeTab === 'support' && isProductQna) return false;
 
         if (!isAdmin && !isOwn) return false;
 
@@ -1401,6 +1407,46 @@ export const CustomerSupport = () => {
                     )}
 
                     {/* List View Main */}
+                    <div className="flex border-b border-slate-200/80 mb-3.5 gap-1.5 bg-slate-100/50 p-1.5 rounded-2xl border border-slate-150/50 shadow-inner">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setActiveTab('support');
+                                setExpandedTicketId(null);
+                                setSelectedTicketForDetail(null);
+                            }}
+                            className={cn(
+                                "flex-1 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer outline-none focus:outline-none",
+                                activeTab === 'support' 
+                                    ? "bg-white text-rose-600 shadow-sm border border-slate-200/50 font-black scale-[1.01]" 
+                                    : "text-slate-500 hover:text-slate-800 hover:bg-white/30"
+                            )}
+                        >
+                            🛠️ AS 기술지원 ({tickets.filter(t => {
+                                const isOwn = (t.email && userEmail && t.email.toLowerCase() === userEmail.toLowerCase()) || (t.uid === user?.id);
+                                return !t.issue_type?.startsWith('qna_') && (isAdmin || isOwn);
+                            }).length})
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setActiveTab('qna');
+                                setExpandedTicketId(null);
+                                setSelectedTicketForDetail(null);
+                            }}
+                            className={cn(
+                                "flex-1 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer outline-none focus:outline-none",
+                                activeTab === 'qna' 
+                                    ? "bg-white text-blue-600 shadow-sm border border-slate-200/50 font-black scale-[1.01]" 
+                                    : "text-slate-500 hover:text-slate-800 hover:bg-white/30"
+                            )}
+                        >
+                            🙋‍♂️ Q&A 제품문의 ({tickets.filter(t => {
+                                const isOwn = (t.email && userEmail && t.email.toLowerCase() === userEmail.toLowerCase()) || (t.uid === user?.id);
+                                return t.issue_type?.startsWith('qna_') && (isAdmin || isOwn);
+                            }).length})
+                        </button>
+                    </div>
                     <div className="flex flex-col sm:flex-row gap-3">
                         <div className="relative flex-1 group">
                             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
