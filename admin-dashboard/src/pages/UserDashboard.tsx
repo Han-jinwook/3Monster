@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 const products = [
     {
@@ -58,6 +59,8 @@ const products = [
 ];
 
 export const UserDashboard = () => {
+    const navigate = useNavigate();
+
     return (
         <div className="max-w-7xl mx-auto space-y-12 pb-20 px-6">
             {/* Hero Section / Support Entrance */}
@@ -76,7 +79,7 @@ export const UserDashboard = () => {
                     </p>
                     <div className="flex flex-wrap gap-4 pt-4">
                         <Button 
-                            onClick={() => window.location.hash = '#/support'}
+                            onClick={() => navigate('/support')}
                             className="h-16 px-10 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xl rounded-2xl shadow-indigo-500/20 shadow-2xl transition-all group"
                         >
                             <MessageSquare className="mr-3 w-6 h-6 group-hover:animate-bounce" /> 기술지원 게시판 이동

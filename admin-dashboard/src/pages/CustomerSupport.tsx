@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -33,6 +34,8 @@ interface ThreadMessage {
 
 export const CustomerSupport = () => {
     const { user, email: verifiedEmail, role, refreshRole } = useAuth();
+    const location = useLocation();
+    const navigate = useNavigate();
     const loggedInEmail = verifiedEmail || localStorage.getItem('user_email') || user?.email || '';
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
     const showToast = (message: string, type: 'success' | 'error' = 'success') => {
@@ -87,7 +90,7 @@ export const CustomerSupport = () => {
 
     // Read URL params for auto-filling
     React.useEffect(() => {
-        const searchStr = window.location.search || (window.location.hash.includes('?') ? '?' + window.location.hash.split('?')[1] : '');
+        const searchStr = location.search || (location.hash.includes('?') ? '?' + location.hash.split('?')[1] : '');
         const params = new URLSearchParams(searchStr);
         const urlEmail = params.get('email');
         const urlLog = params.get('log');
@@ -96,11 +99,11 @@ export const CustomerSupport = () => {
         if (urlEmail) setContactEmail(urlEmail);
         if (urlLog) setDescription(`[자동 복사된 로그]\n${urlLog}\n\n[증상 상세]\n`);
         if (urlType) setIssueType(urlType);
-    }, []);
+    }, [location.search, location.hash]);
 
     // Read URL param ticket_id to auto-select and expand the ticket
     React.useEffect(() => {
-        const searchStr = window.location.search || (window.location.hash.includes('?') ? '?' + window.location.hash.split('?')[1] : '');
+        const searchStr = location.search || (location.hash.includes('?') ? '?' + location.hash.split('?')[1] : '');
         const params = new URLSearchParams(searchStr);
         const ticketId = params.get('ticket_id');
         if (ticketId && tickets.length > 0) {
@@ -138,8 +141,16 @@ export const CustomerSupport = () => {
                     setSelectedLicenseId('');
                 }
             }
+        } else if (!ticketId) {
+            setExpandedTicketId(null);
+            setSelectedTicketForDetail(null);
+            setIsEditing(false);
+            setIssueType('bug');
+            setDescription('');
+            setKmongNickname('');
+            setSelectedLicenseId('');
         }
-    }, [tickets, purchasedLicenses]);
+    }, [tickets, purchasedLicenses, location.search, location.hash]);
 
     // Check license whenever email or nickname changes
     React.useEffect(() => {
@@ -419,8 +430,7 @@ export const CustomerSupport = () => {
             }
 
             if (data && data[0]) {
-                setSelectedTicketForDetail(data[0]);
-                setIsEditing(false);
+                navigate(`/support?ticket_id=${data[0].id}`, { replace: true });
             }
 
             setTimeout(() => {
@@ -626,13 +636,7 @@ export const CustomerSupport = () => {
             
             showToast("문의가 삭제되었습니다.");
             
-            setSelectedTicketForDetail(null);
-            setExpandedTicketId(null);
-            setIssueType('bug');
-            setDescription('');
-            setKmongNickname('');
-            setSelectedLicenseId('');
-            setIsEditing(false);
+            navigate('/support', { replace: true });
             
             await fetchTickets();
         } catch (err: any) {
@@ -729,13 +733,7 @@ export const CustomerSupport = () => {
                                 <button
                                     type="button"
                                     onClick={() => {
-                                        setSelectedTicketForDetail(null);
-                                        setExpandedTicketId(null);
-                                        setIssueType('bug');
-                                        setDescription('');
-                                        setKmongNickname('');
-                                        setSelectedLicenseId('');
-                                        setIsEditing(false);
+                                        navigate('/support', { replace: true });
                                     }}
                                     className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-650 transition-colors cursor-pointer"
                                     title="상세 닫기"
@@ -869,13 +867,7 @@ export const CustomerSupport = () => {
                                             <Button 
                                                 type="button" 
                                                 onClick={() => {
-                                                    setSelectedTicketForDetail(null);
-                                                    setExpandedTicketId(null);
-                                                    setIssueType('bug');
-                                                    setDescription('');
-                                                    setKmongNickname('');
-                                                    setSelectedLicenseId('');
-                                                    setIsEditing(false);
+                                                    navigate('/support', { replace: true });
                                                 }}
                                                 className="flex-1 h-9 bg-slate-100 hover:bg-slate-200 text-slate-650 font-semibold text-xs rounded-lg transition-all border border-slate-200 shadow-sm"
                                             >
@@ -1439,46 +1431,10 @@ export const CustomerSupport = () => {
                                                 onClick={() => {
                                                     if (canViewDetail) {
                                                         const nextExpanded = !isExpanded;
-                                                        setExpandedTicketId(nextExpanded ? ticket.id : null);
-                                                        setSelectedTicketForDetail(nextExpanded ? ticket : null);
                                                         if (nextExpanded) {
-                                                            setIsEditing(false);
-                                                            setIssueType(ticket.issue_type || 'bug');
-                                                            
-                                                            const rawDesc = ticket.description ? parseRawDescription(ticket.description) : '';
-                                                            setDescription(rawDesc);
-                                                            
-                                                            const matchProd = ticket.description?.match(/\[문의 제품:\s*([^\]\s\()]+)/);
-                                                            if (matchProd && matchProd[1]) {
-                                                                setSelectedProduct(matchProd[1]);
-                                                            } else {
-                                                                setSelectedProduct('PlaceDB');
-                                                            }
-
-                                                            const matchKmong = ticket.description?.match(/\[수동 구매 인증 요청: 크몽 (?:닉네임|ID) - (.*?)\]/);
-                                                            if (matchKmong && matchKmong[1]) {
-                                                                setKmongNickname(matchKmong[1]);
-                                                            } else {
-                                                                setKmongNickname('');
-                                                            }
-
-                                                            const matchSerial = ticket.description?.match(/\(시리얼:\s*([^\)]+)\)/);
-                                                            if (matchSerial && matchSerial[1]) {
-                                                                const lic = purchasedLicenses.find(l => l.serial_key === matchSerial[1]);
-                                                                if (lic) {
-                                                                    setSelectedLicenseId(lic.id);
-                                                                }
-                                                            } else {
-                                                                setSelectedLicenseId('');
-                                                            }
-
-                                                            
+                                                            navigate(`/support?ticket_id=${ticket.id}`, { replace: true });
                                                         } else {
-                                                            setIsEditing(false);
-                                                            setIssueType('bug');
-                                                            setDescription('');
-                                                            setKmongNickname('');
-                                                            setSelectedLicenseId('');
+                                                            navigate('/support', { replace: true });
                                                         }
                                                     }
                                                 }}
