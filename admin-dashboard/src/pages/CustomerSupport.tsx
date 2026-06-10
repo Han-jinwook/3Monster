@@ -87,7 +87,8 @@ export const CustomerSupport = () => {
 
     // Read URL params for auto-filling
     React.useEffect(() => {
-        const params = new URLSearchParams(window.location.hash.split('?')[1]);
+        const searchStr = window.location.search || (window.location.hash.includes('?') ? '?' + window.location.hash.split('?')[1] : '');
+        const params = new URLSearchParams(searchStr);
         const urlEmail = params.get('email');
         const urlLog = params.get('log');
         const urlType = params.get('type');
@@ -96,6 +97,49 @@ export const CustomerSupport = () => {
         if (urlLog) setDescription(`[자동 복사된 로그]\n${urlLog}\n\n[증상 상세]\n`);
         if (urlType) setIssueType(urlType);
     }, []);
+
+    // Read URL param ticket_id to auto-select and expand the ticket
+    React.useEffect(() => {
+        const searchStr = window.location.search || (window.location.hash.includes('?') ? '?' + window.location.hash.split('?')[1] : '');
+        const params = new URLSearchParams(searchStr);
+        const ticketId = params.get('ticket_id');
+        if (ticketId && tickets.length > 0) {
+            const found = tickets.find(t => String(t.id) === String(ticketId));
+            if (found) {
+                setExpandedTicketId(found.id);
+                setSelectedTicketForDetail(found);
+                setIsEditing(false);
+                setIssueType(found.issue_type || 'bug');
+                
+                const rawDesc = found.description ? parseRawDescription(found.description) : '';
+                setDescription(rawDesc);
+                
+                const matchProd = found.description?.match(/\[문의 제품:\s*([^\]\s\()]+)/);
+                if (matchProd && matchProd[1]) {
+                    setSelectedProduct(matchProd[1]);
+                } else {
+                    setSelectedProduct('PlaceDB');
+                }
+
+                const matchKmong = found.description?.match(/\[수동 구매 인증 요청: 크몽 (?:닉네임|ID) - (.*?)\]/);
+                if (matchKmong && matchKmong[1]) {
+                    setKmongNickname(matchKmong[1]);
+                } else {
+                    setKmongNickname('');
+                }
+
+                const matchSerial = found.description?.match(/\(시리얼:\s*([^\)]+)\)/);
+                if (matchSerial && matchSerial[1]) {
+                    const lic = purchasedLicenses.find(l => l.serial_key === matchSerial[1]);
+                    if (lic) {
+                        setSelectedLicenseId(lic.id);
+                    }
+                } else {
+                    setSelectedLicenseId('');
+                }
+            }
+        }
+    }, [tickets, purchasedLicenses]);
 
     // Check license whenever email or nickname changes
     React.useEffect(() => {

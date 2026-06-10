@@ -50,8 +50,7 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
 
         let query = supabase
             .from('support_tickets')
-            .select('id, email, uid, issue_type, description, status, created_at, reply')
-            .like('issue_type', 'qna_%');
+            .select('id, email, uid, issue_type, description, status, created_at, reply');
 
         if (role !== 'admin') {
             const userEmail = email || localStorage.getItem('user_email');
@@ -274,7 +273,20 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                                         ) : (
                                             <div className="flex flex-col gap-1 max-h-[300px] overflow-y-auto">
                                                 {notifications.map((notif) => {
-                                                    const prodId = notif.issue_type.replace('qna_', '');
+                                                    const isQna = notif.issue_type && notif.issue_type.startsWith('qna_');
+                                                    const prodId = isQna ? notif.issue_type.replace('qna_', '') : null;
+                                                    let typeLabel = '';
+                                                    if (isQna) {
+                                                        typeLabel = prodId || '';
+                                                    } else {
+                                                        switch (notif.issue_type) {
+                                                            case 'bug': typeLabel = '버그/오류'; break;
+                                                            case 'feature': typeLabel = '기능제안'; break;
+                                                            case 'license': typeLabel = '라이선스'; break;
+                                                            case 'other': typeLabel = '일반문의'; break;
+                                                            default: typeLabel = notif.issue_type || '기타';
+                                                        }
+                                                    }
                                                     const title = notif.description ? notif.description.split('\n')[0] : '내용 없음';
                                                     
                                                     const thread = parseThread(notif.reply);
@@ -299,7 +311,11 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                                                                     }
                                                                 }
                                                                 setBellDropdownOpen(false);
-                                                                navigate(`/?qna_product=${prodId}&ticket_id=${notif.id}`);
+                                                                if (isQna) {
+                                                                    navigate(`/?qna_product=${prodId}&ticket_id=${notif.id}`);
+                                                                } else {
+                                                                    navigate(`/support?ticket_id=${notif.id}`);
+                                                                }
                                                             }}
                                                             className={cn(
                                                                 "w-full text-left p-2 hover:bg-slate-50 rounded-xl transition-colors border flex flex-col gap-1 cursor-pointer",
@@ -311,7 +327,7 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                                                             <div className="flex items-center justify-between gap-2">
                                                                 <div className="flex items-center gap-1.5">
                                                                     <span className="bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider">
-                                                                        {prodId}
+                                                                        {typeLabel}
                                                                     </span>
                                                                     {isUnread && (
                                                                         <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
