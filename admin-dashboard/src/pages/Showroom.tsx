@@ -278,6 +278,23 @@ export const Showroom = () => {
             }
         }
     }, [location.search]);
+
+    useEffect(() => {
+        const handleForceJump = (e: Event) => {
+            const customEvent = e as CustomEvent;
+            const { qnaProduct, ticketId } = customEvent.detail;
+            setActiveQnaProductId(qnaProduct);
+            setExpandedQuestionId(ticketId);
+            setTimeout(() => {
+                const element = document.getElementById(`ticket-${ticketId}`);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 100);
+        };
+        window.addEventListener('force-qna-jump', handleForceJump);
+        return () => window.removeEventListener('force-qna-jump', handleForceJump);
+    }, []);
     
     // New Question States
     const [newQuestionText, setNewQuestionText] = useState('');

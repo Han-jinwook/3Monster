@@ -28,7 +28,7 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
 
     const unreadCount = React.useMemo(() => {
         if (role === 'admin') {
-            return notifications.length;
+            return notifications.filter(notif => notif.status === 'open').length;
         }
         return notifications.filter(notif => {
             const thread = parseThread(notif.reply);
@@ -64,9 +64,9 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                 setNotifications([]);
                 return;
             }
-        } else {
-            query = query.eq('status', 'open');
         }
+            //
+        //
 
         const { data, error } = await query.order('created_at', { ascending: false }).limit(20);
         if (!error && data) {
@@ -321,7 +321,9 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                                                     const title = notif.description ? notif.description.split('\n')[0] : '내용 없음';
                                                     
                                                     const thread = parseThread(notif.reply);
-                                                    const isUnread = role !== 'admin' && thread.length > 0 && (() => {
+                                                    const isUnread = role === 'admin'
+                                                        ? notif.status === 'open'
+                                                        : thread.length > 0 && (() => {
                                                         const lastMsg = thread[thread.length - 1];
                                                         if (lastMsg && lastMsg.sender === 'admin') {
                                                             const readId = localStorage.getItem(`read_ticket_${notif.id}`);
@@ -334,7 +336,7 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                                                         <button
                                                             key={notif.id}
                                                             onClick={() => {
-                                                                if (isUnread) {
+                                                                if (isUnread && role !== 'admin') {
                                                                     const lastMsg = thread[thread.length - 1];
                                                                     if (lastMsg) {
                                                                         localStorage.setItem(`read_ticket_${notif.id}`, lastMsg.id);
@@ -343,9 +345,9 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                                                                 }
                                                                 setBellDropdownOpen(false);
                                                                 if (isQna) {
-                                                                    navigate(`/?qna_product=${prodId}&ticket_id=${notif.id}`);
+                                                                    { const targetSearch = `?qna_product=${prodId}&ticket_id=${notif.id}`; if (location.pathname === '/' && location.search === targetSearch) { window.dispatchEvent(new CustomEvent('force-qna-jump', { detail: { qnaProduct: prodId, ticketId: String(notif.id) } })); } else { navigate(`/${targetSearch}`); } }
                                                                 } else {
-                                                                    navigate(`/support?ticket_id=${notif.id}`);
+                                                                    { const targetSearch = `?ticket_id=${notif.id}`; if (location.pathname === '/support' && location.search === targetSearch) { window.dispatchEvent(new CustomEvent('force-support-jump', { detail: { ticketId: String(notif.id) } })); } else { navigate(`/support${targetSearch}`); } }
                                                                 }
                                                             }}
                                                             className={cn(

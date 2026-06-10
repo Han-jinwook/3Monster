@@ -152,6 +152,24 @@ export const CustomerSupport = () => {
         }
     }, [tickets, purchasedLicenses, location.search, location.hash]);
 
+    React.useEffect(() => {
+        const handleForceJump = (e: Event) => {
+            const customEvent = e as CustomEvent;
+            const { ticketId } = customEvent.detail;
+            setExpandedTicketId(ticketId);
+            const found = tickets.find(t => String(t.id) === String(ticketId));
+            if (found) {
+                setSelectedTicketForDetail(found);
+                setIsEditing(false);
+                setIssueType(found.issue_type || 'bug');
+                const rawDesc = found.description ? parseRawDescription(found.description) : '';
+                setDescription(rawDesc);
+            }
+        };
+        window.addEventListener('force-support-jump', handleForceJump);
+        return () => window.removeEventListener('force-support-jump', handleForceJump);
+    }, [tickets]);
+
     // Check license whenever email or nickname changes
     React.useEffect(() => {
         const checkLicenses = async () => {
