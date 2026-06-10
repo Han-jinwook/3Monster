@@ -1421,8 +1421,10 @@ export const CustomerSupport = () => {
                                         key={ticket.id}
                                     >
                                         <Card className={cn(
-                                            "relative overflow-hidden bg-white border border-slate-200 shadow-sm hover:shadow transition-all duration-200 rounded-lg",
-                                            isExpanded && "border-slate-300 ring-1 ring-slate-100"
+                                            "relative overflow-hidden transition-all duration-200 rounded-lg border",
+                                            isExpanded 
+                                                ? "bg-indigo-50/20 border-indigo-200 ring-2 ring-indigo-100/50 shadow-md scale-[1.01]" 
+                                                : "bg-white border-slate-200 hover:border-slate-300 hover:shadow-md"
                                         )}>
                                             {/* Left Status Bar Indicator */}
                                             <div className={cn(
@@ -1432,7 +1434,7 @@ export const CustomerSupport = () => {
                                             <div 
                                                 className={cn(
                                                     "flex items-center justify-between p-1.5 px-3 cursor-pointer group select-none transition-colors",
-                                                    isExpanded ? "bg-slate-50/60" : "bg-white hover:bg-slate-50/30"
+                                                    isExpanded ? "bg-indigo-50/30" : "bg-white hover:bg-slate-50/30"
                                                 )}
                                                 onClick={() => {
                                                     if (canViewDetail) {
