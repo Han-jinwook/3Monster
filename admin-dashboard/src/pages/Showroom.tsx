@@ -461,7 +461,7 @@ export const Showroom = () => {
 
     useEffect(() => {
         if (expandedQuestionId && questions.length > 0) {
-            const currentQ = questions.find(q => q.id === expandedQuestionId);
+            const currentQ = questions.find(q => String(q.id) === String(expandedQuestionId));
             if (currentQ) {
                 const thread = parseThread(currentQ);
                 if (thread.length > 0) {
@@ -474,6 +474,14 @@ export const Showroom = () => {
                         }
                     }
                 }
+
+                // Scroll the ticket into view
+                setTimeout(() => {
+                    const element = document.getElementById(`ticket-${expandedQuestionId}`);
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }, 200);
             }
         }
     }, [expandedQuestionId, questions]);
@@ -501,8 +509,10 @@ export const Showroom = () => {
                 const lastAdminMsgIndex = currentThread.slice().reverse().findIndex(msg => msg.sender === 'admin');
                 if (lastAdminMsgIndex !== -1) {
                     const actualIndex = currentThread.length - 1 - lastAdminMsgIndex;
+                    const originalId = currentThread[actualIndex].id || Date.now().toString();
                     currentThread[actualIndex] = {
                         ...currentThread[actualIndex],
+                        id: `${originalId.split('-edited-')[0]}-edited-${Date.now()}`,
                         text: replyText,
                         image_url: imageUrl || currentThread[actualIndex].image_url,
                         created_at: new Date().toISOString()
@@ -663,9 +673,10 @@ export const Showroom = () => {
                             )}>
                                 {category.products.map((product) => (
                                     <Card 
-                                        key={product.id} 
+                                        key={product.id}
+                                        id={product.id}
                                         className={cn(
-                                            "group overflow-hidden border-none shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2rem] bg-white flex flex-col cursor-pointer",
+                                            "group overflow-hidden border-none shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2rem] bg-white flex flex-col cursor-pointer scroll-mt-24",
                                             selectedProductIdForDetail === product.id ? "ring-2 ring-indigo-500 shadow-md" : ""
                                         )}
                                         onClick={() => {
@@ -813,7 +824,7 @@ export const Showroom = () => {
                                                             </p>
                                                         ) : (
                                                             questions.map((q) => {
-                                                                const isQExpanded = expandedQuestionId === q.id;
+                                                                const isQExpanded = String(expandedQuestionId) === String(q.id);
                                                                 const thread = parseThread(q);
                                                                 const isQOwner = q.uid === user?.id || (q.email && verifiedEmail && q.email.toLowerCase() === verifiedEmail.toLowerCase());
                                                                 const canReply = isQOwner || isAdmin;

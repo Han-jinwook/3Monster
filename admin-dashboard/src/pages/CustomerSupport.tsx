@@ -501,7 +501,9 @@ export const CustomerSupport = () => {
         try {
             const currentThread = parseThread(ticket);
             const updatedThread = currentThread.map(msg => 
-                msg.id === replyId ? { ...msg, text: newText } : msg
+                msg.id === replyId 
+                    ? { ...msg, text: newText, id: `${replyId.split('-edited-')[0]}-edited-${Date.now()}` } 
+                    : msg
             );
 
             const { data, error: updateError } = await supabase
