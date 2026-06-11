@@ -315,6 +315,17 @@ export const Showroom = () => {
 
     // Expanded Q&A thread inside product Q&A list
     const [expandedQuestionId, setExpandedQuestionId] = useState<string | null>(null);
+    const [collapsedQuestionIds, setCollapsedQuestionIds] = useState<string[]>([]);
+
+    useEffect(() => {
+        setCollapsedQuestionIds([]);
+    }, [activeQnaProductId]);
+
+    useEffect(() => {
+        if (expandedQuestionId) {
+            setCollapsedQuestionIds(prev => prev.filter(id => id !== String(expandedQuestionId)));
+        }
+    }, [expandedQuestionId]);
 
     const maskEmail = (email: string) => {
         if (!email) return 'unknown';
@@ -482,29 +493,39 @@ export const Showroom = () => {
     };
 
     useEffect(() => {
-        if (expandedQuestionId && questions.length > 0) {
-            const currentQ = questions.find(q => String(q.id) === String(expandedQuestionId));
-            if (currentQ) {
-                const thread = parseThread(currentQ);
-                if (thread.length > 0) {
-                    const lastMsg = thread[thread.length - 1];
-                    if (lastMsg && lastMsg.sender === 'admin') {
-                        const readId = localStorage.getItem(`read_ticket_${currentQ.id}`);
-                        if (readId !== lastMsg.id) {
-                            localStorage.setItem(`read_ticket_${currentQ.id}`, lastMsg.id);
-                            window.dispatchEvent(new Event('qna-ticket-read'));
+        if (questions.length > 0) {
+            let hasReadChanged = false;
+            questions.forEach(q => {
+                const qIdStr = String(q.id);
+                const isQExpanded = !collapsedQuestionIds.includes(qIdStr);
+                if (isQExpanded) {
+                    const thread = parseThread(q);
+                    if (thread.length > 0) {
+                        const lastMsg = thread[thread.length - 1];
+                        if (lastMsg && lastMsg.sender === 'admin') {
+                            const readId = localStorage.getItem(`read_ticket_${q.id}`);
+                            if (readId !== lastMsg.id) {
+                                localStorage.setItem(`read_ticket_${q.id}`, lastMsg.id);
+                                hasReadChanged = true;
+                            }
                         }
                     }
                 }
-
-                // Scroll the ticket into view
-                setTimeout(() => {
-                    const element = document.getElementById(`ticket-${expandedQuestionId}`);
-                    if (element) {
-                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-                }, 200);
+            });
+            if (hasReadChanged) {
+                window.dispatchEvent(new Event('qna-ticket-read'));
             }
+        }
+    }, [questions, collapsedQuestionIds]);
+
+    useEffect(() => {
+        if (expandedQuestionId && questions.length > 0) {
+            setTimeout(() => {
+                const element = document.getElementById(`ticket-${expandedQuestionId}`);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 200);
         }
     }, [expandedQuestionId, questions]);
 
@@ -755,13 +776,26 @@ export const Showroom = () => {
                                                             </p>
                                                         ) : (
                                                             questions.map((q) => {
-                                                                const isQExpanded = String(expandedQuestionId) === String(q.id);
+                                                                const isQExpanded = !collapsedQuestionIds.includes(String(q.id));
                                                                 const thread = parseThread(q);
                                                                 return (
                                                                     <div key={q.id} id={`ticket-${q.id}`} className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden transition-all duration-300">
                                                                         {/* Question Header (Click to expand) */}
                                                                         <div 
-                                                                            onClick={() => setExpandedQuestionId(isQExpanded ? null : q.id)}
+                                                                            onClick={() => {
+                                                                                const qIdStr = String(q.id);
+                                                                                const willCollapse = isQExpanded;
+                                                                                setCollapsedQuestionIds(prev => 
+                                                                                    willCollapse 
+                                                                                        ? [...prev, qIdStr] 
+                                                                                        : prev.filter(id => id !== qIdStr)
+                                                                                );
+                                                                                if (!willCollapse) {
+                                                                                    setExpandedQuestionId(q.id);
+                                                                                } else if (String(expandedQuestionId) === qIdStr) {
+                                                                                    setExpandedQuestionId(null);
+                                                                                }
+                                                                            }}
                                                                             className={cn(
                                                                                 "p-1 px-2.5 cursor-pointer flex items-center justify-between gap-1.5 transition-all hover:bg-slate-50/50",
                                                                                 isQExpanded && "bg-slate-50/30 border-b border-slate-100/50"
