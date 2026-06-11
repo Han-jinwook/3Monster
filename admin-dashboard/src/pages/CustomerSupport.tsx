@@ -718,6 +718,26 @@ export const CustomerSupport = () => {
 
     const isAdmin = role === 'admin';
     const userEmail = verifiedEmail || localStorage.getItem('user_email') || user?.email;
+
+    // 카운트 계산용 필터링 목록
+    const supportTickets = tickets.filter(t => {
+        const isOwn = (t.email && userEmail && t.email.toLowerCase() === userEmail.toLowerCase()) || (t.uid === user?.id);
+        return !t.issue_type?.startsWith('qna_') && (isAdmin || isOwn);
+    });
+
+    const qnaTickets = tickets.filter(t => {
+        const isOwn = (t.email && userEmail && t.email.toLowerCase() === userEmail.toLowerCase()) || (t.uid === user?.id);
+        return t.issue_type?.startsWith('qna_') && (isAdmin || isOwn);
+    });
+
+    // AS 기술지원 카운트
+    const supportOpenCount = supportTickets.filter(t => t.status === 'open').length;
+    const supportClosedCount = supportTickets.filter(t => t.status !== 'open').length;
+
+    // Q&A 제품문의 카운트
+    const qnaOpenCount = qnaTickets.filter(t => t.status === 'open').length;
+    const qnaClosedCount = qnaTickets.filter(t => t.status !== 'open').length;
+
     const filteredTickets = tickets.filter(t => {
         // 일반 유저라면 자신의 글만 보임 (이메일 매칭 혹은 UID 매칭)
         const isOwn = 
@@ -739,13 +759,13 @@ export const CustomerSupport = () => {
         <div className="w-full bg-transparent py-12 px-4 min-h-screen">
             <div className="max-w-7xl mx-auto space-y-5 pb-10">
 
-            {/* Main Content Layout - 관리자는 목록만 전체 너비, 일반 유저는 2열 (또는 관리자가 티켓을 선택했을 때) */}
-            <div className={`grid grid-cols-1 gap-6 items-start ${(!isAdmin || selectedTicketForDetail) ? 'lg:grid-cols-2' : ''}`}>
+            {/* Main Content Layout - 2열로 항시 고정하여 화면 흔들림(Layout Shift) 방지 */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
                 
-                {/* Left side: 일반 유저는 항상 노출, 관리자는 문의 선택 시 노출 */}
-                {(!isAdmin || selectedTicketForDetail) && (
+                {/* Left side: 일반 유저는 항상 노출, 관리자는 문의 선택 시 상세 노출 / 미선택 시 기본 안내 포맷 노출 */}
                 <div className="space-y-4">
-                    <Card className="p-6 bg-white border-2 border-slate-300 shadow-md rounded-2xl transition-all duration-300">
+                    {(!isAdmin || selectedTicketForDetail) ? (
+                        <Card className="p-6 bg-white border-2 border-slate-300 shadow-md rounded-2xl transition-all duration-300">
                         <div className="flex items-center justify-between mb-4 pb-2 border-b border-slate-150">
                             <h3 className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
                                 {selectedTicketForDetail ? (
@@ -1371,8 +1391,18 @@ export const CustomerSupport = () => {
                             )}
                         </div>
                     </Card>
+                    ) : (
+                        <Card className="p-12 bg-white border-2 border-dashed border-slate-250 shadow-sm rounded-2xl flex flex-col items-center justify-center text-center min-h-[480px] transition-all duration-300">
+                            <div className="w-16 h-16 rounded-full bg-indigo-50 flex items-center justify-center mb-4 text-indigo-500 shadow-inner">
+                                <FileText className="w-8 h-8" />
+                            </div>
+                            <h3 className="text-base font-bold text-slate-800 mb-2">문의 상세 조회</h3>
+                            <p className="text-xs font-semibold text-slate-400 max-w-xs leading-relaxed">
+                                우측 목록에서 상세히 조회하고 답변을 작성할 고객 문의를 선택해주세요.
+                            </p>
+                        </Card>
+                    )}
                 </div>
-                )}
 
                 {/* Right side: Ticket List */}
                 <div className="space-y-4">
@@ -1422,10 +1452,24 @@ export const CustomerSupport = () => {
                                     : "text-slate-500 hover:text-slate-800 hover:bg-white/30"
                             )}
                         >
-                            🛠️ AS 기술지원 ({tickets.filter(t => {
-                                const isOwn = (t.email && userEmail && t.email.toLowerCase() === userEmail.toLowerCase()) || (t.uid === user?.id);
-                                return !t.issue_type?.startsWith('qna_') && (isAdmin || isOwn);
-                            }).length})
+                            <span className="flex items-center gap-1.5">
+                                🛠️ AS 기술지원
+                                <span className="flex items-center gap-1 ml-1">
+                                    {supportClosedCount > 0 && (
+                                        <span className="inline-flex items-center justify-center bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded-full text-[9px] font-bold border border-emerald-200/60">
+                                            완료 {supportClosedCount}
+                                        </span>
+                                    )}
+                                    {supportOpenCount > 0 && (
+                                        <span className="inline-flex items-center justify-center bg-rose-50 text-rose-700 px-1.5 py-0.5 rounded-full text-[9px] font-bold border border-rose-200/60 animate-pulse">
+                                            대기 {supportOpenCount}
+                                        </span>
+                                    )}
+                                    {supportClosedCount === 0 && supportOpenCount === 0 && (
+                                        <span className="text-slate-400 text-[10px] font-normal">(0)</span>
+                                    )}
+                                </span>
+                            </span>
                         </button>
                         <button
                             type="button"
@@ -1441,10 +1485,24 @@ export const CustomerSupport = () => {
                                     : "text-slate-500 hover:text-slate-800 hover:bg-white/30"
                             )}
                         >
-                            🙋‍♂️ Q&A 제품문의 ({tickets.filter(t => {
-                                const isOwn = (t.email && userEmail && t.email.toLowerCase() === userEmail.toLowerCase()) || (t.uid === user?.id);
-                                return t.issue_type?.startsWith('qna_') && (isAdmin || isOwn);
-                            }).length})
+                            <span className="flex items-center gap-1.5">
+                                🙋‍♂️ Q&A 제품문의
+                                <span className="flex items-center gap-1 ml-1">
+                                    {qnaClosedCount > 0 && (
+                                        <span className="inline-flex items-center justify-center bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded-full text-[9px] font-bold border border-emerald-200/60">
+                                            완료 {qnaClosedCount}
+                                        </span>
+                                    )}
+                                    {qnaOpenCount > 0 && (
+                                        <span className="inline-flex items-center justify-center bg-rose-50 text-rose-700 px-1.5 py-0.5 rounded-full text-[9px] font-bold border border-rose-200/60 animate-pulse">
+                                            대기 {qnaOpenCount}
+                                        </span>
+                                    )}
+                                    {qnaClosedCount === 0 && qnaOpenCount === 0 && (
+                                        <span className="text-slate-400 text-[10px] font-normal">(0)</span>
+                                    )}
+                                </span>
+                            </span>
                         </button>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-3">
