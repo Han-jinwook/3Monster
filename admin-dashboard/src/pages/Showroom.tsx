@@ -313,14 +313,8 @@ export const Showroom = () => {
     const [newQuestionLog, setNewQuestionLog] = useState<File | null>(null);
     const [isSubmittingQuestion, setIsSubmittingQuestion] = useState(false);
 
-    // Reply States (Mapped by ticket ID)
-    const [replyTextMap, setReplyTextMap] = useState<{[ticketId: string]: string}>({});
-    const [replyImageMap, setReplyImageMap] = useState<{[ticketId: string]: File | null}>({});
-    const [submittingReplyId, setSubmittingReplyId] = useState<string | null>(null);
-
     // Expanded Q&A thread inside product Q&A list
     const [expandedQuestionId, setExpandedQuestionId] = useState<string | null>(null);
-    const [activeReplyBoxQuestionId, setActiveReplyBoxQuestionId] = useState<string | null>(null);
 
     const maskEmail = (email: string) => {
         if (!email) return 'unknown';
@@ -514,99 +508,7 @@ export const Showroom = () => {
         }
     }, [expandedQuestionId, questions]);
 
-    const handleSubmitReply = async (ticket: any, nextStatus: 'open' | 'closed') => {
-        const replyText = replyTextMap[ticket.id] || '';
-        const replyImage = replyImageMap[ticket.id] || null;
 
-        if (!replyText.trim() && !replyImage) {
-            alert("댓글 내용을 입력하거나 파일을 첨부해주세요.");
-            return;
-        }
-
-        setSubmittingReplyId(ticket.id);
-        try {
-            let imageUrl = null;
-
-            if (replyImage) imageUrl = await handleUploadFile(replyImage, 'qna/replies/images');
-
-            const currentThread = parseThread(ticket);
-            let updatedThread;
-
-            if (isAdmin) {
-                // Find the index of the last admin message
-                const lastAdminMsgIndex = currentThread.slice().reverse().findIndex(msg => msg.sender === 'admin');
-                if (lastAdminMsgIndex !== -1) {
-                    const actualIndex = currentThread.length - 1 - lastAdminMsgIndex;
-                    const originalId = currentThread[actualIndex].id || Date.now().toString();
-                    currentThread[actualIndex] = {
-                        ...currentThread[actualIndex],
-                        id: `${originalId.split('-edited-')[0]}-edited-${Date.now()}`,
-                        text: replyText,
-                        image_url: imageUrl || currentThread[actualIndex].image_url,
-                        created_at: new Date().toISOString()
-                    };
-                    updatedThread = [...currentThread];
-                } else {
-                    const newMessage: ThreadMessage = {
-                        id: Date.now().toString(),
-                        sender: 'admin',
-                        sender_email: verifiedEmail || user?.email || 'admin@3monster.net',
-                        text: replyText,
-                        image_url: imageUrl,
-                        log_url: null,
-                        created_at: new Date().toISOString()
-                    };
-                    updatedThread = [...currentThread, newMessage];
-                }
-            } else {
-                const newMessage: ThreadMessage = {
-                    id: Date.now().toString(),
-                    sender: 'user',
-                    sender_email: verifiedEmail || user?.email || 'unknown@3monster.net',
-                    text: replyText,
-                    image_url: imageUrl,
-                    log_url: null,
-                    created_at: new Date().toISOString()
-                };
-                updatedThread = [...currentThread, newMessage];
-            }
-            
-            const { data, error: updateError } = await supabase
-                .from('support_tickets')
-                .update({
-                    reply: JSON.stringify(updatedThread),
-                    status: nextStatus,
-                    replied_at: new Date().toISOString()
-                })
-                .eq('id', ticket.id)
-                .select();
-
-            if (updateError) throw updateError;
-            if (!data || data.length === 0) {
-                throw new Error("데이터베이스 저장 권한이 없습니다. (RLS 제한)");
-            }
-
-            // Clear map states
-            setReplyTextMap(prev => ({ ...prev, [ticket.id]: '' }));
-            setReplyImageMap(prev => ({ ...prev, [ticket.id]: null }));
-            setActiveReplyBoxQuestionId(null);
-            
-            if (activeQnaProductId) {
-                await fetchQuestions(activeQnaProductId);
-            }
-            
-            setTimeout(() => {
-                alert("댓글이 등록되었습니다.");
-            }, 100);
-        } catch (err: any) {
-            console.error("Error submitting reply:", err);
-            setTimeout(() => {
-                alert(`댓글 등록 중 오류가 발생했습니다: ${err.message}`);
-            }, 100);
-        } finally {
-            setSubmittingReplyId(null);
-        }
-    };
 
     const handleDeleteReply = async (ticket: any, msgId: string) => {
         if (!confirm("정말 이 댓글을 삭제하시겠습니까?")) return;
@@ -855,9 +757,6 @@ export const Showroom = () => {
                                                             questions.map((q) => {
                                                                 const isQExpanded = String(expandedQuestionId) === String(q.id);
                                                                 const thread = parseThread(q);
-                                                                const isQOwner = q.uid === user?.id || (q.email && verifiedEmail && q.email.toLowerCase() === verifiedEmail.toLowerCase());
-                                                                const canReply = isQOwner && !isAdmin;
-
                                                                 return (
                                                                     <div key={q.id} id={`ticket-${q.id}`} className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden transition-all duration-300">
                                                                         {/* Question Header (Click to expand) */}
@@ -1002,7 +901,7 @@ export const Showroom = () => {
                                                                                 )}
 
                                                                                 {/* Reply Form (Visible to Admin or Question Owner) */}
-                                                                                {isAdmin ? (
+                                                                                {isAdmin && (
                                                                                     <div className="pt-1 text-right">
                                                                                         <Link to={`/support?ticket_id=${q.id}`}>
                                                                                             <button 
@@ -1018,48 +917,6 @@ export const Showroom = () => {
                                                                                             </button>
                                                                                         </Link>
                                                                                     </div>
-                                                                                ) : canReply ? (
-                                                                                    activeReplyBoxQuestionId === q.id ? (
-                                                                                        <div className="pt-1 border-t border-slate-100 space-y-1">
-                                                                                            <textarea
-                                                                                                placeholder="추가 문의사항이나 답변을 입력해주세요..."
-                                                                                                value={replyTextMap[q.id] || ''}
-                                                                                                onChange={(e) => setReplyTextMap(prev => ({ ...prev, [q.id]: e.target.value }))}
-                                                                                                className="w-full min-h-[45px] rounded-lg bg-white p-1.5 text-xs font-bold border border-slate-350 focus:border-indigo-500 outline-none focus:ring-2 focus:ring-indigo-100/50 transition-all resize-none text-slate-900 placeholder:text-slate-500"
-                                                                                            />
-                                                                                            
-                                                                                            <div className="flex flex-wrap items-center justify-between gap-2">
-                                                                                                <div className="flex gap-1">
-                                                                                                </div>
-                                                                                                
-                                                                                                <div className="flex gap-2">
-                                                                                                    <Button 
-                                                                                                        onClick={() => handleSubmitReply(q, 'open')}
-                                                                                                        isLoading={submittingReplyId === q.id}
-                                                                                                        disabled={!(replyTextMap[q.id] || '').trim()}
-                                                                                                        className="h-7 px-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-[9px] font-black transition-all shadow-md shadow-indigo-100 cursor-pointer"
-                                                                                                    >
-                                                                                                        댓글 등록
-                                                                                                    </Button>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    ) : (
-                                                                                        <div className="pt-1 text-right">
-                                                                                            <button 
-                                                                                                onClick={() => {
-                                                                                                    setActiveReplyBoxQuestionId(q.id);
-                                                                                                }}
-                                                                                                className="text-[10px] font-black text-indigo-650 hover:text-indigo-800 px-3 py-1 bg-indigo-50 hover:bg-indigo-100/80 rounded-lg border border-indigo-100/50 transition-all cursor-pointer"
-                                                                                            >
-                                                                                                답변 달기
-                                                                                            </button>
-                                                                                        </div>
-                                                                                    )
-                                                                                ) : (
-                                                                                    <p className="text-[9px] text-slate-400 text-center italic pt-1 border-t border-slate-100">
-                                                                                        질문 작성자만 대댓글을 달 수 있습니다.
-                                                                                    </p>
                                                                                 )}
                                                                             </div>
                                                                         )}
