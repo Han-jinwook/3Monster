@@ -344,7 +344,7 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                                                                     }
                                                                 }
                                                                 setBellDropdownOpen(false);
-                                                                if (isQna) {
+                                                                if (isQna && role !== "admin") {
                                                                     { const targetSearch = `?qna_product=${prodId}&ticket_id=${notif.id}`; if (location.pathname === '/' && location.search === targetSearch) { window.dispatchEvent(new CustomEvent('force-qna-jump', { detail: { qnaProduct: prodId, ticketId: String(notif.id) } })); } else { navigate(`/${targetSearch}`); } }
                                                                 } else {
                                                                     { const targetSearch = `?ticket_id=${notif.id}`; if (location.pathname === '/support' && location.search === targetSearch) { window.dispatchEvent(new CustomEvent('force-support-jump', { detail: { ticketId: String(notif.id) } })); } else { navigate(`/support${targetSearch}`); } }
