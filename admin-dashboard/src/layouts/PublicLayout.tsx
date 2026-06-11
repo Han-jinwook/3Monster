@@ -298,7 +298,7 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                                                         );
                                                     } else {
                                                         categoryBadge = (
-                                                            <span className="bg-rose-50/85 text-rose-600 border border-rose-100/35 px-1.5 py-0.5 rounded text-[9px] font-black tracking-wide">
+                                                            <span className="bg-violet-50 text-violet-700 border border-violet-150 px-1.5 py-0.5 rounded text-[9px] font-black tracking-wide">
                                                                 AS 기술지원
                                                             </span>
                                                         );
