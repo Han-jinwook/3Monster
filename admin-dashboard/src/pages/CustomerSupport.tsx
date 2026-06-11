@@ -1068,7 +1068,13 @@ export const CustomerSupport = () => {
                                                     <div className="relative">
                                                         <textarea
                                                             disabled={isDisabledReply}
-                                                            placeholder={isDisabledReply ? "답변 대기 중에는 추가 문의(댓글)를 작성할 수 없습니다." : "추가 문의사항이나 답변을 입력해주세요..."}
+                                                            placeholder={
+                                                                isDisabledReply 
+                                                                    ? "답변 대기 중에는 추가 문의(댓글)를 작성할 수 없습니다." 
+                                                                    : isAdmin 
+                                                                        ? "고객 문의에 대한 답변 내용을 입력해주세요..." 
+                                                                        : "추가 문의사항이나 답변을 입력해주세요..."
+                                                            }
                                                             value={replyText}
                                                             onChange={(e) => setReplyText(e.target.value)}
                                                             className="w-full min-h-[70px] rounded-xl bg-white border border-slate-300 hover:border-slate-400 p-2.5 text-xs font-medium outline-none focus:ring-2 focus:ring-indigo-150 focus:border-indigo-500 transition-all resize-none placeholder:text-slate-400 text-slate-800 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed shadow-inner"
