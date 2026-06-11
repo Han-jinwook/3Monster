@@ -295,6 +295,17 @@ export const Showroom = () => {
         window.addEventListener('force-qna-jump', handleForceJump);
         return () => window.removeEventListener('force-qna-jump', handleForceJump);
     }, []);
+
+    useEffect(() => {
+        if (selectedProductIdForDetail) {
+            setTimeout(() => {
+                const element = document.getElementById(selectedProductIdForDetail);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 150);
+        }
+    }, [selectedProductIdForDetail]);
     
     // New Question States
     const [newQuestionText, setNewQuestionText] = useState('');
