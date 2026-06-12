@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
-import { Copy, Key, CheckCircle2, ChevronRight, Clock } from 'lucide-react';
+import { Copy, CheckCircle2, ChevronRight, Clock } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -247,7 +247,7 @@ export const LicenseGenerator = () => {
     };
 
     return (
-        <div className="max-w-[1200px] mx-auto space-y-6 py-12 px-4">
+        <div className="max-w-[1200px] mx-auto space-y-6 pt-0 pb-12 px-4">
             <div className="flex flex-col gap-1.5">
                 <h1 className="text-2xl font-black text-slate-800 tracking-tight">신규 라이선스 생성</h1>
                 <p className="text-xs text-slate-400 font-bold">구매자 정보를 입력하고 제품 인증키를 즉시 발행합니다.</p>
@@ -414,12 +414,7 @@ export const LicenseGenerator = () => {
                             </motion.div>
                         )}
                     </AnimatePresence>
-                    {!generatedKey && (
-                        <Card className="bg-slate-100/50 border-dashed border-2 border-slate-200 shadow-none flex flex-col items-center justify-center p-6 text-center gap-3 min-h-[120px] rounded-2xl">
-                            <Key className="w-8 h-8 text-slate-350" />
-                            <p className="text-slate-400 font-bold text-xs">정보를 입력하고 이용 기간을 선택하면<br />인증키가 생성됩니다.</p>
-                        </Card>
-                    )}
+
 
                     {/* Interactive Pricing Policy Table with Tabs and Accordions */}
                     <Card className="p-0 overflow-hidden bg-white border border-slate-200 shadow-[0_15px_45px_rgba(0,0,0,0.07)] rounded-2xl">
