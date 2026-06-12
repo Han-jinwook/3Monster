@@ -295,17 +295,9 @@ export const LicenseGenerator = () => {
                                             value={formData.license_type}
                                             onChange={(e) => handleLicenseTypeChange(e.target.value)}
                                         >
-                                            <optgroup label="크몽 공식 3대 패키지">
-                                                <option value="TRIAL">DELUXE (5일 체험판)</option>
-                                                <option value="6M">STANDARD (6개월 이용권)</option>
-                                                <option value="LIFETIME">PREMIUM (영구 소장본)</option>
-                                            </optgroup>
-                                            <optgroup label="어드민 전용 패키지">
-                                                <option value="TEST">임시 테스트 (1일)</option>
-                                                <option value="1M">1개월권</option>
-                                                <option value="3M">3개월권</option>
-                                                <option value="1Y">1년권</option>
-                                            </optgroup>
+                                            <option value="TRIAL">DELUXE (5일 체험판)</option>
+                                            <option value="6M">STANDARD (6개월 이용권)</option>
+                                            <option value="LIFETIME">PREMIUM (영구 소장본)</option>
                                         </select>
                                         <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
                                             <ChevronRight className="w-4 h-4 text-indigo-400 rotate-90" />
@@ -314,32 +306,31 @@ export const LicenseGenerator = () => {
                                 </div>
                             </div>
 
-                            <div className="space-y-2">
-                                <label className="text-xs font-black text-slate-900 uppercase tracking-widest ml-0.5">구매자 상세 정보 (성함/업체명)</label>
-                                <Input
-                                    required
-                                    placeholder="구매자 정보를 입력하세요 (체험판/테스트 키인 경우 뒤에 접미사가 붙습니다)"
-                                    className="h-12 bg-white border border-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 text-sm font-bold px-4 rounded-xl text-slate-900 placeholder:text-slate-300"
-                                    value={formData.buyer_name}
-                                    onChange={e => setFormData({ ...formData, buyer_name: e.target.value })}
-                                />
-                            </div>
-
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-xs font-black text-slate-900 uppercase tracking-widest ml-0.5">연락처 / 채널</label>
-                                    <div className="flex gap-2">
-                                        <Input placeholder="연락처 (이메일 등)" className="h-12 bg-white border border-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 text-sm font-bold px-4 text-slate-900 rounded-xl flex-1" value={formData.contact} onChange={e => setFormData({ ...formData, contact: e.target.value })} />
+                                    <label className="text-xs font-black text-slate-900 uppercase tracking-widest ml-0.5">가입 / 판매 채널</label>
+                                    <div className="relative">
                                         <select
-                                            className="w-28 h-12 rounded-xl bg-white px-3 text-xs font-bold border border-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 outline-none text-slate-700"
+                                            className="w-full h-12 rounded-xl bg-white px-4 text-sm font-bold border border-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 outline-none transition-all appearance-none cursor-pointer text-slate-950"
                                             value={formData.channel}
-                                            onChange={e => setFormData({ ...formData, channel: e.target.value })}
+                                            onChange={e => {
+                                                const newChan = e.target.value;
+                                                setFormData(prev => ({
+                                                    ...prev,
+                                                    channel: newChan,
+                                                    buyer_name: '',
+                                                    contact: ''
+                                                }));
+                                            }}
                                         >
                                             <option value="크몽">크몽</option>
                                             <option value="블로그">블로그</option>
                                             <option value="지인">지인</option>
                                             <option value="기타">기타</option>
                                         </select>
+                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                                            <ChevronRight className="w-4 h-4 text-slate-400 rotate-90" />
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="space-y-2">
@@ -348,12 +339,44 @@ export const LicenseGenerator = () => {
                                 </div>
                             </div>
 
+                            {formData.channel === '크몽' ? (
+                                <div className="space-y-2">
+                                    <label className="text-xs font-black text-slate-900 uppercase tracking-widest ml-0.5">크몽 ID</label>
+                                    <Input
+                                        required
+                                        placeholder="구매자의 크몽 ID를 입력하세요"
+                                        className="h-12 bg-white border border-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 text-sm font-bold px-4 rounded-xl text-slate-900 placeholder:text-slate-300"
+                                        value={formData.buyer_name}
+                                        onChange={e => setFormData({ ...formData, buyer_name: e.target.value })}
+                                    />
+                                </div>
+                            ) : (
+                                <div className="space-y-2">
+                                    <label className="text-xs font-black text-slate-900 uppercase tracking-widest ml-0.5">이메일 주소</label>
+                                    <Input
+                                        required
+                                        type="email"
+                                        placeholder="구매자의 이메일 주소를 입력하세요"
+                                        className="h-12 bg-white border border-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 text-sm font-bold px-4 rounded-xl text-slate-900 placeholder:text-slate-300"
+                                        value={formData.contact}
+                                        onChange={e => {
+                                            const emailVal = e.target.value;
+                                            setFormData(prev => ({
+                                                ...prev,
+                                                contact: emailVal,
+                                                buyer_name: emailVal
+                                            }));
+                                        }}
+                                    />
+                                </div>
+                            )}
+
                             <div className="space-y-2">
-                                <label className="text-xs font-black text-slate-900 uppercase tracking-widest ml-0.5">메모 (특이사항)</label>
-                                <Input placeholder="관리용 메모 입력" className="h-12 bg-white border border-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 text-sm font-bold px-4 text-slate-900 rounded-xl" value={formData.memo} onChange={e => setFormData({ ...formData, memo: e.target.value })} />
+                                <label className="text-xs font-black text-slate-900 uppercase tracking-widest ml-0.5">메모 (특이사항 / 연락처 등)</label>
+                                <Input placeholder="기타 연락처나 특이사항이 있다면 입력하세요" className="h-12 bg-white border border-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 text-sm font-bold px-4 text-slate-900 rounded-xl" value={formData.memo} onChange={e => setFormData({ ...formData, memo: e.target.value })} />
                             </div>
 
-                            <Button type="submit" className="w-full h-16 text-white font-black text-lg shadow-md hover:bg-indigo-700 active:scale-[0.99] transition-all bg-indigo-600 rounded-xl border-b-4 border-indigo-900" isLoading={loading}>
+                            <Button type="submit" className="w-full h-16 text-white font-black text-lg shadow-md hover:bg-indigo-700 active:scale-[0.99] transition-all bg-indigo-600 rounded-xl border-b-4 border-indigo-900 border-none" isLoading={loading}>
                                 라이선스 즉시 발행하기 <ChevronRight className="ml-1 w-5 h-5" />
                             </Button>
                         </form>
