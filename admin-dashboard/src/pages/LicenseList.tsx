@@ -110,10 +110,10 @@ export const LicenseList = () => {
                 </div>
             </div>
 
-            <Card className="overflow-hidden p-0 border border-slate-200 shadow-[0_15px_45px_rgba(0,0,0,0.07)] rounded-2xl">
+            <Card className="overflow-hidden p-0 border-2 border-slate-800 shadow-[0_15px_45px_rgba(0,0,0,0.1)] rounded-2xl bg-white">
                 <table className="w-full">
-                    <thead className="bg-slate-100/80 border-b border-slate-200">
-                        <tr className="text-[11px] font-black text-slate-500 uppercase tracking-widest text-left">
+                    <thead className="bg-slate-100 border-b-2 border-slate-800">
+                        <tr className="text-[11px] font-black text-slate-700 uppercase tracking-widest text-left">
                             <th className="px-10 py-5">구매자 성함</th>
                             <th className="px-10 py-5">제품 / 시리얼</th>
                             <th className="px-10 py-5">만료일자</th>
@@ -121,7 +121,7 @@ export const LicenseList = () => {
                             <th className="px-10 py-5 text-right">제어</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-200">
+                    <tbody className="divide-y divide-slate-400">
                         {loading ? (
                             <tr><td colSpan={5} className="py-20 text-center"><Loader2 className="mx-auto h-8 w-8 animate-spin text-indigo-200" /></td></tr>
                         ) : filteredLicenses.map((lic) => {
@@ -132,7 +132,7 @@ export const LicenseList = () => {
                                     <td className="px-10 py-6">
                                         <div className="space-y-1">
                                             <p className="text-sm font-bold text-slate-600">{lic.product_id}</p>
-                                            <p className="text-[10px] font-mono text-slate-500 uppercase bg-slate-50 px-2 py-0.5 rounded w-fit border border-slate-150">{lic.serial_key}</p>
+                                            <p className="text-[10px] font-mono text-slate-700 uppercase bg-slate-50 px-2 py-0.5 rounded w-fit border border-slate-400">{lic.serial_key}</p>
                                         </div>
                                     </td>
                                     <td className="px-10 py-6 text-sm font-bold text-slate-500">

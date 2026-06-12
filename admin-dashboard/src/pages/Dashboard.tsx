@@ -412,22 +412,22 @@ export const Dashboard = () => {
                 <div className="xl:col-span-8 space-y-6">
                     
                     {/* Product & Package Sales Summary Card */}
-                    <Card className="p-5 bg-white border border-slate-200 shadow-[0_15px_45px_rgba(0,0,0,0.07)] rounded-2xl space-y-4">
+                    <Card className="p-5 bg-white border border-slate-300 shadow-[0_15px_45px_rgba(0,0,0,0.08)] rounded-2xl space-y-4">
                         <div className="flex items-center gap-2.5">
                             <BarChart3 className="w-4.5 h-4.5 text-indigo-650" />
                             <h3 className="text-base font-black text-slate-800">제품 및 패키지별 발행/판매 현황</h3>
                         </div>
-                        <div className="overflow-x-auto border border-slate-200 rounded-xl shadow-sm">
+                        <div className="overflow-x-auto border border-slate-400 rounded-xl shadow-sm">
                             <table className="w-full text-left border-collapse min-w-[500px]">
-                                <thead className="bg-slate-100/80 border-b border-slate-200">
-                                    <tr className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-left whitespace-nowrap">
+                                <thead className="bg-slate-100 border-b-2 border-slate-400">
+                                    <tr className="text-[10px] font-black text-slate-500 uppercase tracking-widest text-left whitespace-nowrap">
                                         <th className="px-4 py-2.5">제품군</th>
                                         <th className="px-4 py-2.5">패키지</th>
                                         <th className="px-4 py-2.5">발행 건수</th>
                                         <th className="px-4 py-2.5 text-right">총 판매액</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-200 text-xs font-semibold whitespace-nowrap">
+                                <tbody className="divide-y divide-slate-300 text-xs font-semibold whitespace-nowrap">
                                     {productPackageRows.length > 0 ? (
                                         productPackageRows.map((row, idx) => (
                                             <tr key={idx} className="hover:bg-slate-50/30 transition-colors">
@@ -458,7 +458,7 @@ export const Dashboard = () => {
                     </Card>
 
                     {/* App Registered Users List Table */}
-                    <Card className="p-5 bg-white border border-slate-200 shadow-[0_15px_45px_rgba(0,0,0,0.07)] rounded-2xl space-y-4">
+                    <Card className="p-5 bg-white border border-slate-300 shadow-[0_15px_45px_rgba(0,0,0,0.08)] rounded-2xl space-y-4">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                             <div className="flex items-center gap-2.5">
                                 <UsersIcon className="w-4.5 h-4.5 text-indigo-650" />
@@ -473,13 +473,13 @@ export const Dashboard = () => {
                                         placeholder="이름 또는 이메일 검색..."
                                         value={userSearchTerm}
                                         onChange={e => setUserSearchTerm(e.target.value)}
-                                        className="pl-8 h-8 text-[11px] font-bold bg-white border border-slate-300 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100"
+                                        className="pl-8 h-8 text-[11px] font-bold bg-white border border-slate-400 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100"
                                     />
                                 </div>
                                 <select
                                     value={userRoleFilter}
                                     onChange={e => setUserRoleFilter(e.target.value as any)}
-                                    className="h-8 px-2 text-[11px] font-bold bg-white border border-slate-300 rounded-lg text-slate-600 outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600"
+                                    className="h-8 px-2 text-[11px] font-bold bg-white border border-slate-400 rounded-lg text-slate-700 outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600"
                                 >
                                     <option value="all">구분 전체</option>
                                     <option value="buyer">구매자</option>
@@ -489,10 +489,10 @@ export const Dashboard = () => {
                             </div>
                         </div>
 
-                        <div className="overflow-x-auto border border-slate-200 rounded-xl shadow-sm">
+                        <div className="overflow-x-auto border border-slate-400 rounded-xl shadow-sm">
                             <table className="w-full text-left border-collapse min-w-[750px]">
-                                <thead className="bg-slate-100/80 border-b border-slate-200">
-                                    <tr className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-left whitespace-nowrap">
+                                <thead className="bg-slate-100 border-b-2 border-slate-400">
+                                    <tr className="text-[10px] font-black text-slate-500 uppercase tracking-widest text-left whitespace-nowrap">
                                         <th className="px-3 py-2.5 w-12 text-center">번호</th>
                                         <th className="px-3 py-2.5">가입일자</th>
                                         <th className="px-3 py-2.5">이름</th>
@@ -502,7 +502,7 @@ export const Dashboard = () => {
                                         <th className="px-3 py-2.5 text-right">라이선스 제어</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-200 text-xs font-semibold whitespace-nowrap">
+                                <tbody className="divide-y divide-slate-300 text-xs font-semibold whitespace-nowrap">
                                     {filteredUsers.length > 0 ? (
                                         filteredUsers.map((u, idx) => {
                                             const type = getUserType(u);

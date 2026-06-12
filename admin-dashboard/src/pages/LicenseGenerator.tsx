@@ -249,25 +249,23 @@ export const LicenseGenerator = () => {
     return (
         <div className="max-w-[1200px] mx-auto space-y-6 pt-0 pb-12 px-4">
             <div className="flex flex-col gap-1.5">
-                <h1 className="text-2xl font-black text-slate-800 tracking-tight">신규 라이선스 생성</h1>
-                <p className="text-xs text-slate-400 font-bold">구매자 정보를 입력하고 제품 인증키를 즉시 발행합니다.</p>
+                <h1 className="text-3xl font-black text-slate-900 tracking-tight">신규 라이선스 생성</h1>
             </div>
 
             <div className="grid gap-6 lg:grid-cols-12 items-start">
                 {/* Left Form Column */}
-                <Card className="lg:col-span-7 p-0 overflow-hidden border border-slate-200 rounded-2xl bg-white shadow-[0_15px_45px_rgba(0,0,0,0.07)]">
-                    <CardHeader className="p-6 border-b border-indigo-950 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white">
-                        <CardTitle className="text-lg font-black text-white tracking-tighter">라이선스 정보 입력</CardTitle>
-                        <p className="text-xs text-indigo-200/90 font-bold mt-1">각 항목을 정확히 입력해 주세요. 크몽 가격 정책과 연동됩니다.</p>
+                <Card className="lg:col-span-7 p-0 overflow-hidden border-2 border-slate-800 rounded-2xl bg-white shadow-[0_15px_45px_rgba(0,0,0,0.1)]">
+                    <CardHeader className="p-6 border-b-2 border-slate-800 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white">
+                        <CardTitle className="text-xl font-black text-white tracking-tighter">라이선스 정보 입력</CardTitle>
                     </CardHeader>
                     <CardContent className="p-6">
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-xs font-black text-slate-900 uppercase tracking-widest ml-0.5">대상 제품 선택</label>
+                                    <label className="text-sm font-black text-slate-950 uppercase tracking-wide ml-0.5">대상 제품 선택</label>
                                     <div className="relative">
                                         <select
-                                            className="w-full h-12 rounded-xl bg-white px-4 text-sm font-bold border border-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 outline-none transition-all appearance-none cursor-pointer text-slate-900"
+                                            className="w-full h-14 rounded-xl bg-white px-4 text-base font-extrabold border-2 border-slate-800 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150 outline-none transition-all appearance-none cursor-pointer text-slate-955"
                                             value={formData.product_id}
                                             onChange={(e) => handleProductChange(e.target.value)}
                                         >
@@ -283,15 +281,15 @@ export const LicenseGenerator = () => {
                                             </optgroup>
                                         </select>
                                         <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                                            <ChevronRight className="w-4 h-4 text-slate-400 rotate-90" />
+                                            <ChevronRight className="w-4 h-4 text-slate-800 rotate-90" />
                                         </div>
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-black text-slate-900 uppercase tracking-widest ml-0.5">이용 기간 선택</label>
+                                    <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">이용 기간 선택</label>
                                     <div className="relative">
                                         <select
-                                            className="w-full h-12 rounded-xl bg-white px-4 text-sm font-bold border border-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 outline-none transition-all appearance-none cursor-pointer text-indigo-700"
+                                            className="w-full h-14 rounded-xl bg-white px-4 text-base font-extrabold border-2 border-slate-800 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150 outline-none transition-all appearance-none cursor-pointer text-indigo-900"
                                             value={formData.license_type}
                                             onChange={(e) => handleLicenseTypeChange(e.target.value)}
                                         >
@@ -300,7 +298,7 @@ export const LicenseGenerator = () => {
                                             <option value="LIFETIME">PREMIUM (영구 소장본)</option>
                                         </select>
                                         <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                                            <ChevronRight className="w-4 h-4 text-indigo-400 rotate-90" />
+                                            <ChevronRight className="w-4 h-4 text-indigo-900 rotate-90" />
                                         </div>
                                     </div>
                                 </div>
@@ -308,10 +306,10 @@ export const LicenseGenerator = () => {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-xs font-black text-slate-900 uppercase tracking-widest ml-0.5">가입 / 판매 채널</label>
+                                    <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">가입 / 판매 채널</label>
                                     <div className="relative">
                                         <select
-                                            className="w-full h-12 rounded-xl bg-white px-4 text-sm font-bold border border-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 outline-none transition-all appearance-none cursor-pointer text-slate-950"
+                                            className="w-full h-14 rounded-xl bg-white px-4 text-base font-extrabold border-2 border-slate-800 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150 outline-none transition-all appearance-none cursor-pointer text-slate-955"
                                             value={formData.channel}
                                             onChange={e => {
                                                 const newChan = e.target.value;
@@ -330,35 +328,35 @@ export const LicenseGenerator = () => {
                                             <option value="기타">기타</option>
                                         </select>
                                         <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                                            <ChevronRight className="w-4 h-4 text-slate-400 rotate-90" />
+                                            <ChevronRight className="w-4 h-4 text-slate-800 rotate-90" />
                                         </div>
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-black text-slate-900 uppercase tracking-widest ml-0.5">판매 가격 (KRW)</label>
-                                    <Input placeholder="금액 입력" className="h-12 bg-white border border-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 text-sm font-bold px-4 text-slate-900 rounded-xl" value={formatPrice(formData.price_sold)} onChange={e => setFormData({ ...formData, price_sold: parsePrice(e.target.value) })} />
+                                    <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">판매 가격 (KRW)</label>
+                                    <Input placeholder="금액 입력" className="h-14 bg-white border-2 border-slate-800 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150 text-base font-extrabold px-4 text-slate-955 rounded-xl shadow-sm" value={formatPrice(formData.price_sold)} onChange={e => setFormData({ ...formData, price_sold: parsePrice(e.target.value) })} />
                                 </div>
                             </div>
 
                             {formData.channel === '크몽' ? (
                                 <div className="space-y-2">
-                                    <label className="text-xs font-black text-slate-900 uppercase tracking-widest ml-0.5">크몽 ID</label>
+                                    <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">크몽 ID</label>
                                     <Input
                                         required
                                         placeholder="구매자의 크몽 ID를 입력하세요"
-                                        className="h-12 bg-white border border-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 text-sm font-bold px-4 rounded-xl text-slate-900 placeholder:text-slate-300"
+                                        className="h-14 bg-white border-2 border-slate-800 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150 text-base font-extrabold px-4 rounded-xl text-slate-955 placeholder:text-slate-400 shadow-sm"
                                         value={formData.buyer_name}
                                         onChange={e => setFormData({ ...formData, buyer_name: e.target.value })}
                                     />
                                 </div>
                             ) : (
                                 <div className="space-y-2">
-                                    <label className="text-xs font-black text-slate-900 uppercase tracking-widest ml-0.5">이메일 주소</label>
+                                    <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">이메일 주소</label>
                                     <Input
                                         required
                                         type="email"
                                         placeholder="구매자의 이메일 주소를 입력하세요"
-                                        className="h-12 bg-white border border-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 text-sm font-bold px-4 rounded-xl text-slate-900 placeholder:text-slate-300"
+                                        className="h-14 bg-white border-2 border-slate-800 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150 text-base font-extrabold px-4 rounded-xl text-slate-955 placeholder:text-slate-400 shadow-sm"
                                         value={formData.contact}
                                         onChange={e => {
                                             const emailVal = e.target.value;
@@ -373,11 +371,11 @@ export const LicenseGenerator = () => {
                             )}
 
                             <div className="space-y-2">
-                                <label className="text-xs font-black text-slate-900 uppercase tracking-widest ml-0.5">메모 (특이사항 / 연락처 등)</label>
-                                <Input placeholder="기타 연락처나 특이사항이 있다면 입력하세요" className="h-12 bg-white border border-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 text-sm font-bold px-4 text-slate-900 rounded-xl" value={formData.memo} onChange={e => setFormData({ ...formData, memo: e.target.value })} />
+                                <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">메모 (특이사항 / 연락처 등)</label>
+                                <Input placeholder="기타 연락처나 특이사항이 있다면 입력하세요" className="h-14 bg-white border-2 border-slate-800 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150 text-base font-extrabold px-4 text-slate-955 rounded-xl shadow-sm" value={formData.memo} onChange={e => setFormData({ ...formData, memo: e.target.value })} />
                             </div>
 
-                            <Button type="submit" className="w-full h-16 text-white font-black text-lg shadow-md hover:bg-indigo-700 active:scale-[0.99] transition-all bg-indigo-600 rounded-xl border-b-4 border-indigo-900 border-none" isLoading={loading}>
+                            <Button type="submit" className="w-full h-16 text-white font-black text-lg shadow-md hover:bg-indigo-750 active:scale-[0.99] transition-all bg-indigo-600 rounded-xl border-b-4 border-indigo-900 border-none animate-none" isLoading={loading}>
                                 라이선스 즉시 발행하기 <ChevronRight className="ml-1 w-5 h-5" />
                             </Button>
                         </form>
@@ -442,13 +440,10 @@ export const LicenseGenerator = () => {
 
                     {/* Interactive Pricing Policy Table with Tabs and Accordions */}
                     <Card className="p-0 overflow-hidden bg-white border border-slate-200 shadow-[0_15px_45px_rgba(0,0,0,0.07)] rounded-2xl">
-                        <CardHeader className="p-5 border-b border-indigo-950 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white">
+                        <CardHeader className="p-5 border-b-2 border-slate-800 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white">
                             <CardTitle className="text-sm font-black text-white flex items-center gap-1.5">
                                 📋 3Monster 제품별 가격표
                             </CardTitle>
-                            <p className="text-[10px] text-indigo-200/90 font-bold mt-1">
-                                크몽 패키지 판매 스펙에 따라 가격을 관리합니다.
-                            </p>
                         </CardHeader>
                         <CardContent className="p-5 space-y-4">
                             {/* Category Tabs */}
@@ -554,13 +549,6 @@ export const LicenseGenerator = () => {
                                         </div>
                                     );
                                 })}
-                            </div>
-                            <div className="bg-indigo-50/60 p-3.5 rounded-r-xl border-l-4 border-indigo-600 text-[10px] text-slate-600 font-semibold space-y-1">
-                                <p className="font-black text-slate-700 flex items-center gap-1">🛡️ 크몽 판매 패키지 가이드</p>
-                                <p>• <b>DELUXE (5일 체험판)</b>: 5,000원 결제 유도 (리뷰 및 판매 건수 극대화)</p>
-                                <p>• <b>STANDARD (6개월)</b>: 99,000원 결제 (월 1.6만 원 대체의 가성비)</p>
-                                <p>• <b>PREMIUM (영구 소장)</b>: 198,000원 결제 (평생 무제한 사용 팩)</p>
-                                <p>• 모든 스탠다드 이상 상품에는 <b>무상 엔진 업데이트 및 A/S</b>가 포함됩니다.</p>
                             </div>
                         </CardContent>
                     </Card>
