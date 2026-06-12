@@ -14,6 +14,17 @@ const generateSerial = () => {
     return `CM-${segment()}-${segment()}-${segment()}`;
 };
 
+const formatPrice = (value: string | number) => {
+    if (value === undefined || value === null || value === '') return '';
+    const num = String(value).replace(/[^0-9]/g, '');
+    if (!num) return '';
+    return Number(num).toLocaleString('ko-KR');
+};
+
+const parsePrice = (value: string) => {
+    return value.replace(/,/g, '');
+};
+
 interface PricingItem {
     id: number;
     product: string;
@@ -50,7 +61,6 @@ export const LicenseGenerator = () => {
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
-                // Ensure only TRIAL, 6M, LIFETIME exist in pricing table (legacy filter check)
                 if (Array.isArray(parsed) && parsed.every(p => ['TRIAL', '6M', 'LIFETIME'].includes(p.pkg))) {
                     return parsed;
                 }
@@ -222,7 +232,7 @@ export const LicenseGenerator = () => {
                     collection_limit: collectionLimit,
                     status: 'unused',
                     bound_value: null,
-                    price_sold: Number(formData.price_sold) || 0
+                    price_sold: Number(parsePrice(formData.price_sold)) || 0
                 }]);
 
             if (error) throw error;
@@ -245,10 +255,10 @@ export const LicenseGenerator = () => {
 
             <div className="grid gap-6 lg:grid-cols-12 items-start">
                 {/* Left Form Column */}
-                <Card className="lg:col-span-7 p-0 overflow-hidden border border-slate-200 rounded-2xl bg-white shadow-sm">
-                    <CardHeader className="p-6 border-b border-slate-100 bg-slate-50/50">
-                        <CardTitle className="text-lg font-black text-slate-900 tracking-tighter">라이선스 정보 입력</CardTitle>
-                        <p className="text-xs text-slate-400 font-bold mt-1">각 항목을 정확히 입력해 주세요. 크몽 가격 정책과 연동됩니다.</p>
+                <Card className="lg:col-span-7 p-0 overflow-hidden border border-slate-200 rounded-2xl bg-white shadow-[0_15px_45px_rgba(0,0,0,0.07)]">
+                    <CardHeader className="p-6 border-b border-indigo-950 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white">
+                        <CardTitle className="text-lg font-black text-white tracking-tighter">라이선스 정보 입력</CardTitle>
+                        <p className="text-xs text-indigo-200/90 font-bold mt-1">각 항목을 정확히 입력해 주세요. 크몽 가격 정책과 연동됩니다.</p>
                     </CardHeader>
                     <CardContent className="p-6">
                         <form onSubmit={handleSubmit} className="space-y-6">
@@ -257,7 +267,7 @@ export const LicenseGenerator = () => {
                                     <label className="text-xs font-black text-slate-900 uppercase tracking-widest ml-0.5">대상 제품 선택</label>
                                     <div className="relative">
                                         <select
-                                            className="w-full h-12 rounded-xl bg-white px-4 text-sm font-bold border-2 border-slate-350 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-50 outline-none transition-all appearance-none cursor-pointer text-slate-900"
+                                            className="w-full h-12 rounded-xl bg-white px-4 text-sm font-bold border border-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 outline-none transition-all appearance-none cursor-pointer text-slate-900"
                                             value={formData.product_id}
                                             onChange={(e) => handleProductChange(e.target.value)}
                                         >
@@ -281,7 +291,7 @@ export const LicenseGenerator = () => {
                                     <label className="text-xs font-black text-slate-900 uppercase tracking-widest ml-0.5">이용 기간 선택</label>
                                     <div className="relative">
                                         <select
-                                            className="w-full h-12 rounded-xl bg-white px-4 text-sm font-bold border-2 border-slate-350 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-50 outline-none transition-all appearance-none cursor-pointer text-indigo-700"
+                                            className="w-full h-12 rounded-xl bg-white px-4 text-sm font-bold border border-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 outline-none transition-all appearance-none cursor-pointer text-indigo-700"
                                             value={formData.license_type}
                                             onChange={(e) => handleLicenseTypeChange(e.target.value)}
                                         >
@@ -309,7 +319,7 @@ export const LicenseGenerator = () => {
                                 <Input
                                     required
                                     placeholder="구매자 정보를 입력하세요 (체험판/테스트 키인 경우 뒤에 접미사가 붙습니다)"
-                                    className="h-12 bg-white border-2 border-slate-350 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-50 text-sm font-bold px-4 rounded-xl text-slate-900 placeholder:text-slate-300"
+                                    className="h-12 bg-white border border-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 text-sm font-bold px-4 rounded-xl text-slate-900 placeholder:text-slate-300"
                                     value={formData.buyer_name}
                                     onChange={e => setFormData({ ...formData, buyer_name: e.target.value })}
                                 />
@@ -319,9 +329,9 @@ export const LicenseGenerator = () => {
                                 <div className="space-y-2">
                                     <label className="text-xs font-black text-slate-900 uppercase tracking-widest ml-0.5">연락처 / 채널</label>
                                     <div className="flex gap-2">
-                                        <Input placeholder="연락처 (이메일 등)" className="h-12 bg-white border-2 border-slate-350 text-sm font-bold px-4 text-slate-900 rounded-xl flex-1" value={formData.contact} onChange={e => setFormData({ ...formData, contact: e.target.value })} />
+                                        <Input placeholder="연락처 (이메일 등)" className="h-12 bg-white border border-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 text-sm font-bold px-4 text-slate-900 rounded-xl flex-1" value={formData.contact} onChange={e => setFormData({ ...formData, contact: e.target.value })} />
                                         <select
-                                            className="w-28 h-12 rounded-xl bg-white px-3 text-xs font-bold border-2 border-slate-350 outline-none text-slate-700"
+                                            className="w-28 h-12 rounded-xl bg-white px-3 text-xs font-bold border border-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 outline-none text-slate-700"
                                             value={formData.channel}
                                             onChange={e => setFormData({ ...formData, channel: e.target.value })}
                                         >
@@ -334,13 +344,13 @@ export const LicenseGenerator = () => {
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-xs font-black text-slate-900 uppercase tracking-widest ml-0.5">판매 가격 (KRW)</label>
-                                    <Input placeholder="금액 입력" className="h-12 bg-white border-2 border-slate-350 text-sm font-bold px-4 text-slate-900 rounded-xl" value={formData.price_sold} onChange={e => setFormData({ ...formData, price_sold: e.target.value })} />
+                                    <Input placeholder="금액 입력" className="h-12 bg-white border border-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 text-sm font-bold px-4 text-slate-900 rounded-xl" value={formatPrice(formData.price_sold)} onChange={e => setFormData({ ...formData, price_sold: parsePrice(e.target.value) })} />
                                 </div>
                             </div>
 
                             <div className="space-y-2">
                                 <label className="text-xs font-black text-slate-900 uppercase tracking-widest ml-0.5">메모 (특이사항)</label>
-                                <Input placeholder="관리용 메모 입력" className="h-12 bg-white border-2 border-slate-350 text-sm font-bold px-4 text-slate-900 rounded-xl" value={formData.memo} onChange={e => setFormData({ ...formData, memo: e.target.value })} />
+                                <Input placeholder="관리용 메모 입력" className="h-12 bg-white border border-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 text-sm font-bold px-4 text-slate-900 rounded-xl" value={formData.memo} onChange={e => setFormData({ ...formData, memo: e.target.value })} />
                             </div>
 
                             <Button type="submit" className="w-full h-16 text-white font-black text-lg shadow-md hover:bg-indigo-700 active:scale-[0.99] transition-all bg-indigo-600 rounded-xl border-b-4 border-indigo-900" isLoading={loading}>
@@ -356,7 +366,7 @@ export const LicenseGenerator = () => {
                         {generatedKey && (
                             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
                                 {generatedKey.startsWith('TRIAL-') ? (
-                                    <Card className="bg-emerald-600 text-white p-6 space-y-4 shadow-soft rounded-2xl border-none">
+                                    <Card className="bg-emerald-600 text-white p-6 space-y-4 shadow-lg rounded-2xl border-none">
                                         <div className="flex items-center gap-3">
                                             <div className="h-9 w-9 rounded-xl bg-white/20 flex items-center justify-center">
                                                 <CheckCircle2 className="w-4 h-4" />
@@ -380,7 +390,7 @@ export const LicenseGenerator = () => {
                                         </Button>
                                     </Card>
                                 ) : (
-                                    <Card className={`${generatedKey.startsWith('TEST-') ? 'bg-emerald-600' : 'bg-indigo-600'} text-white p-6 space-y-4 shadow-soft rounded-2xl border-none`}>
+                                    <Card className={`${generatedKey.startsWith('TEST-') ? 'bg-emerald-600' : 'bg-indigo-600'} text-white p-6 space-y-4 shadow-lg rounded-2xl border-none`}>
                                         <div className="flex items-center gap-3">
                                             <div className="h-9 w-9 rounded-xl bg-white/20 flex items-center justify-center">
                                                 {generatedKey.startsWith('TEST-') ? <Clock className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
@@ -412,119 +422,128 @@ export const LicenseGenerator = () => {
                     )}
 
                     {/* Interactive Pricing Policy Table with Tabs and Accordions */}
-                    <Card className="p-5 bg-white border border-slate-200 shadow-sm rounded-2xl space-y-4">
-                        <div className="border-b border-slate-100 pb-3">
-                            <h3 className="text-sm font-black text-slate-800 flex items-center gap-1.5">
+                    <Card className="p-0 overflow-hidden bg-white border border-slate-200 shadow-[0_15px_45px_rgba(0,0,0,0.07)] rounded-2xl">
+                        <CardHeader className="p-5 border-b border-indigo-950 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white">
+                            <CardTitle className="text-sm font-black text-white flex items-center gap-1.5">
                                 📋 3Monster 제품별 가격표
-                            </h3>
-                            <p className="text-[10px] text-slate-400 font-semibold mt-1">
+                            </CardTitle>
+                            <p className="text-[10px] text-indigo-200/90 font-bold mt-1">
                                 크몽 패키지 판매 스펙에 따라 가격을 관리합니다.
                             </p>
-                        </div>
+                        </CardHeader>
+                        <CardContent className="p-5 space-y-4">
+                            {/* Category Tabs */}
+                            <div className="flex gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveTab('marketing')}
+                                    className={cn(
+                                        "flex-1 py-2 text-xs font-black rounded-lg transition-all cursor-pointer border-none",
+                                        activeTab === 'marketing'
+                                            ? "bg-indigo-600 text-white shadow-md"
+                                            : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                                    )}
+                                >
+                                    마케팅몬스터
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveTab('cafe')}
+                                    className={cn(
+                                        "flex-1 py-2 text-xs font-black rounded-lg transition-all cursor-pointer border-none",
+                                        activeTab === 'cafe'
+                                            ? "bg-indigo-600 text-white shadow-md"
+                                            : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                                    )}
+                                >
+                                    카페몬스터
+                                </button>
+                            </div>
 
-                        {/* Category Tabs */}
-                        <div className="flex gap-1.5 bg-slate-50 p-1 rounded-xl border border-slate-150">
-                            <button
-                                type="button"
-                                onClick={() => setActiveTab('marketing')}
-                                className={cn(
-                                    "flex-1 py-2 text-xs font-black rounded-lg transition-all cursor-pointer border-none",
-                                    activeTab === 'marketing'
-                                        ? "bg-white text-indigo-650 shadow-sm"
-                                        : "text-slate-500 hover:text-slate-800"
-                                )}
-                            >
-                                마케팅몬스터
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setActiveTab('cafe')}
-                                className={cn(
-                                    "flex-1 py-2 text-xs font-black rounded-lg transition-all cursor-pointer border-none",
-                                    activeTab === 'cafe'
-                                        ? "bg-white text-indigo-650 shadow-sm"
-                                        : "text-slate-500 hover:text-slate-800"
-                                )}
-                            >
-                                카페몬스터
-                            </button>
-                        </div>
+                            {/* Product Accordion List */}
+                            <div className="space-y-2.5">
+                                {pricingProducts[activeTab].map((prod) => {
+                                    const isExpanded = expandedProductId === prod.id;
+                                    const prodPricing = pricing.filter(p => p.product === prod.id);
 
-                        {/* Product Accordion List */}
-                        <div className="space-y-2.5">
-                            {pricingProducts[activeTab].map((prod) => {
-                                const isExpanded = expandedProductId === prod.id;
-                                const prodPricing = pricing.filter(p => p.product === prod.id);
+                                    return (
+                                        <div key={prod.id} className={cn(
+                                            "border rounded-xl overflow-hidden bg-white transition-all duration-200",
+                                            isExpanded
+                                                ? "border-indigo-500 shadow-md ring-2 ring-indigo-500/10"
+                                                : "border-slate-300 hover:border-slate-400 shadow-sm"
+                                        )}>
+                                            {/* Accordion Trigger Header */}
+                                            <button
+                                                type="button"
+                                                onClick={() => setExpandedProductId(isExpanded ? '' : prod.id)}
+                                                className={cn(
+                                                    "w-full px-4 py-3 text-left font-black text-xs text-slate-800 transition-colors flex items-center justify-between border-none",
+                                                    isExpanded ? "bg-indigo-50/50 border-b border-indigo-100" : "bg-slate-50 hover:bg-slate-100/70"
+                                                )}
+                                            >
+                                                <div className="flex flex-col gap-0.5">
+                                                    <span className="font-black text-slate-850 text-xs">{prod.name}</span>
+                                                    <span className="text-[9px] text-slate-400 font-bold">{prod.desc}</span>
+                                                </div>
+                                                <span className={cn(
+                                                    "text-[9px] font-black px-2 py-0.5 rounded shrink-0",
+                                                    prodPricing.some(p => p.status === '확정')
+                                                        ? "bg-emerald-600 text-white shadow-sm"
+                                                        : "bg-slate-200 text-slate-700"
+                                                )}>
+                                                    {prodPricing.some(p => p.status === '확정') ? '출시 확정' : '준비 중'}
+                                                </span>
+                                            </button>
 
-                                return (
-                                    <div key={prod.id} className="border border-slate-150 rounded-xl overflow-hidden bg-white shadow-[0_2px_6px_rgba(0,0,0,0.015)]">
-                                        {/* Accordion Trigger Header */}
-                                        <button
-                                            type="button"
-                                            onClick={() => setExpandedProductId(isExpanded ? '' : prod.id)}
-                                            className="w-full px-4 py-3 text-left font-black text-xs text-slate-800 bg-slate-50/50 hover:bg-slate-50 transition-colors flex items-center justify-between border-none border-b border-slate-100"
-                                        >
-                                            <div className="flex flex-col gap-0.5">
-                                                <span className="font-black text-slate-850 text-xs">{prod.name}</span>
-                                                <span className="text-[9px] text-slate-400 font-bold">{prod.desc}</span>
-                                            </div>
-                                            <span className={cn(
-                                                "text-[9px] font-black px-1.5 py-0.5 rounded shrink-0",
-                                                prodPricing.some(p => p.status === '확정')
-                                                    ? "bg-emerald-50 text-emerald-700"
-                                                    : "bg-slate-100 text-slate-550"
-                                            )}>
-                                                {prodPricing.some(p => p.status === '확정') ? '출시 확정' : '준비 중'}
-                                            </span>
-                                        </button>
-
-                                        {/* Accordion Content showing prices */}
-                                        {isExpanded && (
-                                            <div className="p-4 space-y-3 bg-white divide-y divide-slate-100 animate-in slide-in-from-top-1 duration-150">
-                                                {prodPricing.map((item) => (
-                                                    <div key={item.id} className="flex items-center justify-between gap-2 text-xs pt-2.5 first:pt-0 border-none">
-                                                        <div className="flex flex-col">
-                                                            <span className="font-bold text-slate-700">{item.label}</span>
-                                                            <span className="text-[9px] text-slate-450 font-mono uppercase">{item.pkg}</span>
-                                                        </div>
-                                                        <div className="flex items-center gap-1.5 shrink-0">
-                                                            <div className="relative flex items-center">
-                                                                <input
-                                                                    type="number"
-                                                                    className="w-20 h-7 text-right pr-4 pl-1 font-bold border border-slate-250 rounded text-slate-850 focus:border-indigo-500 focus:outline-none text-[11px]"
-                                                                    value={item.price}
-                                                                    onChange={(e) => handleUpdatePrice(item.id, Number(e.target.value))}
-                                                                />
-                                                                <span className="absolute right-1 text-[9px] text-slate-400 font-bold pointer-events-none">원</span>
+                                            {/* Accordion Content showing prices */}
+                                            {isExpanded && (
+                                                <div className="p-4 space-y-3 bg-white divide-y divide-slate-100 animate-in slide-in-from-top-1 duration-150">
+                                                    {prodPricing.map((item) => (
+                                                        <div key={item.id} className="flex items-center justify-between gap-2 text-xs pt-2.5 first:pt-0 border-none">
+                                                            <div className="flex flex-col">
+                                                                <span className="font-bold text-slate-700">{item.label}</span>
+                                                                <span className="text-[9px] text-slate-450 font-mono uppercase">{item.pkg}</span>
                                                             </div>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => handleToggleStatus(item.id)}
-                                                                className={cn(
-                                                                    "px-2 py-0.5 rounded text-[10px] font-black border transition-all cursor-pointer",
-                                                                    item.status === '확정'
-                                                                        ? "bg-emerald-50 text-emerald-700 border-emerald-250 hover:bg-emerald-100/50"
-                                                                        : "bg-amber-50 text-amber-600 border-amber-250 hover:bg-amber-100/50"
-                                                                )}
-                                                            >
-                                                                {item.status}
-                                                            </button>
+                                                            <div className="flex items-center gap-1.5 shrink-0">
+                                                                <div className="relative flex items-center">
+                                                                    <input
+                                                                        type="text"
+                                                                        className="w-20 h-7 text-right pr-4 pl-1 font-bold border border-slate-300 rounded text-slate-850 focus:border-indigo-500 focus:outline-none text-[11px]"
+                                                                        value={formatPrice(item.price)}
+                                                                        onChange={(e) => handleUpdatePrice(item.id, Number(parsePrice(e.target.value)) || 0)}
+                                                                    />
+                                                                    <span className="absolute right-1 text-[9px] text-slate-400 font-bold pointer-events-none">원</span>
+                                                                </div>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleToggleStatus(item.id)}
+                                                                    className={cn(
+                                                                        "px-2.5 py-1 rounded text-[10px] font-black transition-all cursor-pointer text-white shadow-sm border-none shrink-0",
+                                                                        item.status === '확정'
+                                                                            ? "bg-emerald-600 hover:bg-emerald-700 active:scale-95"
+                                                                            : "bg-amber-500 hover:bg-amber-600 active:scale-95"
+                                                                    )}
+                                                                >
+                                                                    {item.status}
+                                                                </button>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                );
-                            })}
-                        </div>
-                        <div className="bg-slate-50 p-3 rounded-xl border border-slate-150 text-[10px] text-slate-500 font-semibold space-y-1">
-                            <p className="font-black text-slate-700 flex items-center gap-1">🛡️ 크몽 판매 패키지 가이드</p>
-                            <p>• <b>DELUXE (5일 체험판)</b>: 5,000원 결제 유도 (리뷰 및 판매 건수 극대화)</p>
-                            <p>• <b>STANDARD (6개월)</b>: 99,000원 결제 (월 1.6만 원 대체의 가성비)</p>
-                            <p>• <b>PREMIUM (영구 소장)</b>: 198,000원 결제 (평생 무제한 사용 팩)</p>
-                            <p>• 모든 스탠다드 이상 상품에는 <b>무상 엔진 업데이트 및 A/S</b>가 포함됩니다.</p>
-                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                            <div className="bg-indigo-50/60 p-3.5 rounded-r-xl border-l-4 border-indigo-600 text-[10px] text-slate-600 font-semibold space-y-1">
+                                <p className="font-black text-slate-700 flex items-center gap-1">🛡️ 크몽 판매 패키지 가이드</p>
+                                <p>• <b>DELUXE (5일 체험판)</b>: 5,000원 결제 유도 (리뷰 및 판매 건수 극대화)</p>
+                                <p>• <b>STANDARD (6개월)</b>: 99,000원 결제 (월 1.6만 원 대체의 가성비)</p>
+                                <p>• <b>PREMIUM (영구 소장)</b>: 198,000원 결제 (평생 무제한 사용 팩)</p>
+                                <p>• 모든 스탠다드 이상 상품에는 <b>무상 엔진 업데이트 및 A/S</b>가 포함됩니다.</p>
+                            </div>
+                        </CardContent>
                     </Card>
                 </div>
             </div>

@@ -367,7 +367,7 @@ export const Dashboard = () => {
 
             {/* General Stats KPIs */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-                <Card className="p-4 flex items-center gap-4 bg-white border-none shadow-sm hover:shadow-md transition-shadow">
+                <Card className="p-4 flex items-center gap-4 bg-white border border-slate-200 shadow-[0_15px_45px_rgba(0,0,0,0.07)] hover:shadow-lg transition-shadow">
                     <div className="h-12 w-12 rounded-xl flex items-center justify-center bg-blue-50 text-blue-600 shrink-0">
                         <UsersIcon className="w-6 h-6" />
                     </div>
@@ -376,7 +376,7 @@ export const Dashboard = () => {
                         <h3 className="text-xl font-black text-slate-800 mt-0.5">{totalUsers}명</h3>
                     </div>
                 </Card>
-                <Card className="p-4 flex items-center gap-4 bg-white border-none shadow-sm hover:shadow-md transition-shadow">
+                <Card className="p-4 flex items-center gap-4 bg-white border border-slate-200 shadow-[0_15px_45px_rgba(0,0,0,0.07)] hover:shadow-lg transition-shadow">
                     <div className="h-12 w-12 rounded-xl flex items-center justify-center bg-purple-50 text-purple-600 shrink-0">
                         <Key className="w-6 h-6" />
                     </div>
@@ -385,7 +385,7 @@ export const Dashboard = () => {
                         <h3 className="text-xl font-black text-slate-800 mt-0.5">{totalLicenses}개</h3>
                     </div>
                 </Card>
-                <Card className="p-4 flex items-center gap-4 bg-white border-none shadow-sm hover:shadow-md transition-shadow">
+                <Card className="p-4 flex items-center gap-4 bg-white border border-slate-200 shadow-[0_15px_45px_rgba(0,0,0,0.07)] hover:shadow-lg transition-shadow">
                     <div className="h-12 w-12 rounded-xl flex items-center justify-center bg-emerald-50 text-emerald-600 shrink-0">
                         <Award className="w-6 h-6" />
                     </div>
@@ -394,7 +394,7 @@ export const Dashboard = () => {
                         <h3 className="text-xl font-black text-slate-800 mt-0.5">{upgradeCount}명</h3>
                     </div>
                 </Card>
-                <Card className="p-4 flex items-center gap-4 bg-white border-none shadow-sm hover:shadow-md transition-shadow">
+                <Card className="p-4 flex items-center gap-4 bg-white border border-slate-200 shadow-[0_15px_45px_rgba(0,0,0,0.07)] hover:shadow-lg transition-shadow">
                     <div className="h-12 w-12 rounded-xl flex items-center justify-center bg-rose-50 text-rose-600 shrink-0">
                         <XCircle className="w-6 h-6" />
                     </div>
@@ -412,14 +412,14 @@ export const Dashboard = () => {
                 <div className="xl:col-span-8 space-y-6">
                     
                     {/* Product & Package Sales Summary Card */}
-                    <Card className="p-5 bg-white border-none shadow-sm rounded-2xl space-y-4">
+                    <Card className="p-5 bg-white border border-slate-200 shadow-[0_15px_45px_rgba(0,0,0,0.07)] rounded-2xl space-y-4">
                         <div className="flex items-center gap-2.5">
                             <BarChart3 className="w-4.5 h-4.5 text-indigo-650" />
                             <h3 className="text-base font-black text-slate-800">제품 및 패키지별 발행/판매 현황</h3>
                         </div>
-                        <div className="overflow-x-auto border border-slate-100 rounded-xl">
+                        <div className="overflow-x-auto border border-slate-200 rounded-xl shadow-sm">
                             <table className="w-full text-left border-collapse min-w-[500px]">
-                                <thead className="bg-slate-50/70">
+                                <thead className="bg-slate-100/80 border-b border-slate-200">
                                     <tr className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-left whitespace-nowrap">
                                         <th className="px-4 py-2.5">제품군</th>
                                         <th className="px-4 py-2.5">패키지</th>
@@ -427,7 +427,7 @@ export const Dashboard = () => {
                                         <th className="px-4 py-2.5 text-right">총 판매액</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-100 text-xs font-semibold whitespace-nowrap">
+                                <tbody className="divide-y divide-slate-200 text-xs font-semibold whitespace-nowrap">
                                     {productPackageRows.length > 0 ? (
                                         productPackageRows.map((row, idx) => (
                                             <tr key={idx} className="hover:bg-slate-50/30 transition-colors">
@@ -458,7 +458,7 @@ export const Dashboard = () => {
                     </Card>
 
                     {/* App Registered Users List Table */}
-                    <Card className="p-5 bg-white border-none shadow-sm rounded-2xl space-y-4">
+                    <Card className="p-5 bg-white border border-slate-200 shadow-[0_15px_45px_rgba(0,0,0,0.07)] rounded-2xl space-y-4">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                             <div className="flex items-center gap-2.5">
                                 <UsersIcon className="w-4.5 h-4.5 text-indigo-650" />
@@ -473,13 +473,13 @@ export const Dashboard = () => {
                                         placeholder="이름 또는 이메일 검색..."
                                         value={userSearchTerm}
                                         onChange={e => setUserSearchTerm(e.target.value)}
-                                        className="pl-8 h-8 text-[11px] font-bold bg-slate-50 border-none rounded-lg"
+                                        className="pl-8 h-8 text-[11px] font-bold bg-white border border-slate-300 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100"
                                     />
                                 </div>
                                 <select
                                     value={userRoleFilter}
                                     onChange={e => setUserRoleFilter(e.target.value as any)}
-                                    className="h-8 px-2 text-[11px] font-bold bg-slate-50 border-none rounded-lg text-slate-600 outline-none focus:ring-2 focus:ring-indigo-100"
+                                    className="h-8 px-2 text-[11px] font-bold bg-white border border-slate-300 rounded-lg text-slate-600 outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600"
                                 >
                                     <option value="all">구분 전체</option>
                                     <option value="buyer">구매자</option>
@@ -489,9 +489,9 @@ export const Dashboard = () => {
                             </div>
                         </div>
 
-                        <div className="overflow-x-auto border border-slate-100 rounded-xl">
+                        <div className="overflow-x-auto border border-slate-200 rounded-xl shadow-sm">
                             <table className="w-full text-left border-collapse min-w-[750px]">
-                                <thead className="bg-slate-50/70">
+                                <thead className="bg-slate-100/80 border-b border-slate-200">
                                     <tr className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-left whitespace-nowrap">
                                         <th className="px-3 py-2.5 w-12 text-center">번호</th>
                                         <th className="px-3 py-2.5">가입일자</th>
@@ -502,7 +502,7 @@ export const Dashboard = () => {
                                         <th className="px-3 py-2.5 text-right">라이선스 제어</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-100 text-xs font-semibold whitespace-nowrap">
+                                <tbody className="divide-y divide-slate-200 text-xs font-semibold whitespace-nowrap">
                                     {filteredUsers.length > 0 ? (
                                         filteredUsers.map((u, idx) => {
                                             const type = getUserType(u);
@@ -555,7 +555,7 @@ export const Dashboard = () => {
                 <div className="xl:col-span-4 space-y-6">
                     
                     {/* Period Sales Statistics Card */}
-                    <Card className="p-5 bg-white border-none shadow-sm rounded-2xl space-y-4">
+                    <Card className="p-5 bg-white border border-slate-200 shadow-[0_15px_45px_rgba(0,0,0,0.07)] rounded-2xl space-y-4">
                         <div className="flex flex-col gap-3">
                             <div className="flex items-center gap-2.5">
                                 <Calendar className="w-4.5 h-4.5 text-indigo-650" />
@@ -563,12 +563,12 @@ export const Dashboard = () => {
                             </div>
                             
                             {/* Toggle switcher */}
-                            <div className="flex bg-slate-100 p-0.5 rounded-lg w-fit">
+                            <div className="flex bg-slate-200/80 p-0.5 rounded-lg w-fit border border-slate-300">
                                 <button
                                     onClick={() => setStatPeriod('daily')}
                                     className={cn(
-                                        "px-3 py-1.5 text-[11px] font-black rounded-md transition-all",
-                                        statPeriod === 'daily' ? "bg-white text-slate-800 shadow-sm" : "text-slate-400 hover:text-slate-600"
+                                        "px-3 py-1.5 text-[11px] font-black rounded-md transition-all border-none cursor-pointer",
+                                        statPeriod === 'daily' ? "bg-indigo-600 text-white shadow-sm" : "text-slate-600 hover:text-slate-900"
                                     )}
                                 >
                                     일별 (최근 7일)
@@ -576,8 +576,8 @@ export const Dashboard = () => {
                                 <button
                                     onClick={() => setStatPeriod('monthly')}
                                     className={cn(
-                                        "px-3 py-1.5 text-[11px] font-black rounded-md transition-all",
-                                        statPeriod === 'monthly' ? "bg-white text-slate-800 shadow-sm" : "text-slate-400 hover:text-slate-600"
+                                        "px-3 py-1.5 text-[11px] font-black rounded-md transition-all border-none cursor-pointer",
+                                        statPeriod === 'monthly' ? "bg-indigo-600 text-white shadow-sm" : "text-slate-600 hover:text-slate-900"
                                     )}
                                 >
                                     월별 (최근 6개월)
@@ -590,7 +590,7 @@ export const Dashboard = () => {
                             {periodData.map((item: any, idx: number) => {
                                 const percentage = maxPeriodSales > 0 ? (item.sales / maxPeriodSales) * 100 : 0;
                                 return (
-                                    <div key={idx} className="space-y-1 bg-slate-50/50 p-3 rounded-xl border border-slate-100/50">
+                                    <div key={idx} className="space-y-1 bg-slate-50 p-3 rounded-xl border border-slate-200 shadow-sm">
                                         <div className="flex justify-between items-center text-[11px] font-bold text-slate-600">
                                             <span>{item.label}</span>
                                             <span className="text-indigo-650 font-black">
@@ -598,9 +598,9 @@ export const Dashboard = () => {
                                             </span>
                                         </div>
                                         {/* Progress Bar Container */}
-                                        <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                                        <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
                                             <div 
-                                                className="bg-indigo-600 h-full rounded-full transition-all duration-500" 
+                                                className="bg-gradient-to-r from-indigo-500 to-indigo-700 h-full rounded-full transition-all duration-500" 
                                                 style={{ width: `${Math.max(3, percentage)}%` }} 
                                             />
                                         </div>
