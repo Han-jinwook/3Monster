@@ -324,6 +324,7 @@ export const LicenseGenerator = () => {
                                             }}
                                         >
                                             <option value="크몽">크몽</option>
+                                            <option value="썬드림 쇼핑몰">썬드림 쇼핑몰</option>
                                             <option value="블로그">블로그</option>
                                             <option value="지인">지인</option>
                                             <option value="기타">기타</option>
