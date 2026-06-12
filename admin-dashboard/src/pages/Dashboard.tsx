@@ -420,19 +420,19 @@ export const Dashboard = () => {
                         <div className="overflow-x-auto border border-slate-400 rounded-xl shadow-sm">
                             <table className="w-full text-left border-collapse min-w-[500px]">
                                 <thead className="bg-slate-900 text-white">
-                                    <tr className="text-xs font-black uppercase tracking-wider text-left whitespace-nowrap">
-                                        <th className="px-4 py-3 text-slate-200">제품군</th>
-                                        <th className="px-4 py-3 text-slate-200">패키지</th>
-                                        <th className="px-4 py-3 text-slate-200">발행 건수</th>
-                                        <th className="px-4 py-3 text-right text-slate-200">총 판매액</th>
+                                    <tr className="text-sm font-black uppercase tracking-wider text-left whitespace-nowrap">
+                                        <th className="px-4 py-4 text-slate-200">제품군</th>
+                                        <th className="px-4 py-4 text-slate-200">패키지</th>
+                                        <th className="px-4 py-4 text-slate-200">발행 건수</th>
+                                        <th className="px-4 py-4 text-right text-slate-200">총 판매액</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-300 text-xs font-semibold whitespace-nowrap">
                                     {productPackageRows.length > 0 ? (
                                         productPackageRows.map((row, idx) => (
                                             <tr key={idx} className="hover:bg-slate-50/30 transition-colors">
-                                                <td className="px-4 py-2.5 font-black text-slate-700">{row.product}</td>
-                                                <td className="px-4 py-2.5 text-slate-500">
+                                                <td className="px-4 py-2 font-black text-slate-700">{row.product}</td>
+                                                <td className="px-4 py-2 text-slate-500">
                                                     <span className="px-2 py-0.5 text-[9px] font-black rounded bg-indigo-50 text-indigo-700 border border-indigo-100/50">
                                                         {row.pkg === 'TRIAL' ? 'DELUXE (5일 체험판)' :
                                                          row.pkg === '6M' ? 'STANDARD (6개월)' :
@@ -492,14 +492,14 @@ export const Dashboard = () => {
                         <div className="overflow-x-auto border border-slate-400 rounded-xl shadow-sm">
                             <table className="w-full text-left border-collapse min-w-[750px]">
                                 <thead className="bg-slate-900 text-white">
-                                    <tr className="text-xs font-black uppercase tracking-wider text-left whitespace-nowrap">
-                                        <th className="px-3 py-3 w-12 text-center text-slate-200">번호</th>
-                                        <th className="px-3 py-3 text-slate-200">가입일자</th>
-                                        <th className="px-3 py-3 text-slate-200">이름</th>
-                                        <th className="px-3 py-3 text-slate-200">이메일</th>
-                                        <th className="px-3 py-3 text-slate-200">가입 경로</th>
-                                        <th className="px-3 py-3 text-slate-200">회원 구분</th>
-                                        <th className="px-3 py-3 text-right text-slate-200">라이선스 제어</th>
+                                    <tr className="text-sm font-black uppercase tracking-wider text-left whitespace-nowrap">
+                                        <th className="px-3 py-4 w-12 text-center text-slate-200">번호</th>
+                                        <th className="px-3 py-4 text-slate-200">가입일자</th>
+                                        <th className="px-3 py-4 text-slate-200">이름</th>
+                                        <th className="px-3 py-4 text-slate-200">이메일</th>
+                                        <th className="px-3 py-4 text-slate-200">가입 경로</th>
+                                        <th className="px-3 py-4 text-slate-200">회원 구분</th>
+                                        <th className="px-3 py-4 text-right text-slate-200">라이선스 제어</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-300 text-xs font-semibold whitespace-nowrap">
@@ -509,19 +509,19 @@ export const Dashboard = () => {
                                             const isNonBuyer = type.label === '비구매자';
                                             return (
                                                 <tr key={u.id} className="hover:bg-slate-50/30 transition-colors">
-                                                    <td className="px-3 py-2.5 text-center text-slate-400 font-bold">{idx + 1}</td>
-                                                    <td className="px-3 py-2.5 text-slate-500 font-bold">
+                                                    <td className="px-3 py-2 text-center text-slate-400 font-bold">{idx + 1}</td>
+                                                    <td className="px-3 py-2 text-slate-500 font-bold">
                                                         {u.created_at ? format(new Date(u.created_at), 'yyyy.MM.dd HH:mm') : '-'}
                                                     </td>
-                                                    <td className="px-3 py-2.5 font-black text-slate-700">{u.name || '이름 없음'}</td>
-                                                    <td className="px-3 py-2.5 text-slate-600 font-mono">{u.email}</td>
-                                                    <td className="px-3 py-2.5 text-slate-500">{u.channel || 'Direct'}</td>
-                                                    <td className="px-3 py-2.5">
+                                                    <td className="px-3 py-2 font-black text-slate-700">{u.name || '이름 없음'}</td>
+                                                    <td className="px-3 py-2 text-slate-600 font-mono">{u.email}</td>
+                                                    <td className="px-3 py-2 text-slate-500">{u.channel || 'Direct'}</td>
+                                                    <td className="px-3 py-2">
                                                         <span className={cn("px-2 py-0.5 rounded text-[9px] font-black border uppercase tracking-wider", type.color)}>
                                                             {type.label}
                                                         </span>
                                                     </td>
-                                                    <td className="px-3 py-2.5 text-right">
+                                                    <td className="px-3 py-2 text-right">
                                                         {u.role !== 'admin' && (
                                                             <Button
                                                                 size="sm"

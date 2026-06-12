@@ -112,12 +112,12 @@ export const LicenseList = () => {
             <Card className="overflow-hidden p-0 border border-slate-200 shadow-[0_15px_45px_rgba(0,0,0,0.07)] rounded-2xl bg-white">
                 <table className="w-full">
                     <thead className="bg-slate-900 text-white">
-                        <tr className="text-xs font-black uppercase tracking-wider text-left">
-                            <th className="px-10 py-4.5 text-slate-200">구매자 성함</th>
-                            <th className="px-10 py-4.5 text-slate-200">제품 / 시리얼</th>
-                            <th className="px-10 py-4.5 text-slate-200">만료일자</th>
-                            <th className="px-10 py-4.5 text-slate-200">상태</th>
-                            <th className="px-10 py-4.5 text-right text-slate-200">제어</th>
+                        <tr className="text-sm font-black uppercase tracking-wider text-left">
+                            <th className="px-10 py-5.5 text-slate-200">구매자 성함</th>
+                            <th className="px-10 py-5.5 text-slate-200">제품 / 시리얼</th>
+                            <th className="px-10 py-5.5 text-slate-200">만료일자</th>
+                            <th className="px-10 py-5.5 text-slate-200">상태</th>
+                            <th className="px-10 py-5.5 text-right text-slate-200">제어</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-300">
@@ -127,22 +127,22 @@ export const LicenseList = () => {
                             const status = getStatusInfo(lic);
                             return (
                                 <tr key={lic.id} className="hover:bg-slate-50/50 transition-colors">
-                                    <td className="px-10 py-6 font-black text-slate-800">{lic.buyer_name}</td>
-                                    <td className="px-10 py-6">
+                                    <td className="px-10 py-3 font-black text-slate-800">{lic.buyer_name}</td>
+                                    <td className="px-10 py-3">
                                         <div className="space-y-1">
                                             <p className="text-sm font-bold text-slate-600">{lic.product_id}</p>
                                             <p className="text-[10px] font-mono text-slate-700 uppercase bg-slate-50 px-2 py-0.5 rounded w-fit border border-slate-400">{lic.serial_key}</p>
                                         </div>
                                     </td>
-                                    <td className="px-10 py-6 text-sm font-bold text-slate-500">
+                                    <td className="px-10 py-3 text-sm font-bold text-slate-500">
                                         {lic.expire_date ? format(new Date(lic.expire_date), 'yyyy.MM.dd') : '-'}
                                     </td>
-                                    <td className="px-10 py-6">
+                                    <td className="px-10 py-3">
                                         <div className={cn("inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black border", status.color)}>
                                             <status.icon className="w-3 h-3" /> {status.label}
                                         </div>
                                     </td>
-                                    <td className="px-10 py-6 text-right">
+                                    <td className="px-10 py-3 text-right">
                                         <div className="flex justify-end gap-2">
                                             <Button variant="ghost" size="icon" className="h-9 w-9 text-slate-500 hover:bg-slate-100 hover:text-slate-800"><Power className="w-4 h-4" /></Button>
                                             <Button variant="ghost" size="icon" className="h-9 w-9 text-rose-500 hover:bg-rose-50 hover:text-rose-700"><Trash2 className="w-4 h-4" /></Button>
