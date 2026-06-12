@@ -247,7 +247,7 @@ export const LicenseGenerator = () => {
     };
 
     return (
-        <div className="max-w-[1200px] mx-auto space-y-6">
+        <div className="max-w-[1200px] mx-auto space-y-6 py-12 px-4">
             <div className="flex flex-col gap-1.5">
                 <h1 className="text-2xl font-black text-slate-800 tracking-tight">신규 라이선스 생성</h1>
                 <p className="text-xs text-slate-400 font-bold">구매자 정보를 입력하고 제품 인증키를 즉시 발행합니다.</p>
@@ -433,15 +433,15 @@ export const LicenseGenerator = () => {
                         </CardHeader>
                         <CardContent className="p-5 space-y-4">
                             {/* Category Tabs */}
-                            <div className="flex gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
+                            <div className="flex gap-1.5 bg-slate-100 p-1.5 rounded-xl border border-slate-200 shadow-inner">
                                 <button
                                     type="button"
                                     onClick={() => setActiveTab('marketing')}
                                     className={cn(
-                                        "flex-1 py-2 text-xs font-black rounded-lg transition-all cursor-pointer border-none",
+                                        "flex-1 py-2.5 text-xs font-black rounded-lg transition-all cursor-pointer border-none outline-none focus:outline-none",
                                         activeTab === 'marketing'
-                                            ? "bg-indigo-600 text-white shadow-md"
-                                            : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                                            ? "bg-indigo-600 text-white shadow-[0_4px_12px_rgba(79,70,229,0.25)] scale-[1.01]"
+                                            : "text-slate-650 hover:text-slate-900 hover:bg-white/50"
                                     )}
                                 >
                                     마케팅몬스터
@@ -450,10 +450,10 @@ export const LicenseGenerator = () => {
                                     type="button"
                                     onClick={() => setActiveTab('cafe')}
                                     className={cn(
-                                        "flex-1 py-2 text-xs font-black rounded-lg transition-all cursor-pointer border-none",
+                                        "flex-1 py-2.5 text-xs font-black rounded-lg transition-all cursor-pointer border-none outline-none focus:outline-none",
                                         activeTab === 'cafe'
-                                            ? "bg-indigo-600 text-white shadow-md"
-                                            : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                                            ? "bg-indigo-600 text-white shadow-[0_4px_12px_rgba(79,70,229,0.25)] scale-[1.01]"
+                                            : "text-slate-655 hover:text-slate-900 hover:bg-white/50"
                                     )}
                                 >
                                     카페몬스터

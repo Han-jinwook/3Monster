@@ -8,7 +8,6 @@ import {
     User, 
     Mail, 
     Calendar, 
-    Bell, 
     LogOut, 
     ShoppingBag, 
     Check, 
@@ -207,156 +206,161 @@ export const Profile = () => {
                     
                     {/* Left Column: Purchase list (7/12) */}
                     <div className="lg:col-span-7 space-y-4">
-                        <Card className="p-6 bg-white border border-slate-200 shadow-sm rounded-2xl">
-                            <div className="flex items-center gap-2 mb-6 pb-3 border-b border-slate-100">
-                                <ShoppingBag className="w-5 h-5 text-indigo-600" />
-                                <h3 className="text-sm font-black text-slate-800">구매 리스트 ({licenses.length})</h3>
+                        <Card className="p-0 overflow-hidden bg-white border border-slate-200 shadow-[0_15px_45px_rgba(0,0,0,0.07)] rounded-2xl">
+                            <div className="flex items-center gap-2 px-6 py-4 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white">
+                                <ShoppingBag className="w-5 h-5 text-indigo-400" />
+                                <h3 className="text-sm font-black text-white">구매 리스트 ({licenses.length})</h3>
                             </div>
 
-                            {licenses.length === 0 ? (
-                                <div className="text-center py-16 space-y-3">
-                                    <div className="w-12 h-12 bg-slate-50 text-slate-400 rounded-full flex items-center justify-center mx-auto">
-                                        <ShoppingBag className="w-5 h-5" />
+                            <div className="p-6">
+                                {licenses.length === 0 ? (
+                                    <div className="text-center py-16 space-y-3">
+                                        <div className="w-12 h-12 bg-slate-50 text-slate-400 rounded-full flex items-center justify-center mx-auto border border-slate-200">
+                                            <ShoppingBag className="w-5 h-5" />
+                                        </div>
+                                        <p className="text-xs text-slate-400 font-bold">등록된 구매 내역이 없습니다.</p>
                                     </div>
-                                    <p className="text-xs text-slate-400 font-bold">등록된 구매 내역이 없습니다.</p>
-                                </div>
-                            ) : (
-                                <div className="space-y-4">
-                                    {licenses.map((lic) => {
-                                        const date = lic.created_at ? new Date(lic.created_at).toLocaleDateString() : 'N/A';
-                                        const expDate = lic.expire_date ? new Date(lic.expire_date).toLocaleDateString() : '평생 무제한';
-                                        
-                                        return (
-                                            <div 
-                                                key={lic.id} 
-                                                className="p-4 bg-slate-50/50 hover:bg-slate-50 border border-slate-150 hover:border-indigo-100 rounded-xl transition-all duration-200 text-left space-y-3 group"
-                                            >
-                                                <div className="flex justify-between items-start">
-                                                    <div>
-                                                        <span className="text-[10px] font-extrabold text-indigo-700 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded uppercase">
-                                                            {lic.product_id}
-                                                        </span>
-                                                        <h4 className="text-xs font-black text-slate-700 mt-1.5 break-all">
-                                                            시리얼: <code className="bg-slate-100 px-1 py-0.5 rounded text-[11px] font-mono text-slate-650">{lic.serial_key}</code>
-                                                        </h4>
+                                ) : (
+                                    <div className="space-y-4">
+                                        {licenses.map((lic) => {
+                                            const date = lic.created_at ? new Date(lic.created_at).toLocaleDateString() : 'N/A';
+                                            const expDate = lic.expire_date ? new Date(lic.expire_date).toLocaleDateString() : '평생 무제한';
+                                            
+                                            return (
+                                                <div 
+                                                    key={lic.id} 
+                                                    className="p-4 bg-slate-50/50 hover:bg-slate-50 border border-slate-250 hover:border-indigo-400 rounded-xl transition-all duration-200 text-left space-y-3 group"
+                                                >
+                                                    <div className="flex justify-between items-start">
+                                                        <div>
+                                                            <span className="text-[10px] font-extrabold text-indigo-750 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded uppercase">
+                                                                {lic.product_id}
+                                                            </span>
+                                                            <h4 className="text-xs font-black text-slate-700 mt-1.5 break-all">
+                                                                시리얼: <code className="bg-slate-100 px-1 py-0.5 rounded text-[11px] font-mono text-slate-650">{lic.serial_key}</code>
+                                                            </h4>
+                                                        </div>
+                                                        {getStatusBadge(lic.status)}
                                                     </div>
-                                                    {getStatusBadge(lic.status)}
-                                                </div>
 
-                                                <div className="grid grid-cols-2 gap-4 text-[10px] text-slate-500 pt-2 border-t border-slate-100/50">
-                                                    <div>
-                                                        <span className="block text-slate-400 font-medium">등록 일시</span>
-                                                        <span className="font-bold text-slate-700">{date}</span>
-                                                    </div>
-                                                    <div>
-                                                        <span className="block text-slate-400 font-medium">만료일 (기간)</span>
-                                                        <span className="font-bold text-slate-700">{expDate}</span>
+                                                    <div className="grid grid-cols-2 gap-4 text-[10px] text-slate-500 pt-2 border-t border-slate-200">
+                                                        <div>
+                                                            <span className="block text-slate-400 font-medium">등록 일시</span>
+                                                            <span className="font-bold text-slate-700">{date}</span>
+                                                        </div>
+                                                        <div>
+                                                            <span className="block text-slate-400 font-medium">만료일 (기간)</span>
+                                                            <span className="font-bold text-slate-700">{expDate}</span>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            )}
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </div>
                         </Card>
                     </div>
 
                     {/* Right Column: Settings / Profile / Logout (5/12) */}
                     <div className="lg:col-span-5 space-y-4">
                         <div className="space-y-4">
-                            <Card className="p-6 bg-white border border-slate-200 shadow-sm rounded-2xl space-y-6">
-                                
-                                {/* 1. Account details */}
-                                <div className="space-y-4 text-left">
-                                    <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-                                        <Shield className="w-5 h-5 text-indigo-600" />
-                                        <h3 className="text-sm font-black text-slate-800">계정 프로필 정보</h3>
-                                    </div>
-
-                                    <div className="space-y-3">
-                                        <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-100 space-y-2">
-                                            <div className="flex items-center gap-2 text-[10px] text-slate-400 font-bold uppercase">
-                                                <Mail className="w-3.5 h-3.5" /> 이메일 주소 / ID
-                                            </div>
-                                            <div className="flex flex-col">
-                                                <span className="text-xs text-slate-800 font-black">{userEmail}</span>
-                                                <span className="text-[10px] text-slate-400 mt-0.5">ID: {userEmail.split('@')[0]}</span>
-                                            </div>
+                            <Card className="p-0 overflow-hidden bg-white border border-slate-200 shadow-[0_15px_45px_rgba(0,0,0,0.07)] rounded-2xl">
+                                <div className="flex items-center gap-2 px-6 py-4 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white mb-6">
+                                    <Shield className="w-5 h-5 text-indigo-400" />
+                                    <h3 className="text-sm font-black text-white">계정 설정 & 관리</h3>
+                                </div>
+                                <div className="p-6 pt-0 space-y-6">
+                                    
+                                    {/* 1. Account details */}
+                                    <div className="space-y-4 text-left">
+                                        <div className="flex items-center gap-2 pb-2 border-b border-slate-250">
+                                            <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">계정 프로필 정보</h4>
                                         </div>
 
-                                        {signupDate && (
-                                            <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-100 space-y-1">
-                                                <div className="flex items-center gap-2 text-[10px] text-slate-400 font-bold uppercase">
-                                                    <Calendar className="w-3.5 h-3.5" /> 가입 일자
+                                        <div className="space-y-3">
+                                            <div className="bg-slate-50/50 p-3.5 rounded-xl border border-slate-250 space-y-2">
+                                                <div className="flex items-center gap-2 text-[10px] text-slate-450 font-bold uppercase">
+                                                    <Mail className="w-3.5 h-3.5" /> 이메일 주소 / ID
                                                 </div>
-                                                <span className="text-xs text-slate-700 font-bold">{signupDate}</span>
+                                                <div className="flex flex-col">
+                                                    <span className="text-xs text-slate-800 font-black">{userEmail}</span>
+                                                    <span className="text-[10px] text-slate-400 mt-0.5">ID: {userEmail.split('@')[0]}</span>
+                                                </div>
                                             </div>
-                                        )}
-                                    </div>
-                                </div>
 
-                                {/* 2. Secondary Auth Info */}
-                                <div className="space-y-3.5 text-left">
-                                    <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-                                        <User className="w-5 h-5 text-indigo-600" />
-                                        <h3 className="text-sm font-black text-slate-800">크몽 ID (2차 인증 정보)</h3>
-                                    </div>
-                                    <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold text-slate-400">크몽 구매자 ID</label>
-                                        <div className="flex gap-2">
-                                            <Input
-                                                type="text"
-                                                value={name}
-                                                onChange={e => setName(e.target.value)}
-                                                placeholder="크몽 ID를 입력해 주세요"
-                                                className="h-10 bg-slate-50 border-slate-200 focus-visible:bg-white rounded-lg text-xs flex-1"
-                                            />
-                                            <Button 
-                                                type="button"
-                                                onClick={handleSaveNickname}
-                                                disabled={name.trim() === initialName || savingNickname}
-                                                className="h-10 px-4 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg disabled:opacity-50 disabled:bg-slate-100 disabled:text-slate-450 transition-all shrink-0"
-                                            >
-                                                {savingNickname ? '저장중' : '저장'}
-                                            </Button>
+                                            {signupDate && (
+                                                <div className="bg-slate-50/50 p-3.5 rounded-xl border border-slate-250 space-y-1">
+                                                    <div className="flex items-center gap-2 text-[10px] text-slate-450 font-bold uppercase">
+                                                        <Calendar className="w-3.5 h-3.5" /> 가입 일자
+                                                    </div>
+                                                    <span className="text-xs text-slate-700 font-bold">{signupDate}</span>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
-                                </div>
 
-                                {/* 3. Notifications settings */}
-                                <div className="space-y-4 text-left">
-                                    <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-                                        <Bell className="w-5 h-5 text-indigo-600" />
-                                        <h3 className="text-sm font-black text-slate-800">알림 설정</h3>
+                                    {/* 2. Secondary Auth Info */}
+                                    <div className="space-y-3.5 text-left">
+                                        <div className="flex items-center gap-2 pb-2 border-b border-slate-250">
+                                            <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">크몽 ID (2차 인증 정보)</h4>
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className="text-[10px] font-bold text-slate-400 pl-0.5">크몽 구매자 ID</label>
+                                            <div className="flex gap-2">
+                                                <Input
+                                                    type="text"
+                                                    value={name}
+                                                    onChange={e => setName(e.target.value)}
+                                                    placeholder="크몽 ID를 입력해 주세요"
+                                                    className="h-10 bg-slate-50 border border-slate-350 hover:border-slate-400 focus:border-indigo-500 focus-visible:bg-white rounded-lg text-xs flex-1 focus-visible:ring-indigo-100"
+                                                />
+                                                <Button 
+                                                    type="button"
+                                                    onClick={handleSaveNickname}
+                                                    disabled={name.trim() === initialName || savingNickname}
+                                                    className="h-10 px-4 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg disabled:opacity-50 disabled:bg-slate-100 disabled:text-slate-450 transition-all shrink-0 border-none"
+                                                >
+                                                    {savingNickname ? '저장중' : '저장'}
+                                                </Button>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center justify-between py-1">
-                                        <span className="text-xs text-slate-650 font-bold">이메일 알림 및 서비스 소식 수신</span>
-                                        <label className="relative inline-flex items-center cursor-pointer select-none">
-                                            <input 
-                                                type="checkbox" 
-                                                checked={notify}
-                                                onChange={e => {
-                                                    const val = e.target.checked;
-                                                    setNotify(val);
-                                                    localStorage.setItem('notify_enabled', String(val));
-                                                }}
-                                                className="sr-only peer"
-                                            />
-                                            <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
-                                        </label>
-                                    </div>
-                                </div>
 
-                                {/* 4. Logout (Bottom Right aligned) */}
-                                <div className="pt-4 border-t border-slate-100 flex justify-end">
-                                    <Button 
-                                        type="button"
-                                        variant="outline"
-                                        onClick={logout}
-                                        className="h-9 px-4 text-[11px] font-bold border border-slate-200 hover:border-rose-200 text-slate-600 hover:text-rose-600 hover:bg-rose-50/30 rounded-lg flex items-center gap-1.5 transition-all shadow-sm bg-white"
-                                    >
-                                        <LogOut className="w-3.5 h-3.5" /> 로그아웃
-                                    </Button>
+                                    {/* 3. Notifications settings */}
+                                    <div className="space-y-4 text-left">
+                                        <div className="flex items-center gap-2 pb-2 border-b border-slate-250">
+                                            <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">알림 설정</h4>
+                                        </div>
+                                        <div className="flex items-center justify-between py-1">
+                                            <span className="text-xs text-slate-655 font-bold pl-0.5">이메일 알림 및 서비스 소식 수신</span>
+                                            <label className="relative inline-flex items-center cursor-pointer select-none">
+                                                <input 
+                                                    type="checkbox" 
+                                                    checked={notify}
+                                                    onChange={e => {
+                                                        const val = e.target.checked;
+                                                        setNotify(val);
+                                                        localStorage.setItem('notify_enabled', String(val));
+                                                    }}
+                                                    className="sr-only peer"
+                                                />
+                                                <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    {/* 4. Logout (Bottom Right aligned) */}
+                                    <div className="pt-4 border-t border-slate-200 flex justify-end">
+                                        <Button 
+                                            type="button"
+                                            variant="outline"
+                                            onClick={logout}
+                                            className="h-9 px-4 text-[11px] font-bold border border-slate-300 hover:border-rose-300 text-slate-600 hover:text-rose-600 hover:bg-rose-50/30 rounded-lg flex items-center gap-1.5 transition-all shadow-sm bg-white"
+                                        >
+                                            <LogOut className="w-3.5 h-3.5" /> 로그아웃
+                                        </Button>
+                                    </div>
                                 </div>
                             </Card>
                         </div>

@@ -772,16 +772,16 @@ export const CustomerSupport = () => {
                 {/* Left side: 일반 유저는 항상 노출, 관리자는 문의 선택 시 상세 노출 / 미선택 시 기본 안내 포맷 노출 */}
                 <div className="space-y-4">
                     {(!isAdmin || selectedTicketForDetail) ? (
-                        <Card className="p-6 bg-white border-2 border-slate-300 shadow-md rounded-2xl transition-all duration-300">
-                        <div className="flex items-center justify-between mb-4 pb-2 border-b border-slate-150">
-                            <h3 className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                        <Card className="p-0 overflow-hidden bg-white border border-slate-200 shadow-[0_15px_45px_rgba(0,0,0,0.07)] rounded-2xl transition-all duration-300">
+                        <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white">
+                            <h3 className="text-sm font-black text-white flex items-center gap-1.5">
                                 {selectedTicketForDetail ? (
                                     <>
-                                        <FileText className="w-4 h-4 text-indigo-600" /> 등록된 문의 상세
+                                        <FileText className="w-4 h-4 text-indigo-400" /> 등록된 문의 상세
                                     </>
                                 ) : (
                                     <>
-                                        <Plus className="w-4 h-4 text-indigo-600" /> 새 문의 등록
+                                        <Plus className="w-4 h-4 text-indigo-400" /> 새 문의 등록
                                     </>
                                 )}
                             </h3>
@@ -791,7 +791,7 @@ export const CustomerSupport = () => {
                                     onClick={() => {
                                         navigate('/support', { replace: true });
                                     }}
-                                    className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-650 transition-colors cursor-pointer"
+                                    className="p-1 rounded-lg hover:bg-white/10 text-indigo-200 hover:text-white transition-colors cursor-pointer"
                                     title="상세 닫기"
                                 >
                                     <X className="w-4.5 h-4.5" />
@@ -801,22 +801,22 @@ export const CustomerSupport = () => {
                                 <div className="relative min-w-[130px]">
                                     <select
                                         disabled={!!selectedTicketForDetail && !isEditing}
-                                        className="w-full h-8 rounded-lg bg-slate-100/70 border border-slate-300 hover:border-slate-400 focus:bg-white pl-2.5 pr-8 text-xs font-semibold outline-none focus:ring-2 focus:ring-indigo-150 focus:border-indigo-500 transition-all appearance-none cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed shadow-sm"
+                                        className="w-full h-8 rounded-lg bg-white/10 border border-white/20 hover:border-white/40 focus:bg-slate-800 text-white pl-2.5 pr-8 text-xs font-semibold outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all appearance-none cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed shadow-sm animate-none"
                                         value={issueType}
                                         onChange={e => setIssueType(e.target.value)}
                                     >
-                                        <option value="bug">버그/오류 신고</option>
-                                        <option value="feature">기능 제안/문의</option>
-                                        <option value="license">라이선스 관련</option>
-                                        <option value="custom">커스텀 제작 의뢰</option>
-                                        <option value="other">기타</option>
+                                        <option value="bug" className="text-slate-900">버그/오류 신고</option>
+                                        <option value="feature" className="text-slate-900">기능 제안/문의</option>
+                                        <option value="license" className="text-slate-900">라이선스 관련</option>
+                                        <option value="custom" className="text-slate-900">커스텀 제작 의뢰</option>
+                                        <option value="other" className="text-slate-900">기타</option>
                                     </select>
-                                    <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500 pointer-events-none" />
+                                    <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-indigo-300 pointer-events-none" />
                                 </div>
                             )}
                         </div>
 
-                        <div className="space-y-4">
+                        <div className="p-6 space-y-4">
                                 {success && (
                                     <div className="flex items-center gap-3 bg-emerald-50 text-emerald-600 p-4 rounded-xl animate-in fade-in zoom-in">
                                         <CheckCircle2 className="w-5 h-5" />
@@ -1407,12 +1407,12 @@ export const CustomerSupport = () => {
                         </div>
                     </Card>
                     ) : (
-                        <Card className="p-12 bg-white border-2 border-dashed border-slate-250 shadow-sm rounded-2xl flex flex-col items-center justify-center text-center min-h-[480px] transition-all duration-300">
-                            <div className="w-16 h-16 rounded-full bg-indigo-50 flex items-center justify-center mb-4 text-indigo-500 shadow-inner">
+                        <Card className="p-12 bg-white border border-dashed border-slate-300 shadow-inner rounded-2xl flex flex-col items-center justify-center text-center min-h-[480px] transition-all duration-300">
+                            <div className="w-16 h-16 rounded-full bg-indigo-50 flex items-center justify-center mb-4 text-indigo-500 shadow-inner border border-indigo-100">
                                 <FileText className="w-8 h-8" />
                             </div>
-                            <h3 className="text-base font-bold text-slate-800 mb-2">문의 상세 조회</h3>
-                            <p className="text-xs font-semibold text-slate-400 max-w-xs leading-relaxed">
+                            <h3 className="text-base font-black text-slate-800 mb-2">문의 상세 조회</h3>
+                            <p className="text-xs font-bold text-slate-400 max-w-xs leading-relaxed">
                                 우측 목록에서 상세히 조회하고 답변을 작성할 고객 문의를 선택해주세요.
                             </p>
                         </Card>
@@ -1452,7 +1452,7 @@ export const CustomerSupport = () => {
                     )}
 
                     {/* List View Main */}
-                    <div className="flex border-b border-slate-200/80 mb-3.5 gap-1.5 bg-slate-100/50 p-1.5 rounded-2xl border border-slate-150/50 shadow-inner">
+                    <div className="flex gap-1.5 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 shadow-inner mb-3.5">
                         <button
                             type="button"
                             onClick={() => {
@@ -1461,27 +1461,37 @@ export const CustomerSupport = () => {
                                 setSelectedTicketForDetail(null);
                             }}
                             className={cn(
-                                "flex-1 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer outline-none focus:outline-none",
+                                "flex-1 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer border-none outline-none focus:outline-none",
                                 activeTab === 'support' 
-                                    ? "bg-white text-rose-600 shadow-sm border border-slate-200/50 font-black scale-[1.01]" 
-                                    : "text-slate-500 hover:text-slate-800 hover:bg-white/30"
+                                    ? "bg-rose-600 text-white shadow-[0_4px_12px_rgba(225,29,72,0.25)] font-black scale-[1.01]" 
+                                    : "text-slate-655 hover:text-slate-800 hover:bg-slate-200/60"
                             )}
                         >
                             <span className="flex items-center gap-1.5">
                                 🛠️ AS 기술지원
                                 <span className="flex items-center gap-1 ml-1">
                                     {supportClosedCount > 0 && (
-                                        <span className="inline-flex items-center justify-center bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded-full text-[9px] font-bold border border-emerald-200/60">
+                                        <span className={cn(
+                                            "inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-[9px] font-bold border",
+                                            activeTab === 'support'
+                                                ? "bg-white/20 text-white border-white/30"
+                                                : "bg-emerald-50 text-emerald-700 border-emerald-200/60"
+                                        )}>
                                             완료 {supportClosedCount}
                                         </span>
                                     )}
                                     {supportOpenCount > 0 && (
-                                        <span className="inline-flex items-center justify-center bg-rose-50 text-rose-700 px-1.5 py-0.5 rounded-full text-[9px] font-bold border border-rose-200/60 animate-pulse">
+                                        <span className={cn(
+                                            "inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-[9px] font-bold border animate-pulse",
+                                            activeTab === 'support'
+                                                ? "bg-white/30 text-white border-white/40"
+                                                : "bg-rose-50 text-rose-700 border-rose-200/60"
+                                        )}>
                                             대기 {supportOpenCount}
                                         </span>
                                     )}
                                     {supportClosedCount === 0 && supportOpenCount === 0 && (
-                                        <span className="text-slate-400 text-[10px] font-normal">(0)</span>
+                                        <span className={activeTab === 'support' ? "text-white/60 text-[10px]" : "text-slate-400 text-[10px]"}>(0)</span>
                                     )}
                                 </span>
                             </span>
@@ -1494,27 +1504,37 @@ export const CustomerSupport = () => {
                                 setSelectedTicketForDetail(null);
                             }}
                             className={cn(
-                                "flex-1 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer outline-none focus:outline-none",
+                                "flex-1 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer border-none outline-none focus:outline-none",
                                 activeTab === 'qna' 
-                                    ? "bg-white text-blue-600 shadow-sm border border-slate-200/50 font-black scale-[1.01]" 
-                                    : "text-slate-500 hover:text-slate-800 hover:bg-white/30"
+                                    ? "bg-indigo-600 text-white shadow-[0_4px_12px_rgba(79,70,229,0.25)] font-black scale-[1.01]" 
+                                    : "text-slate-655 hover:text-slate-800 hover:bg-slate-200/60"
                             )}
                         >
                             <span className="flex items-center gap-1.5">
                                 🙋‍♂️ 제품 문의
                                 <span className="flex items-center gap-1 ml-1">
                                     {qnaClosedCount > 0 && (
-                                        <span className="inline-flex items-center justify-center bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded-full text-[9px] font-bold border border-emerald-200/60">
+                                        <span className={cn(
+                                            "inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-[9px] font-bold border",
+                                            activeTab === 'qna'
+                                                ? "bg-white/20 text-white border-white/30"
+                                                : "bg-emerald-50 text-emerald-700 border-emerald-200/60"
+                                        )}>
                                             완료 {qnaClosedCount}
                                         </span>
                                     )}
                                     {qnaOpenCount > 0 && (
-                                        <span className="inline-flex items-center justify-center bg-rose-50 text-rose-700 px-1.5 py-0.5 rounded-full text-[9px] font-bold border border-rose-200/60 animate-pulse">
+                                        <span className={cn(
+                                            "inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-[9px] font-bold border animate-pulse",
+                                            activeTab === 'qna'
+                                                ? "bg-white/30 text-white border-white/40"
+                                                : "bg-rose-50 text-rose-700 border-rose-200/60"
+                                        )}>
                                             대기 {qnaOpenCount}
                                         </span>
                                     )}
                                     {qnaClosedCount === 0 && qnaOpenCount === 0 && (
-                                        <span className="text-slate-400 text-[10px] font-normal">(0)</span>
+                                        <span className={activeTab === 'qna' ? "text-white/60 text-[10px]" : "text-slate-400 text-[10px]"}>(0)</span>
                                     )}
                                 </span>
                             </span>
@@ -1527,7 +1547,7 @@ export const CustomerSupport = () => {
                                 value={searchTerm}
                                 onChange={e => setSearchTerm(e.target.value)}
                                 placeholder="이메일이나 내용으로 검색..."
-                                className="h-9 pl-9 bg-slate-55 border border-slate-200 hover:border-slate-300 focus:bg-white shadow-sm rounded-lg text-xs font-semibold placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 transition-all"
+                                className="h-9 pl-9 bg-slate-50 border border-slate-300 hover:border-slate-400 focus:bg-white shadow-sm rounded-lg text-xs font-semibold placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 transition-all"
                             />
                         </div>
                     </div>
@@ -1555,10 +1575,10 @@ export const CustomerSupport = () => {
                                         key={ticket.id}
                                     >
                                         <Card className={cn(
-                                            "relative overflow-hidden transition-all duration-200 rounded-lg border",
+                                            "relative overflow-hidden transition-all duration-200 rounded-xl border shadow-sm",
                                             isExpanded 
-                                                ? "bg-indigo-50/20 border-indigo-200 ring-2 ring-indigo-100/50 shadow-md scale-[1.01]" 
-                                                : "bg-white border-slate-200 hover:border-slate-300 hover:shadow-md"
+                                                ? "bg-indigo-50/25 border-indigo-400 ring-2 ring-indigo-100/50 shadow-md scale-[1.01]" 
+                                                : "bg-white border-slate-250 hover:border-slate-350 hover:shadow-md"
                                         )}>
                                             {/* Left Status Bar Indicator */}
                                             <div className={cn(

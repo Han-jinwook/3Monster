@@ -114,7 +114,7 @@ export const UserDashboard = () => {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.1 }}
                         >
-                            <Card className="group overflow-hidden border-none shadow-sm hover:shadow-2xl transition-all duration-500 rounded-[2.5rem] bg-white h-full flex flex-col">
+                            <Card className="group overflow-hidden border border-slate-200 shadow-[0_15px_45px_rgba(0,0,0,0.05)] hover:shadow-2xl hover:border-indigo-400 transition-all duration-500 rounded-[2.5rem] bg-white h-full flex flex-col">
                                 <div className={cn("h-4 p-0 w-full bg-gradient-to-r", product.color)} />
                                 <div className="p-10 space-y-8 flex-1 flex flex-col">
                                     <div className="flex justify-between items-start">
@@ -143,10 +143,10 @@ export const UserDashboard = () => {
                                     </div>
 
                                     <div className="pt-6 mt-auto flex gap-3">
-                                        <Button className="flex-1 h-12 bg-slate-900 hover:bg-indigo-600 text-white rounded-xl font-black transition-all">
+                                        <Button className="flex-1 h-12 bg-slate-900 hover:bg-indigo-600 text-white rounded-xl font-black transition-all border-none">
                                             자세히 보기
                                         </Button>
-                                        <Button variant="outline" size="icon" className="h-12 w-12 border-2 border-slate-100 rounded-xl hover:bg-slate-50">
+                                        <Button variant="outline" size="icon" className="h-12 w-12 border border-slate-300 rounded-xl hover:bg-slate-50">
                                             <Download className="w-5 h-5 text-slate-400" />
                                         </Button>
                                     </div>

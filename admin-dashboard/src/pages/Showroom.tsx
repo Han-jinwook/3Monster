@@ -627,7 +627,7 @@ export const Showroom = () => {
                                         key={product.id}
                                         id={product.id}
                                         className={cn(
-                                            "group overflow-hidden border-none shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2rem] bg-white flex flex-col cursor-pointer scroll-mt-24",
+                                            "group overflow-hidden border border-slate-200 shadow-[0_15px_45px_rgba(0,0,0,0.05)] hover:shadow-xl hover:border-indigo-400 transition-all duration-500 rounded-[2rem] bg-white flex flex-col cursor-pointer scroll-mt-24",
                                             selectedProductIdForDetail === product.id ? "ring-2 ring-indigo-500 shadow-md" : ""
                                         )}
                                         onClick={() => {
@@ -659,7 +659,7 @@ export const Showroom = () => {
                                                 </div>
                                                 {product.icon && (
                                                     <div className={cn(
-                                                        "w-10 h-10 rounded-xl flex items-center justify-center bg-slate-50 text-slate-700 shrink-0 border border-slate-100"
+                                                        "w-10 h-10 rounded-xl flex items-center justify-center bg-slate-50/80 text-slate-700 shrink-0 border border-slate-200 shadow-sm"
                                                     )}>
                                                         <product.icon className="w-5 h-5" />
                                                     </div>
@@ -689,7 +689,7 @@ export const Showroom = () => {
                                                         }
                                                     }}
                                                     className={cn(
-                                                        "w-1/2 h-10 rounded-xl font-bold transition-all flex items-center justify-center gap-1 text-[11px] sm:text-xs px-2.5",
+                                                        "w-1/2 h-10 rounded-xl font-bold transition-all flex items-center justify-center gap-1 text-[11px] sm:text-xs px-2.5 border-none",
                                                         selectedProductIdForDetail === product.id 
                                                             ? "bg-indigo-600 text-white hover:bg-indigo-700" 
                                                             : "bg-slate-900 hover:bg-indigo-600 text-white"

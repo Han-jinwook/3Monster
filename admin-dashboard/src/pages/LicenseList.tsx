@@ -64,29 +64,29 @@ export const LicenseList = () => {
         const isExpired = expireDate && expireDate < now;
 
         if (license.status === 'blocked') {
-            return { label: '정지', color: 'text-rose-600 bg-rose-50', icon: AlertCircle };
+            return { label: '정지', color: 'text-rose-700 bg-rose-50 border border-rose-200/60', icon: AlertCircle };
         }
 
         if (isExpired) {
-            return { label: '만료', color: 'text-slate-400 bg-slate-50', icon: AlertCircle };
+            return { label: '만료', color: 'text-slate-550 bg-slate-50 border border-slate-200', icon: AlertCircle };
         }
 
         // Check for "Expiring Soon" (within 7 days)
         if (expireDate && (license.status === 'active' || license.status === 'used')) {
             const daysLeft = Math.ceil((expireDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
             if (daysLeft <= 7) {
-                return { label: '만료 예정', color: 'text-orange-600 bg-orange-50', icon: Clock };
+                return { label: '만료 예정', color: 'text-orange-700 bg-orange-50 border border-orange-200/60', icon: Clock };
             }
         }
 
         switch (license.status) {
             case 'active':
             case 'used':
-                return { label: '사용중', color: 'text-emerald-600 bg-emerald-50', icon: CheckCircle2 };
+                return { label: '사용중', color: 'text-emerald-700 bg-emerald-50 border border-emerald-200/60', icon: CheckCircle2 };
             case 'unused':
-                return { label: '대기중', color: 'text-indigo-600 bg-indigo-50', icon: Clock };
+                return { label: '대기중', color: 'text-indigo-700 bg-indigo-50 border border-indigo-200/60', icon: Clock };
             default:
-                return { label: '사용중', color: 'text-emerald-600 bg-emerald-50', icon: CheckCircle2 };
+                return { label: '사용중', color: 'text-emerald-700 bg-emerald-50 border border-emerald-200/60', icon: CheckCircle2 };
         }
     };
 
@@ -99,10 +99,10 @@ export const LicenseList = () => {
                 </div>
                 <div className="flex gap-4">
                     <div className="relative w-80">
-                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                         <Input
                             placeholder="구매자 또는 시리얼 검색"
-                            className="pl-12 bg-white h-14"
+                            className="pl-11 bg-white border border-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 text-sm font-bold rounded-xl h-12"
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
                         />
@@ -110,10 +110,10 @@ export const LicenseList = () => {
                 </div>
             </div>
 
-            <Card className="overflow-hidden p-0 border-none">
+            <Card className="overflow-hidden p-0 border border-slate-200 shadow-[0_15px_45px_rgba(0,0,0,0.07)] rounded-2xl">
                 <table className="w-full">
-                    <thead className="bg-slate-50">
-                        <tr className="text-[11px] font-black text-slate-400 uppercase tracking-widest text-left">
+                    <thead className="bg-slate-100/80 border-b border-slate-200">
+                        <tr className="text-[11px] font-black text-slate-500 uppercase tracking-widest text-left">
                             <th className="px-10 py-5">구매자 성함</th>
                             <th className="px-10 py-5">제품 / 시리얼</th>
                             <th className="px-10 py-5">만료일자</th>
@@ -121,7 +121,7 @@ export const LicenseList = () => {
                             <th className="px-10 py-5 text-right">제어</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-50">
+                    <tbody className="divide-y divide-slate-200">
                         {loading ? (
                             <tr><td colSpan={5} className="py-20 text-center"><Loader2 className="mx-auto h-8 w-8 animate-spin text-indigo-200" /></td></tr>
                         ) : filteredLicenses.map((lic) => {
@@ -132,21 +132,21 @@ export const LicenseList = () => {
                                     <td className="px-10 py-6">
                                         <div className="space-y-1">
                                             <p className="text-sm font-bold text-slate-600">{lic.product_id}</p>
-                                            <p className="text-[10px] font-mono text-slate-400 uppercase bg-slate-50 px-2 py-0.5 rounded w-fit">{lic.serial_key}</p>
+                                            <p className="text-[10px] font-mono text-slate-500 uppercase bg-slate-50 px-2 py-0.5 rounded w-fit border border-slate-150">{lic.serial_key}</p>
                                         </div>
                                     </td>
                                     <td className="px-10 py-6 text-sm font-bold text-slate-500">
                                         {lic.expire_date ? format(new Date(lic.expire_date), 'yyyy.MM.dd') : '-'}
                                     </td>
                                     <td className="px-10 py-6">
-                                        <div className={cn("inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black", status.color)}>
+                                        <div className={cn("inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black border", status.color)}>
                                             <status.icon className="w-3 h-3" /> {status.label}
                                         </div>
                                     </td>
                                     <td className="px-10 py-6 text-right">
                                         <div className="flex justify-end gap-2">
-                                            <Button variant="ghost" size="icon" className="h-9 w-9 text-slate-400 hover:bg-slate-100"><Power className="w-4 h-4" /></Button>
-                                            <Button variant="ghost" size="icon" className="h-9 w-9 text-rose-300 hover:bg-rose-50 hover:text-rose-600"><Trash2 className="w-4 h-4" /></Button>
+                                            <Button variant="ghost" size="icon" className="h-9 w-9 text-slate-500 hover:bg-slate-100 hover:text-slate-800"><Power className="w-4 h-4" /></Button>
+                                            <Button variant="ghost" size="icon" className="h-9 w-9 text-rose-500 hover:bg-rose-50 hover:text-rose-700"><Trash2 className="w-4 h-4" /></Button>
                                         </div>
                                     </td>
                                 </tr>
