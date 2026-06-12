@@ -28,6 +28,7 @@ export const Sidebar = () => {
                         <NavLink
                             key={item.href}
                             to={item.href}
+                            end
                             className={({ isActive }) =>
                                 cn(
                                     "group relative flex items-center gap-2.5 rounded-xl px-2.5 py-2.5 text-sm font-bold transition-all duration-200",
