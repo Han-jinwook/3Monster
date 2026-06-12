@@ -30,7 +30,7 @@ export const AdminLayout = () => {
             <Sidebar />
 
             {/* Admin Content Area */}
-            <main className="flex-1 lg:ml-60 min-h-screen">
+            <main className="flex-1 lg:ml-40 min-h-screen">
                 <div className="p-4 lg:p-6 max-w-[1600px] mx-auto animate-in fade-in duration-300">
                     <Outlet />
                 </div>

@@ -24,7 +24,7 @@ export const DashboardLayout = () => {
             <Sidebar />
 
             {/* Main Wrapper: Supporting the three-column grid internally where needed */}
-            <main className="flex-1 lg:ml-60 min-h-screen">
+            <main className="flex-1 lg:ml-40 min-h-screen">
                 <div className="p-4 lg:p-6 max-w-[1600px] mx-auto">
                     <Outlet />
                 </div>

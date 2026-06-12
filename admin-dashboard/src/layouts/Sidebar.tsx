@@ -21,8 +21,8 @@ export const Sidebar = () => {
 
     const navItems = role === 'admin' ? adminNavItems : buyerNavItems;
     return (
-        <aside className="fixed top-20 bottom-0 left-0 z-40 w-60 transform bg-white transition-transform duration-300 lg:translate-x-0 border-r border-slate-100">
-            <div className="flex flex-col h-full py-5 px-4">
+        <aside className="fixed top-20 bottom-0 left-0 z-40 w-40 transform bg-white transition-transform duration-300 lg:translate-x-0 border-r border-slate-100">
+            <div className="flex flex-col h-full py-4 px-3">
                 <nav className="flex-1 space-y-1.5">
                     {navItems.map((item) => (
                         <NavLink
@@ -30,7 +30,7 @@ export const Sidebar = () => {
                             to={item.href}
                             className={({ isActive }) =>
                                 cn(
-                                    "group relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold transition-all duration-200",
+                                    "group relative flex items-center gap-2.5 rounded-xl px-2.5 py-2.5 text-sm font-bold transition-all duration-200",
                                     isActive
                                         ? "bg-slate-50 text-primary"
                                         : "text-slate-400 hover:text-slate-600 hover:bg-slate-50/50"
@@ -54,7 +54,7 @@ export const Sidebar = () => {
                     <div className="mt-auto">
                         <button
                             onClick={() => logout()}
-                            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-slate-400 transition-all duration-200 hover:text-slate-900 group"
+                            className="flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2.5 text-sm font-bold text-slate-400 transition-all duration-200 hover:text-slate-900 group"
                         >
                             <LogOut className="h-5 w-5" />
                             로그아웃
