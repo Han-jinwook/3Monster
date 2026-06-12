@@ -421,10 +421,10 @@ export const Dashboard = () => {
                             <table className="w-full text-left border-collapse min-w-[500px]">
                                 <thead className="bg-slate-900 text-white">
                                     <tr className="text-sm font-black uppercase tracking-wider text-left whitespace-nowrap">
-                                        <th className="px-4 py-4 text-slate-200">제품군</th>
-                                        <th className="px-4 py-4 text-slate-200">패키지</th>
-                                        <th className="px-4 py-4 text-slate-200">발행 건수</th>
-                                        <th className="px-4 py-4 text-right text-slate-200">총 판매액</th>
+                                        <th className="px-4 py-5 text-slate-200">제품군</th>
+                                        <th className="px-4 py-5 text-slate-200">패키지</th>
+                                        <th className="px-4 py-5 text-slate-200">발행 건수</th>
+                                        <th className="px-4 py-5 text-right text-slate-200">총 판매액</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-300 text-xs font-semibold whitespace-nowrap">
@@ -493,13 +493,13 @@ export const Dashboard = () => {
                             <table className="w-full text-left border-collapse min-w-[750px]">
                                 <thead className="bg-slate-900 text-white">
                                     <tr className="text-sm font-black uppercase tracking-wider text-left whitespace-nowrap">
-                                        <th className="px-3 py-4 w-12 text-center text-slate-200">번호</th>
-                                        <th className="px-3 py-4 text-slate-200">가입일자</th>
-                                        <th className="px-3 py-4 text-slate-200">이름</th>
-                                        <th className="px-3 py-4 text-slate-200">이메일</th>
-                                        <th className="px-3 py-4 text-slate-200">가입 경로</th>
-                                        <th className="px-3 py-4 text-slate-200">회원 구분</th>
-                                        <th className="px-3 py-4 text-right text-slate-200">라이선스 제어</th>
+                                        <th className="px-3 py-5 w-12 text-center text-slate-200">번호</th>
+                                        <th className="px-3 py-5 text-slate-200">가입일자</th>
+                                        <th className="px-3 py-5 text-slate-200">이름</th>
+                                        <th className="px-3 py-5 text-slate-200">이메일</th>
+                                        <th className="px-3 py-5 text-slate-200">가입 경로</th>
+                                        <th className="px-3 py-5 text-slate-200">회원 구분</th>
+                                        <th className="px-3 py-5 text-right text-slate-200">라이선스 제어</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-300 text-xs font-semibold whitespace-nowrap">
