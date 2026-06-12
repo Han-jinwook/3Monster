@@ -254,8 +254,8 @@ export const LicenseGenerator = () => {
 
             <div className="grid gap-6 lg:grid-cols-12 items-start">
                 {/* Left Form Column */}
-                <Card className="lg:col-span-7 p-0 overflow-hidden border-2 border-slate-800 rounded-2xl bg-white shadow-[0_15px_45px_rgba(0,0,0,0.1)]">
-                    <CardHeader className="p-6 border-b-2 border-slate-800 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white">
+                <Card className="lg:col-span-7 p-0 overflow-hidden border border-slate-200 rounded-2xl bg-white shadow-[0_15px_45px_rgba(0,0,0,0.07)]">
+                    <CardHeader className="p-6 border-b border-slate-200 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white">
                         <CardTitle className="text-xl font-black text-white tracking-tighter">라이선스 정보 입력</CardTitle>
                     </CardHeader>
                     <CardContent className="p-6">
@@ -265,7 +265,7 @@ export const LicenseGenerator = () => {
                                     <label className="text-sm font-black text-slate-950 uppercase tracking-wide ml-0.5">대상 제품 선택</label>
                                     <div className="relative">
                                         <select
-                                            className="w-full h-14 rounded-xl bg-white px-4 text-base font-extrabold border-2 border-slate-800 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150 outline-none transition-all appearance-none cursor-pointer text-slate-955"
+                                            className="w-full h-14 rounded-xl bg-white px-4 text-base font-extrabold border border-slate-400 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150 outline-none transition-all appearance-none cursor-pointer text-slate-955"
                                             value={formData.product_id}
                                             onChange={(e) => handleProductChange(e.target.value)}
                                         >
@@ -281,7 +281,7 @@ export const LicenseGenerator = () => {
                                             </optgroup>
                                         </select>
                                         <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                                            <ChevronRight className="w-4 h-4 text-slate-800 rotate-90" />
+                                            <ChevronRight className="w-4 h-4 text-slate-400 rotate-90" />
                                         </div>
                                     </div>
                                 </div>
@@ -289,7 +289,7 @@ export const LicenseGenerator = () => {
                                     <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">이용 기간 선택</label>
                                     <div className="relative">
                                         <select
-                                            className="w-full h-14 rounded-xl bg-white px-4 text-base font-extrabold border-2 border-slate-800 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150 outline-none transition-all appearance-none cursor-pointer text-indigo-900"
+                                            className="w-full h-14 rounded-xl bg-white px-4 text-base font-extrabold border border-slate-400 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150 outline-none transition-all appearance-none cursor-pointer text-indigo-900"
                                             value={formData.license_type}
                                             onChange={(e) => handleLicenseTypeChange(e.target.value)}
                                         >
@@ -298,7 +298,7 @@ export const LicenseGenerator = () => {
                                             <option value="LIFETIME">PREMIUM (영구 소장본)</option>
                                         </select>
                                         <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                                            <ChevronRight className="w-4 h-4 text-indigo-900 rotate-90" />
+                                            <ChevronRight className="w-4 h-4 text-slate-400 rotate-90" />
                                         </div>
                                     </div>
                                 </div>
@@ -309,7 +309,7 @@ export const LicenseGenerator = () => {
                                     <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">가입 / 판매 채널</label>
                                     <div className="relative">
                                         <select
-                                            className="w-full h-14 rounded-xl bg-white px-4 text-base font-extrabold border-2 border-slate-800 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150 outline-none transition-all appearance-none cursor-pointer text-slate-955"
+                                            className="w-full h-14 rounded-xl bg-white px-4 text-base font-extrabold border border-slate-400 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150 outline-none transition-all appearance-none cursor-pointer text-slate-955"
                                             value={formData.channel}
                                             onChange={e => {
                                                 const newChan = e.target.value;
@@ -328,13 +328,13 @@ export const LicenseGenerator = () => {
                                             <option value="기타">기타</option>
                                         </select>
                                         <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                                            <ChevronRight className="w-4 h-4 text-slate-800 rotate-90" />
+                                            <ChevronRight className="w-4 h-4 text-slate-400 rotate-90" />
                                         </div>
                                     </div>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">판매 가격 (KRW)</label>
-                                    <Input placeholder="금액 입력" className="h-14 bg-white border-2 border-slate-800 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150 text-base font-extrabold px-4 text-slate-955 rounded-xl shadow-sm" value={formatPrice(formData.price_sold)} onChange={e => setFormData({ ...formData, price_sold: parsePrice(e.target.value) })} />
+                                    <Input placeholder="금액 입력" className="h-14 bg-white border border-slate-400 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150 text-base font-extrabold px-4 text-slate-955 rounded-xl shadow-sm" value={formatPrice(formData.price_sold)} onChange={e => setFormData({ ...formData, price_sold: parsePrice(e.target.value) })} />
                                 </div>
                             </div>
 
@@ -344,7 +344,7 @@ export const LicenseGenerator = () => {
                                     <Input
                                         required
                                         placeholder="구매자의 크몽 ID를 입력하세요"
-                                        className="h-14 bg-white border-2 border-slate-800 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150 text-base font-extrabold px-4 rounded-xl text-slate-955 placeholder:text-slate-400 shadow-sm"
+                                        className="h-14 bg-white border border-slate-400 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150 text-base font-extrabold px-4 rounded-xl text-slate-955 placeholder:text-slate-400 shadow-sm"
                                         value={formData.buyer_name}
                                         onChange={e => setFormData({ ...formData, buyer_name: e.target.value })}
                                     />
@@ -356,7 +356,7 @@ export const LicenseGenerator = () => {
                                         required
                                         type="email"
                                         placeholder="구매자의 이메일 주소를 입력하세요"
-                                        className="h-14 bg-white border-2 border-slate-800 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150 text-base font-extrabold px-4 rounded-xl text-slate-955 placeholder:text-slate-400 shadow-sm"
+                                        className="h-14 bg-white border border-slate-400 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150 text-base font-extrabold px-4 rounded-xl text-slate-955 placeholder:text-slate-400 shadow-sm"
                                         value={formData.contact}
                                         onChange={e => {
                                             const emailVal = e.target.value;
@@ -372,7 +372,7 @@ export const LicenseGenerator = () => {
 
                             <div className="space-y-2">
                                 <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">메모 (특이사항 / 연락처 등)</label>
-                                <Input placeholder="기타 연락처나 특이사항이 있다면 입력하세요" className="h-14 bg-white border-2 border-slate-800 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150 text-base font-extrabold px-4 text-slate-955 rounded-xl shadow-sm" value={formData.memo} onChange={e => setFormData({ ...formData, memo: e.target.value })} />
+                                <Input placeholder="기타 연락처나 특이사항이 있다면 입력하세요" className="h-14 bg-white border border-slate-400 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150 text-base font-extrabold px-4 text-slate-955 rounded-xl shadow-sm" value={formData.memo} onChange={e => setFormData({ ...formData, memo: e.target.value })} />
                             </div>
 
                             <Button type="submit" className="w-full h-16 text-white font-black text-lg shadow-md hover:bg-indigo-750 active:scale-[0.99] transition-all bg-indigo-600 rounded-xl border-b-4 border-indigo-900 border-none animate-none" isLoading={loading}>

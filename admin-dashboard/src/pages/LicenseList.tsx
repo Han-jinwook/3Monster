@@ -110,9 +110,9 @@ export const LicenseList = () => {
                 </div>
             </div>
 
-            <Card className="overflow-hidden p-0 border-2 border-slate-800 shadow-[0_15px_45px_rgba(0,0,0,0.1)] rounded-2xl bg-white">
+            <Card className="overflow-hidden p-0 border border-slate-200 shadow-[0_15px_45px_rgba(0,0,0,0.07)] rounded-2xl bg-white">
                 <table className="w-full">
-                    <thead className="bg-slate-100 border-b-2 border-slate-800">
+                    <thead className="bg-slate-100 border-b border-slate-200">
                         <tr className="text-[11px] font-black text-slate-700 uppercase tracking-widest text-left">
                             <th className="px-10 py-5">구매자 성함</th>
                             <th className="px-10 py-5">제품 / 시리얼</th>
@@ -121,7 +121,7 @@ export const LicenseList = () => {
                             <th className="px-10 py-5 text-right">제어</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-400">
+                    <tbody className="divide-y divide-slate-300">
                         {loading ? (
                             <tr><td colSpan={5} className="py-20 text-center"><Loader2 className="mx-auto h-8 w-8 animate-spin text-indigo-200" /></td></tr>
                         ) : filteredLicenses.map((lic) => {
