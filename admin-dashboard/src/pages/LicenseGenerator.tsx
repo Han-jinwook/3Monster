@@ -252,7 +252,7 @@ export const LicenseGenerator = () => {
             <div className="grid gap-6 lg:grid-cols-12 items-start">
                 {/* Left Form Column */}
                 <Card className="lg:col-span-7 p-0 overflow-hidden border border-slate-200 rounded-2xl bg-white shadow-[0_15px_45px_rgba(0,0,0,0.07)]">
-                    <CardHeader className="p-6 border-b border-slate-200 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white">
+                    <CardHeader className="px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white">
                         <CardTitle className="text-xl font-black text-white tracking-tighter">라이선스 정보 입력</CardTitle>
                     </CardHeader>
                     <CardContent className="p-6">
@@ -437,7 +437,7 @@ export const LicenseGenerator = () => {
 
                     {/* Interactive Pricing Policy Table with Tabs and Accordions */}
                     <Card className="p-0 overflow-hidden bg-white border border-slate-200 shadow-[0_15px_45px_rgba(0,0,0,0.07)] rounded-2xl">
-                        <CardHeader className="p-5 border-b-2 border-slate-800 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white">
+                        <CardHeader className="px-5 py-4 border-b-2 border-slate-800 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white">
                             <CardTitle className="text-sm font-black text-white flex items-center gap-1.5">
                                 📋 3Monster 제품별 가격표
                             </CardTitle>
