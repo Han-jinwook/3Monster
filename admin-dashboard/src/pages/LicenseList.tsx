@@ -213,7 +213,9 @@ export const LicenseList = () => {
                 <table className="w-full">
                     <thead className="bg-slate-900 text-white">
                         <tr className="text-xs font-black uppercase tracking-wider text-left">
-                            <th className="px-4 py-2.5 text-slate-200">구매자 ID / 이메일</th>
+                            <th className="px-4 py-2.5 text-slate-200">구매자 ID</th>
+                            <th className="px-4 py-2.5 text-slate-200">이메일</th>
+                            <th className="px-4 py-2.5 text-slate-200">메모</th>
                             <th className="px-4 py-2.5 text-slate-200">제품 / 시리얼</th>
                             <th className="px-4 py-2.5 text-slate-200">구매일자</th>
                             <th className="px-4 py-2.5 text-slate-200">만료일자</th>
@@ -223,28 +225,32 @@ export const LicenseList = () => {
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                         {loading ? (
-                            <tr><td colSpan={6} className="py-16 text-center"><Loader2 className="mx-auto h-7 w-7 animate-spin text-indigo-200" /></td></tr>
+                            <tr><td colSpan={8} className="py-16 text-center"><Loader2 className="mx-auto h-7 w-7 animate-spin text-indigo-200" /></td></tr>
                         ) : filteredLicenses.map((lic) => {
                             const status = getStatusInfo(lic);
                             const pkgBadge = getLicenseTypeBadge(lic.license_type || '');
                             return (
                                 <tr key={lic.id} className="hover:bg-slate-50/60 transition-colors">
-                                    {/* 구매자 ID / 이메일 */}
-                                    <td className="px-4 py-2 font-bold text-slate-800">
-                                        <div className="flex flex-col gap-0.5">
-                                            <span className="text-sm">{lic.buyer_name}</span>
-                                            {lic.contact && (
-                                                <span className="text-[11px] text-slate-500 font-medium">{lic.contact}</span>
-                                            )}
-                                            {lic.memo && (
-                                                <button
-                                                    className="text-left text-[10px] text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-1.5 py-0.5 rounded transition-colors w-fit font-semibold"
-                                                    onClick={() => handleShowMemo(lic.memo!)}
-                                                >
-                                                    📝 메모
-                                                </button>
-                                            )}
-                                        </div>
+                                    {/* 구매자 ID */}
+                                    <td className="px-4 py-2 font-bold text-slate-800 text-sm whitespace-nowrap">
+                                        {lic.buyer_name.replace(/\s*\(TRIAL\)\s*|\s*\(TEST\)\s*/gi, '').trim()}
+                                    </td>
+
+                                    {/* 이메일 */}
+                                    <td className="px-4 py-2 text-[11px] text-slate-500 font-medium whitespace-nowrap">
+                                        {lic.contact || <span className="text-slate-300">-</span>}
+                                    </td>
+
+                                    {/* 메모 */}
+                                    <td className="px-4 py-2">
+                                        {lic.memo ? (
+                                            <button
+                                                className="text-[10px] text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-2 py-0.5 rounded transition-colors font-semibold whitespace-nowrap"
+                                                onClick={() => handleShowMemo(lic.memo!)}
+                                            >
+                                                📝 보기
+                                            </button>
+                                        ) : <span className="text-slate-300 text-[10px]">-</span>}
                                     </td>
 
                                     {/* 제품 / 시리얼 */}
@@ -325,7 +331,7 @@ export const LicenseList = () => {
                             );
                         })}
                         {!loading && filteredLicenses.length === 0 && (
-                            <tr><td colSpan={6} className="py-12 text-center text-slate-400 font-medium text-sm">검색 결과가 없습니다.</td></tr>
+                            <tr><td colSpan={8} className="py-12 text-center text-slate-400 font-medium text-sm">검색 결과가 없습니다.</td></tr>
                         )}
                     </tbody>
                 </table>
