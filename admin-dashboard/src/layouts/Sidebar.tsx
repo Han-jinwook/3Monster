@@ -10,6 +10,7 @@ export const Sidebar = () => {
         { icon: LayoutDashboard, label: '대시보드', href: '/admin' },
         { icon: Key, label: '발행 도구', href: '/admin/generator' },
         { icon: Users, label: '구매자 관리', href: '/admin/licenses' },
+        { icon: Users, label: '일반 회원', href: '/admin/users' },
         { icon: Bell, label: '알림 관리', href: '/admin/notifications' },
         { icon: HelpCircle, label: '고객센터', href: '/support' },
     ];

@@ -335,18 +335,17 @@ export const LicenseGenerator = () => {
                                 </div>
                             </div>
 
-                            {formData.channel === '크몽' ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">크몽 ID</label>
+                                    <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">구매자 ID (크몽 등)</label>
                                     <Input
                                         required
-                                        placeholder="구매자의 크몽 ID를 입력하세요"
+                                        placeholder="구매자의 ID를 입력하세요"
                                         className="h-14 bg-white border border-slate-400 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150 text-base font-extrabold px-4 rounded-xl text-slate-955 placeholder:text-slate-400 shadow-sm"
                                         value={formData.buyer_name}
                                         onChange={e => setFormData({ ...formData, buyer_name: e.target.value })}
                                     />
                                 </div>
-                            ) : (
                                 <div className="space-y-2">
                                     <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">이메일 주소</label>
                                     <Input
@@ -355,17 +354,10 @@ export const LicenseGenerator = () => {
                                         placeholder="구매자의 이메일 주소를 입력하세요"
                                         className="h-14 bg-white border border-slate-400 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150 text-base font-extrabold px-4 rounded-xl text-slate-955 placeholder:text-slate-400 shadow-sm"
                                         value={formData.contact}
-                                        onChange={e => {
-                                            const emailVal = e.target.value;
-                                            setFormData(prev => ({
-                                                ...prev,
-                                                contact: emailVal,
-                                                buyer_name: emailVal
-                                            }));
-                                        }}
+                                        onChange={e => setFormData({ ...formData, contact: e.target.value })}
                                     />
                                 </div>
-                            )}
+                            </div>
 
                             <div className="space-y-2">
                                 <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">메모 (특이사항 / 연락처 등)</label>
@@ -393,7 +385,7 @@ export const LicenseGenerator = () => {
                                             <h4 className="font-black text-sm">체험판 구매자 등록 완료</h4>
                                         </div>
                                         <div className="rounded-xl bg-white/10 p-4 text-xs space-y-2">
-                                            <p>• <b>구매자 (크몽 ID)</b>: {formData.buyer_name}</p>
+                                            <p>• <b>구매자 ID</b>: {formData.buyer_name} / <b>이메일</b>: {formData.contact}</p>
                                             <p>• <b>등록 제품</b>: {formData.product_id}</p>
                                             <p>• <b>이용 유형</b>: DELUXE (5일 체험판)</p>
                                             <p className="mt-2 text-emerald-100 font-bold border-t border-white/10 pt-2 text-[10px] leading-relaxed">

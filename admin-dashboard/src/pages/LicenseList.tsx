@@ -18,6 +18,8 @@ interface License {
     bound_value?: string;
     price_sold?: number;
     license_type?: string;
+    contact?: string;
+    memo?: string;
 }
 
 export const LicenseList = () => {
@@ -127,26 +129,54 @@ export const LicenseList = () => {
         }
     };
 
-    const handleToggleStatus = async (id: string, currentStatus: string, buyerName: string) => {
-        const isBlocked = currentStatus === 'blocked';
-        const newStatus = isBlocked ? 'active' : 'blocked';
-        const actionLabel = isBlocked ? '차단 해제' : '차단';
-
-        if (!window.confirm(`"${buyerName}" 구매자의 라이선스를 ${actionLabel}하시겠습니까?`)) {
-            return;
-        }
-
+    const handleEditExpireDate = async (id: string, currentExpire: string, buyerName: string) => {
+        const newDate = window.prompt(`"${buyerName}"의 새로운 만료일자를 입력하세요 (YYYY-MM-DD):`, currentExpire ? currentExpire.split('T')[0] : '');
+        if (!newDate) return;
+        
         try {
+            const parsedDate = new Date(newDate);
+            if (isNaN(parsedDate.getTime())) {
+                alert('잘못된 날짜 형식입니다. YYYY-MM-DD 형식으로 입력해주세요.');
+                return;
+            }
+            
             const { error } = await supabase
                 .from('licenses')
-                .update({ status: newStatus })
+                .update({ expire_date: parsedDate.toISOString() })
                 .eq('id', id);
 
             if (error) throw error;
             fetchLicenses();
         } catch (error: any) {
-            console.error('Error updating status:', error);
-            alert(`상태 변경 중 오류가 발생했습니다: ${error.message}`);
+            console.error('Error updating expire date:', error);
+            alert(`만료일자 수정 중 오류가 발생했습니다: ${error.message}`);
+        }
+    };
+
+    const handleToggleStatus = async (id: string, currentStatus: string, buyerName: string) => {
+        const isBlocked = currentStatus === 'blocked';
+
+        if (isBlocked) {
+            if (!window.confirm(`"${buyerName}" 구매자의 라이선스 차단을 해제하시겠습니까?`)) return;
+            try {
+                const { error } = await supabase.from('licenses').update({ status: 'active' }).eq('id', id);
+                if (error) throw error;
+                fetchLicenses();
+            } catch (err: any) { alert(err.message); }
+        } else {
+            const reason = window.prompt(`"${buyerName}" 구매자의 라이선스를 차단합니다.\n\n정지 사유나 메모를 간략히 입력하세요:`, '');
+            if (reason === null) return;
+
+            try {
+                const { data: licData } = await supabase.from('licenses').select('memo').eq('id', id).single();
+                const currentMemo = licData?.memo || '';
+                const appendText = reason ? `\n[차단사유: ${reason}]` : '\n[차단사유: 미입력]';
+                const newMemo = currentMemo + appendText;
+
+                const { error } = await supabase.from('licenses').update({ status: 'blocked', memo: newMemo }).eq('id', id);
+                if (error) throw error;
+                fetchLicenses();
+            } catch (err: any) { alert(err.message); }
         }
     };
 
@@ -173,7 +203,7 @@ export const LicenseList = () => {
                 <table className="w-full">
                     <thead className="bg-slate-900 text-white">
                         <tr className="text-sm font-black uppercase tracking-wider text-left">
-                            <th className="px-10 py-3 text-slate-200">구매자 성함</th>
+                            <th className="px-10 py-3 text-slate-200">구매자 ID</th>
                             <th className="px-10 py-3 text-slate-200">제품 / 시리얼</th>
                             <th className="px-10 py-3 text-slate-200">구매일자</th>
                             <th className="px-10 py-3 text-slate-200">만료일자</th>
@@ -189,7 +219,20 @@ export const LicenseList = () => {
                             const pkgBadge = getLicenseTypeBadge(lic.license_type || '');
                             return (
                                 <tr key={lic.id} className="hover:bg-slate-50/50 transition-colors">
-                                    <td className="px-10 py-1 font-black text-slate-800">{lic.buyer_name}</td>
+                                    <td className="px-10 py-1 font-black text-slate-800">
+                                        <div className="flex flex-col">
+                                            <span>{lic.buyer_name}</span>
+                                            {lic.contact && <span className="text-xs text-slate-500 font-medium">{lic.contact}</span>}
+                                            {lic.memo && (
+                                                <button 
+                                                    className="text-left text-[10px] text-indigo-600 mt-1 bg-indigo-50 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-100 transition-colors w-fit"
+                                                    onClick={() => alert(`[메모]\n${lic.memo}`)}
+                                                >
+                                                    📝 메모 보기
+                                                </button>
+                                            )}
+                                        </div>
+                                    </td>
                                     <td className="px-10 py-1">
                                         <div className="flex items-center gap-2">
                                             <span className="text-sm font-black text-slate-700">{lic.product_id}</span>
@@ -203,7 +246,16 @@ export const LicenseList = () => {
                                         {lic.created_at ? format(new Date(lic.created_at), 'yyyy.MM.dd') : '-'}
                                     </td>
                                     <td className="px-10 py-1 text-sm font-bold text-slate-550">
-                                        {lic.expire_date ? format(new Date(lic.expire_date), 'yyyy.MM.dd') : '-'}
+                                        <div className="flex items-center gap-2">
+                                            <span>{lic.expire_date ? format(new Date(lic.expire_date), 'yyyy.MM.dd') : '-'}</span>
+                                            <button 
+                                                className="text-[10px] text-slate-400 hover:text-indigo-600 border border-slate-200 hover:border-indigo-300 rounded px-1.5 py-0.5 transition-colors"
+                                                onClick={() => handleEditExpireDate(lic.id, lic.expire_date, lic.buyer_name)}
+                                                title="만료일자 수정"
+                                            >
+                                                수정
+                                            </button>
+                                        </div>
                                     </td>
                                     <td className="px-10 py-1">
                                         <div className={cn("inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black border", status.color)}>

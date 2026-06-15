@@ -11,6 +11,7 @@ import { Login } from './pages/Login';
 import { Profile } from './pages/Profile';
 import { NotificationManager } from './pages/NotificationManager';
 import { SupportWrapper } from './components/SupportWrapper';
+import { UserList } from './pages/UserList';
 
 function AppRoutes() {
     return (
@@ -48,11 +49,11 @@ function AppRoutes() {
                 </PublicLayout>
             } />
 
-            {/* Restricted Admin Area */}
             <Route path="/admin" element={<PublicLayout><AdminLayout /></PublicLayout>}>
                 <Route index element={<Dashboard />} />
                 <Route path="generator" element={<LicenseGenerator />} />
                 <Route path="licenses" element={<LicenseList />} />
+                <Route path="users" element={<UserList />} />
                 <Route path="notifications" element={<NotificationManager />} />
             </Route>
 
