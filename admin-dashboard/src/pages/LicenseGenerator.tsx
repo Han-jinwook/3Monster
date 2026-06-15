@@ -216,7 +216,7 @@ export const LicenseGenerator = () => {
                 expireDate.setFullYear(now.getFullYear() + 99);
             }
 
-            const suffix = isTest ? ' (TEST)' : isTrial ? ' (TRIAL)' : '';
+            const suffix = isTest ? ' (TEST)' : '';
             const finalBuyerName = `${formData.buyer_name}${suffix}`;
 
             const { error } = await supabase

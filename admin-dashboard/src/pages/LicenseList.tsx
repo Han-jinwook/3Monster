@@ -175,6 +175,7 @@ export const LicenseList = () => {
                         <tr className="text-sm font-black uppercase tracking-wider text-left">
                             <th className="px-10 py-3 text-slate-200">구매자 성함</th>
                             <th className="px-10 py-3 text-slate-200">제품 / 시리얼</th>
+                            <th className="px-10 py-3 text-slate-200">구매일자</th>
                             <th className="px-10 py-3 text-slate-200">만료일자</th>
                             <th className="px-10 py-3 text-slate-200">상태</th>
                             <th className="px-10 py-3 text-right text-slate-200">제어</th>
@@ -197,6 +198,9 @@ export const LicenseList = () => {
                                             </span>
                                             <span className="text-[10px] font-mono text-slate-700 uppercase bg-slate-50 px-2 py-0.5 rounded border border-slate-400">{lic.serial_key}</span>
                                         </div>
+                                    </td>
+                                    <td className="px-10 py-1 text-sm font-bold text-slate-550">
+                                        {lic.created_at ? format(new Date(lic.created_at), 'yyyy.MM.dd') : '-'}
                                     </td>
                                     <td className="px-10 py-1 text-sm font-bold text-slate-550">
                                         {lic.expire_date ? format(new Date(lic.expire_date), 'yyyy.MM.dd') : '-'}
