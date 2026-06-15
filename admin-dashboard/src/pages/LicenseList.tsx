@@ -17,6 +17,7 @@ interface License {
     created_at: string;
     bound_value?: string;
     price_sold?: number;
+    license_type?: string;
 }
 
 export const LicenseList = () => {
@@ -90,6 +91,61 @@ export const LicenseList = () => {
         }
     };
 
+    const getLicenseTypeBadge = (licenseType: string) => {
+        switch (licenseType) {
+            case 'TRIAL':
+                return { label: 'DELUXE (체험판)', color: 'bg-emerald-50 text-emerald-700 border-emerald-200/80' };
+            case '6M':
+                return { label: 'STANDARD', color: 'bg-indigo-50 text-indigo-700 border-indigo-200/80' };
+            case 'LIFETIME':
+                return { label: 'PREMIUM', color: 'bg-purple-50 text-purple-700 border-purple-200/80' };
+            default:
+                return { label: licenseType || '기타', color: 'bg-slate-50 text-slate-700 border-slate-200' };
+        }
+    };
+
+    const handleDeleteLicense = async (id: string, buyerName: string) => {
+        if (!window.confirm(`"${buyerName}" 구매자의 라이선스를 완전히 삭제하시겠습니까?`)) {
+            return;
+        }
+
+        try {
+            const { error } = await supabase
+                .from('licenses')
+                .delete()
+                .eq('id', id);
+
+            if (error) throw error;
+            fetchLicenses();
+        } catch (error: any) {
+            console.error('Error deleting license:', error);
+            alert(`삭제 중 오류가 발생했습니다: ${error.message}`);
+        }
+    };
+
+    const handleToggleStatus = async (id: string, currentStatus: string, buyerName: string) => {
+        const isBlocked = currentStatus === 'blocked';
+        const newStatus = isBlocked ? 'active' : 'blocked';
+        const actionLabel = isBlocked ? '차단 해제' : '차단';
+
+        if (!window.confirm(`"${buyerName}" 구매자의 라이선스를 ${actionLabel}하시겠습니까?`)) {
+            return;
+        }
+
+        try {
+            const { error } = await supabase
+                .from('licenses')
+                .update({ status: newStatus })
+                .eq('id', id);
+
+            if (error) throw error;
+            fetchLicenses();
+        } catch (error: any) {
+            console.error('Error updating status:', error);
+            alert(`상태 변경 중 오류가 발생했습니다: ${error.message}`);
+        }
+    };
+
     return (
         <div className="space-y-10">
             <div className="flex justify-between items-end">
@@ -125,16 +181,20 @@ export const LicenseList = () => {
                             <tr><td colSpan={5} className="py-20 text-center"><Loader2 className="mx-auto h-8 w-8 animate-spin text-indigo-200" /></td></tr>
                         ) : filteredLicenses.map((lic) => {
                             const status = getStatusInfo(lic);
+                            const pkgBadge = getLicenseTypeBadge(lic.license_type || '');
                             return (
                                 <tr key={lic.id} className="hover:bg-slate-50/50 transition-colors">
                                     <td className="px-10 py-1 font-black text-slate-800">{lic.buyer_name}</td>
                                     <td className="px-10 py-1">
                                         <div className="flex items-center gap-2">
-                                            <span className="text-sm font-bold text-slate-600">{lic.product_id}</span>
+                                            <span className="text-sm font-black text-slate-700">{lic.product_id}</span>
+                                            <span className={cn("px-1.5 py-0.5 rounded text-[9px] font-black border uppercase tracking-wider", pkgBadge.color)}>
+                                                {pkgBadge.label}
+                                            </span>
                                             <span className="text-[10px] font-mono text-slate-700 uppercase bg-slate-50 px-2 py-0.5 rounded border border-slate-400">{lic.serial_key}</span>
                                         </div>
                                     </td>
-                                    <td className="px-10 py-1 text-sm font-bold text-slate-500">
+                                    <td className="px-10 py-1 text-sm font-bold text-slate-550">
                                         {lic.expire_date ? format(new Date(lic.expire_date), 'yyyy.MM.dd') : '-'}
                                     </td>
                                     <td className="px-10 py-1">
@@ -143,9 +203,30 @@ export const LicenseList = () => {
                                         </div>
                                     </td>
                                     <td className="px-10 py-1 text-right">
-                                        <div className="flex justify-end gap-2">
-                                            <Button variant="ghost" size="icon" className="h-9 w-9 text-slate-500 hover:bg-slate-100 hover:text-slate-800"><Power className="w-4 h-4" /></Button>
-                                            <Button variant="ghost" size="icon" className="h-9 w-9 text-rose-500 hover:bg-rose-50 hover:text-rose-700"><Trash2 className="w-4 h-4" /></Button>
+                                        <div className="flex justify-end gap-1">
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className={cn(
+                                                    "h-8 w-8 transition-colors",
+                                                    lic.status === 'blocked'
+                                                        ? "text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
+                                                        : "text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+                                                )}
+                                                onClick={() => handleToggleStatus(lic.id, lic.status, lic.buyer_name)}
+                                                title={lic.status === 'blocked' ? "정지 해제" : "라이선스 정지"}
+                                            >
+                                                <Power className="w-3.5 h-3.5" />
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-8 w-8 text-rose-500 hover:bg-rose-50 hover:text-rose-700 transition-colors"
+                                                onClick={() => handleDeleteLicense(lic.id, lic.buyer_name)}
+                                                title="라이선스 삭제"
+                                            >
+                                                <Trash2 className="w-3.5 h-3.5" />
+                                            </Button>
                                         </div>
                                     </td>
                                 </tr>
