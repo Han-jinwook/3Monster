@@ -195,7 +195,7 @@ export const LicenseList = () => {
                     <thead className="bg-slate-900 text-white">
                         <tr className="text-[11px] font-black uppercase tracking-wide text-left">
                             <th className="px-3 py-2.5 text-slate-400 text-center">NO</th>
-                            <th className="px-3 py-2.5 text-slate-200">구매자 ID</th>
+                            <th className="px-3 py-2.5 text-slate-200">크몽 ID</th>
                             <th className="px-3 py-2.5 text-slate-200">이메일</th>
                             <th className="px-3 py-2.5 text-slate-200 text-center">메모</th>
                             <th className="px-3 py-2.5 text-slate-200">제품</th>
@@ -234,7 +234,11 @@ export const LicenseList = () => {
                                             <div className="relative inline-block">
                                                 <button
                                                     className="text-indigo-500 hover:text-indigo-700 transition-colors"
-                                                    onClick={(e) => { e.stopPropagation(); setOpenMemoId(openMemoId === lic.id ? null : lic.id); }}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        e.nativeEvent.stopImmediatePropagation();
+                                                        setOpenMemoId(openMemoId === lic.id ? null : lic.id);
+                                                    }}
                                                     title="메모 보기"
                                                 >
                                                     📝
