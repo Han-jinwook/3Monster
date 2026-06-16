@@ -45,6 +45,7 @@ export const LicenseGenerator = () => {
     const { user } = useAuth();
     const [loading, setLoading] = useState(false);
     const [generatedKey, setGeneratedKey] = useState('');
+    const [emailAutoFilled, setEmailAutoFilled] = useState(false);
     const [formData, setFormData] = useState({
         product_id: 'NPlace-DB',
         license_type: 'TRIAL',
@@ -93,6 +94,28 @@ export const LicenseGenerator = () => {
     useEffect(() => {
         localStorage.setItem('3monster_pricing_policies', JSON.stringify(pricing));
     }, [pricing]);
+
+    // 크몽 ID 입력 시 users 테이블에서 이메일 자동완성
+    useEffect(() => {
+        const name = formData.buyer_name.trim();
+        if (!name) { setEmailAutoFilled(false); return; }
+
+        const timer = setTimeout(async () => {
+            const { data } = await supabase
+                .from('users')
+                .select('email')
+                .eq('name', name)
+                .maybeSingle();
+            if (data?.email) {
+                setFormData(prev => ({ ...prev, contact: data.email }));
+                setEmailAutoFilled(true);
+            } else {
+                setEmailAutoFilled(false);
+            }
+        }, 400);
+
+        return () => clearTimeout(timer);
+    }, [formData.buyer_name]);
 
     // Accordion and Tab States
     const [activeTab, setActiveTab] = useState<'marketing' | 'cafe'>('marketing');
@@ -346,15 +369,27 @@ export const LicenseGenerator = () => {
                                         onChange={e => setFormData({ ...formData, buyer_name: e.target.value })}
                                     />
                                 </div>
-                                <div className="space-y-2">
+                                <div className="space-y-2 relative">
                                     <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">이메일 주소</label>
+                                    {emailAutoFilled && (
+                                        <span className="absolute right-0 top-0 text-[10px] font-black text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                                            ✓ 회원 자동완성
+                                        </span>
+                                    )}
                                     <Input
                                         required
                                         type="email"
                                         placeholder="구매자의 이메일 주소를 입력하세요"
-                                        className="h-14 bg-white border border-slate-400 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150 text-base font-extrabold px-4 rounded-xl text-slate-955 placeholder:text-slate-400 shadow-sm"
+                                        className={`h-14 bg-white text-base font-extrabold px-4 rounded-xl shadow-sm ${
+                                            emailAutoFilled
+                                                ? 'border-emerald-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100'
+                                                : 'border border-slate-400 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150'
+                                        } text-slate-955 placeholder:text-slate-400`}
                                         value={formData.contact}
-                                        onChange={e => setFormData({ ...formData, contact: e.target.value })}
+                                        onChange={e => {
+                                            setEmailAutoFilled(false);
+                                            setFormData({ ...formData, contact: e.target.value });
+                                        }}
                                     />
                                 </div>
                             </div>
