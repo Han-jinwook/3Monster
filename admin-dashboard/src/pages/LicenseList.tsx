@@ -77,9 +77,9 @@ export const LicenseList = () => {
     const groupedLicenses = useMemo(() => {
         const groups = new Map<string, License[]>();
         filteredLicenses.forEach(lic => {
-            // 그룹화 기준: 구매자명 + 이메일 (동명이인 방지 및 공백 무시)
-            const normalizedBuyer = lic.buyer_name.replace(/\s*\(TRIAL\)\s*|\s*\(TEST\)\s*/gi, '').trim();
-            const key = `${normalizedBuyer}_${lic.contact?.trim() || ''}`.toLowerCase();
+            // 그룹화 기준: 이메일 (채널 무관하게 이메일이 고유 식별자)
+            const email = lic.contact?.trim().toLowerCase();
+            const key = email || lic.buyer_name.trim().toLowerCase(); // 이메일이 없는 예외 케이스 대비 (이름/ID 대체)
             
             if (!groups.has(key)) {
                 groups.set(key, []);
