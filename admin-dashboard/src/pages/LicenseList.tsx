@@ -149,10 +149,10 @@ export const LicenseList = () => {
             {/* 메모 고정 툴팁 - overflow 클리핑 우회 */}
             {memoTooltip && (
                 <div
-                    className="fixed z-[9999] bg-slate-900 text-white text-[11px] font-medium leading-relaxed rounded-xl shadow-2xl px-3 py-2.5 w-64 whitespace-pre-wrap pointer-events-none"
+                    className="fixed z-[9999] bg-white text-slate-700 text-[11px] font-medium leading-relaxed rounded-xl shadow-2xl border border-slate-200 px-3 py-2.5 w-64 whitespace-pre-wrap pointer-events-none"
                     style={{ left: memoTooltip.x, top: memoTooltip.y, transform: 'translateX(-50%)' }}
                 >
-                    <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-l-transparent border-r-transparent border-b-slate-900" />
+                    <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-l-transparent border-r-transparent border-b-slate-200" />
                     {memoTooltip.text}
                 </div>
             )}
