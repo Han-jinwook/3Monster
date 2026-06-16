@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, Fragment } from 'react';
 import { supabase } from '../lib/supabase';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
-import { Search, Loader2, Trash2, Power, CheckCircle2, Clock, AlertCircle, Pencil, Copy } from 'lucide-react';
+import { Search, Loader2, Trash2, Power, CheckCircle2, Clock, AlertCircle, Pencil, Copy, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '../lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface License {
     id: string;
@@ -35,6 +36,8 @@ export const LicenseList = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [toasts, setToasts] = useState<Toast[]>([]);
     const [memoTooltip, setMemoTooltip] = useState<{ text: string; x: number; y: number } | null>(null);
+    const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
+
     let toastCounter = 0;
 
     const showToast = (message: string, type: 'info' | 'success' = 'info') => {
@@ -63,11 +66,48 @@ export const LicenseList = () => {
         return () => { supabase.removeChannel(channel); };
     }, []);
 
-    const filteredLicenses = licenses.filter(l =>
-        l.buyer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        l.serial_key.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (l.contact && l.contact.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
+    const filteredLicenses = useMemo(() => {
+        return licenses.filter(l =>
+            l.buyer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            l.serial_key.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (l.contact && l.contact.toLowerCase().includes(searchTerm.toLowerCase()))
+        );
+    }, [licenses, searchTerm]);
+
+    const groupedLicenses = useMemo(() => {
+        const groups = new Map<string, License[]>();
+        filteredLicenses.forEach(lic => {
+            // 그룹화 기준: 구매자명 + 이메일 (동명이인 방지 및 공백 무시)
+            const normalizedBuyer = lic.buyer_name.replace(/\s*\(TRIAL\)\s*|\s*\(TEST\)\s*/gi, '').trim();
+            const key = `${normalizedBuyer}_${lic.contact?.trim() || ''}`.toLowerCase();
+            
+            if (!groups.has(key)) {
+                groups.set(key, []);
+            }
+            groups.get(key)!.push(lic);
+        });
+
+        // 각 그룹 내에서 최신 등록순으로 정렬
+        Array.from(groups.values()).forEach(group => {
+            group.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        });
+
+        return Array.from(groups.entries()).map(([key, group]) => ({
+            key,
+            main: group[0],
+            history: group.slice(1)
+        }));
+    }, [filteredLicenses]);
+
+
+    const toggleGroup = (key: string) => {
+        setExpandedGroups(prev => {
+            const next = new Set(prev);
+            if (next.has(key)) next.delete(key);
+            else next.add(key);
+            return next;
+        });
+    };
 
     const getStatusInfo = (license: License) => {
         const expireDate = license.expire_date ? new Date(license.expire_date) : null;
@@ -85,10 +125,9 @@ export const LicenseList = () => {
         }
     };
 
-    // 제품명(타입) 형식으로 반환
     const getProductLabel = (productId: string, licenseType?: string) => {
         const typeMap: Record<string, string> = {
-            'TRIAL':    'Deluxe 체험판',
+            'TRIAL':    '디럭스(체험판)',
             '1M':       'Standard 1개월',
             '3M':       'Premium 3개월',
             '6M':       'Standard 6개월',
@@ -145,9 +184,112 @@ export const LicenseList = () => {
         }
     };
 
+    const renderLicenseRow = (lic: License) => {
+        const status = getStatusInfo(lic);
+
+        return (
+            <Fragment key={lic.id}>
+                {/* 메모 - fixed position 툴팁 로직은 td 내부 유지 */}
+                <td className="px-3 py-2 text-center">
+                    {lic.memo ? (
+                        <span
+                            className="cursor-default text-base select-none"
+                            onMouseEnter={(e) => {
+                                const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                                setMemoTooltip({
+                                    text: lic.memo!,
+                                    x: rect.left + rect.width / 2,
+                                    y: rect.bottom + 10,
+                                });
+                            }}
+                            onMouseLeave={() => setMemoTooltip(null)}
+                        >
+                            📝
+                        </span>
+                    ) : <span className="text-slate-200 text-xs">-</span>}
+                </td>
+
+                {/* 제품 */}
+                <td className="px-3 py-2 font-bold text-slate-700 truncate max-w-0">
+                    <span className="block truncate">{getProductLabel(lic.product_id, lic.license_type)}</span>
+                </td>
+
+                {/* 시리얼 - 체험판은 복사버튼 대신 안내문구 */}
+                <td className="px-3 py-2 text-center">
+                    {lic.license_type === 'TRIAL' ? (
+                        <span className="text-[10px] text-slate-400 font-medium bg-slate-50 px-2 py-0.5 rounded border border-slate-100">내장 인증</span>
+                    ) : (
+                        <button
+                            className="inline-flex items-center gap-1 font-bold text-slate-500 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-700 px-2 py-0.5 rounded border border-slate-200 hover:border-indigo-200 transition-colors"
+                            onClick={(e) => { e.stopPropagation(); handleCopySerial(lic.serial_key); }}
+                            title={lic.serial_key}
+                        >
+                            <Copy className="w-2.5 h-2.5" /> 복사
+                        </button>
+                    )}
+                </td>
+
+                {/* 구매일자 */}
+                <td className="px-3 py-2 font-bold text-slate-500">
+                    {lic.created_at ? format(new Date(lic.created_at), 'yyyy.MM.dd') : '-'}
+                </td>
+
+                {/* 실행일자 */}
+                <td className="px-3 py-2 font-bold text-slate-500">
+                    {lic.first_run_date ? format(new Date(lic.first_run_date), 'yyyy.MM.dd') : <span className="text-slate-300 text-[10px]">대기</span>}
+                </td>
+
+                {/* 만료일자 */}
+                <td className="px-3 py-2 font-bold text-slate-500">
+                    <div className="flex items-center gap-1">
+                        <span>{lic.expire_date ? format(new Date(lic.expire_date), 'yyyy.MM.dd') : '-'}</span>
+                        <button
+                            className="text-slate-300 hover:text-indigo-500 transition-colors flex-shrink-0"
+                            onClick={(e) => { e.stopPropagation(); handleEditExpireDate(lic.id, lic.expire_date, lic.buyer_name); }}
+                            title="만료일자 수정"
+                        >
+                            <Pencil className="w-2.5 h-2.5" />
+                        </button>
+                    </div>
+                </td>
+
+                {/* 상태 */}
+                <td className="px-3 py-2">
+                    <div className={cn("inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-black border text-[10px]", status.color)}>
+                        <status.icon className="w-3 h-3" /> {status.label}
+                    </div>
+                </td>
+
+                {/* 제어 */}
+                <td className="px-3 py-2 text-right">
+                    <div className="flex justify-end gap-0.5">
+                        <Button variant="ghost" size="icon"
+                            className={cn("h-7 w-7 transition-colors",
+                                lic.status === 'blocked'
+                                    ? "text-emerald-600 hover:bg-emerald-50"
+                                    : "text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                            )}
+                            onClick={(e) => { e.stopPropagation(); handleToggleStatus(lic.id, lic.status, lic.buyer_name); }}
+                            title={lic.status === 'blocked' ? "정지 해제" : "라이선스 정지"}
+                        >
+                            <Power className="w-3.5 h-3.5" />
+                        </Button>
+                        <Button variant="ghost" size="icon"
+                            className="h-7 w-7 text-rose-400 hover:bg-rose-50 hover:text-rose-600 transition-colors"
+                            onClick={(e) => { e.stopPropagation(); handleDeleteLicense(lic.id, lic.buyer_name); }}
+                            title="라이선스 삭제"
+                        >
+                            <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                    </div>
+                </td>
+            </Fragment>
+        );
+    };
+
     return (
         <div className="space-y-5 relative">
-            {/* 메모 고정 툴팁 - overflow 클리핑 우회 */}
+            {/* 메모 고정 툴팁 */}
             {memoTooltip && (
                 <div
                     className="fixed z-[9999] bg-white text-slate-700 text-[11px] font-medium leading-relaxed rounded-xl shadow-2xl border border-slate-200 px-3 py-2.5 w-64 whitespace-pre-wrap pointer-events-none"
@@ -157,7 +299,8 @@ export const LicenseList = () => {
                     {memoTooltip.text}
                 </div>
             )}
-            {/* 복사 토스트 - 상단 중앙 */}
+
+            {/* 복사 토스트 */}
             <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none">
                 {toasts.map(t => (
                     <div key={t.id} className={cn(
@@ -185,12 +328,12 @@ export const LicenseList = () => {
             <Card className="overflow-hidden p-0 border border-slate-200 shadow-[0_15px_45px_rgba(0,0,0,0.07)] rounded-2xl bg-white">
                 <table className="w-full">
                     <colgroup>
-                        <col style={{ width: '44px' }} />  {/* NO */}
+                        <col style={{ width: '44px' }} />  {/* 펼침 / NO */}
                         <col style={{ width: '10%' }} />   {/* 크몽 ID */}
                         <col style={{ width: '12%' }} />   {/* 이메일 */}
                         <col style={{ width: '44px' }} />  {/* 메모 */}
                         <col style={{ width: '16%' }} />   {/* 제품 */}
-                        <col style={{ width: '60px' }} />  {/* 시리얼(복사) */}
+                        <col style={{ width: '70px' }} />  {/* 시리얼(복사) */}
                         <col style={{ width: '8%' }}  />   {/* 구매일자 */}
                         <col style={{ width: '8%' }}  />   {/* 실행일자 */}
                         <col style={{ width: '9%' }}  />   {/* 만료일자 */}
@@ -203,7 +346,7 @@ export const LicenseList = () => {
                             <th className="px-3 py-2.5 text-slate-200">크몽 ID</th>
                             <th className="px-3 py-2.5 text-slate-200">이메일</th>
                             <th className="px-3 py-2.5 text-slate-200 text-center">메모</th>
-                            <th className="px-3 py-2.5 text-slate-200">제품</th>
+                            <th className="px-3 py-2.5 text-slate-200">최근 구매 제품</th>
                             <th className="px-3 py-2.5 text-slate-200 text-center">시리얼</th>
                             <th className="px-3 py-2.5 text-slate-200">구매일자</th>
                             <th className="px-3 py-2.5 text-slate-200">실행일자</th>
@@ -215,120 +358,94 @@ export const LicenseList = () => {
                     <tbody className="divide-y divide-slate-100 text-xs">
                         {loading ? (
                             <tr><td colSpan={11} className="py-14 text-center"><Loader2 className="mx-auto h-7 w-7 animate-spin text-indigo-200" /></td></tr>
-                        ) : filteredLicenses.map((lic, idx) => {
-                            const status = getStatusInfo(lic);
-                            const displayName = lic.buyer_name.replace(/\s*\(TRIAL\)\s*|\s*\(TEST\)\s*/gi, '').trim();
+                        ) : groupedLicenses.map((group, idx) => {
+                            const hasHistory = group.history.length > 0;
+                            const isExpanded = expandedGroups.has(group.key);
+                            const displayName = group.main.buyer_name.replace(/\s*\(TRIAL\)\s*|\s*\(TEST\)\s*/gi, '').trim();
+
                             return (
-                                <tr key={lic.id} className="hover:bg-slate-50/60 transition-colors align-middle">
+                                <Fragment key={group.key}>
+                                    {/* 메인 레코드 (가장 최신) */}
+                                    <tr 
+                                        className={cn(
+                                            "transition-colors align-middle", 
+                                            hasHistory ? "cursor-pointer hover:bg-slate-50" : "hover:bg-slate-50/60"
+                                        )}
+                                        onClick={() => hasHistory && toggleGroup(group.key)}
+                                    >
+                                        {/* NO & 펼침 아이콘 */}
+                                        <td className="px-3 py-2 text-slate-400 font-bold text-center">
+                                            {hasHistory ? (
+                                                <button className="flex items-center justify-center w-full h-full text-indigo-500 hover:text-indigo-700 transition-transform">
+                                                    <ChevronRight className={cn("w-4 h-4 transition-transform duration-200", isExpanded && "rotate-90")} />
+                                                </button>
+                                            ) : (
+                                                idx + 1
+                                            )}
+                                        </td>
 
-                                    {/* NO */}
-                                    <td className="px-3 py-2 text-slate-400 font-bold text-center">{idx + 1}</td>
+                                        {/* 구매자 ID */}
+                                        <td className="px-3 py-2 font-bold text-slate-800 truncate max-w-0">
+                                            <div className="flex items-center gap-1.5">
+                                                <span className="block truncate">{displayName}</span>
+                                                {hasHistory && <span className="bg-indigo-100 text-indigo-700 text-[9px] px-1.5 py-0.5 rounded-full font-black">+{group.history.length}</span>}
+                                            </div>
+                                        </td>
 
-                                    {/* 구매자 ID */}
-                                    <td className="px-3 py-2 font-bold text-slate-800 truncate max-w-0">
-                                        <span className="block truncate">{displayName}</span>
-                                    </td>
+                                        {/* 이메일 */}
+                                        <td className="px-3 py-2 text-slate-500 truncate max-w-0">
+                                            <span className="block truncate">{group.main.contact || <span className="text-slate-300">-</span>}</span>
+                                        </td>
 
-                                    {/* 이메일 */}
-                                    <td className="px-3 py-2 text-slate-500 truncate max-w-0">
-                                        <span className="block truncate">{lic.contact || <span className="text-slate-300">-</span>}</span>
-                                    </td>
+                                        {/* 공통 렌더링 로직 (메모 ~ 제어) */}
+                                        {renderLicenseRow(group.main)}
+                                    </tr>
 
-                                    {/* 메모 - fixed position 툴팁 */}
-                                    <td className="px-3 py-2 text-center">
-                                        {lic.memo ? (
-                                            <span
-                                                className="cursor-default text-base select-none"
-                                                onMouseEnter={(e) => {
-                                                    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-                                                    setMemoTooltip({
-                                                        text: lic.memo!,
-                                                        x: rect.left + rect.width / 2,
-                                                        y: rect.bottom + 10,
-                                                    });
-                                                }}
-                                                onMouseLeave={() => setMemoTooltip(null)}
-                                            >
-                                                📝
-                                            </span>
-                                        ) : <span className="text-slate-200 text-xs">-</span>}
-                                    </td>
-
-                                    {/* 제품 - NPlace-DB(Deluxe 체험판) 형식 */}
-                                    <td className="px-3 py-2 font-bold text-slate-700 truncate max-w-0">
-                                        <span className="block truncate">{getProductLabel(lic.product_id, lic.license_type)}</span>
-                                    </td>
-
-                                    {/* 시리얼 - 복사 버튼만 */}
-                                    <td className="px-3 py-2 text-center">
-                                        <button
-                                            className="inline-flex items-center gap-1 font-bold text-slate-500 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-700 px-2 py-0.5 rounded border border-slate-200 hover:border-indigo-200 transition-colors"
-                                            onClick={() => handleCopySerial(lic.serial_key)}
-                                            title={lic.serial_key}
-                                        >
-                                            <Copy className="w-2.5 h-2.5" />
-                                            복사
-                                        </button>
-                                    </td>
-
-                                    {/* 구매일자 */}
-                                    <td className="px-3 py-2 font-bold text-slate-500">
-                                        {lic.created_at ? format(new Date(lic.created_at), 'yyyy.MM.dd') : '-'}
-                                    </td>
-
-                                    {/* 실행일자 */}
-                                    <td className="px-3 py-2 font-bold text-slate-500">
-                                        {lic.first_run_date ? format(new Date(lic.first_run_date), 'yyyy.MM.dd') : <span className="text-slate-300 text-[10px]">대기</span>}
-                                    </td>
-
-                                    {/* 만료일자 */}
-                                    <td className="px-3 py-2 font-bold text-slate-500">
-                                        <div className="flex items-center gap-1">
-                                            <span>{lic.expire_date ? format(new Date(lic.expire_date), 'yyyy.MM.dd') : '-'}</span>
-                                            <button
-                                                className="text-slate-300 hover:text-indigo-500 transition-colors flex-shrink-0"
-                                                onClick={() => handleEditExpireDate(lic.id, lic.expire_date, lic.buyer_name)}
-                                                title="만료일자 수정"
-                                            >
-                                                <Pencil className="w-2.5 h-2.5" />
-                                            </button>
-                                        </div>
-                                    </td>
-
-                                    {/* 상태 */}
-                                    <td className="px-3 py-2">
-                                        <div className={cn("inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-black border text-[10px]", status.color)}>
-                                            <status.icon className="w-3 h-3" /> {status.label}
-                                        </div>
-                                    </td>
-
-                                    {/* 제어 */}
-                                    <td className="px-3 py-2 text-right">
-                                        <div className="flex justify-end gap-0.5">
-                                            <Button variant="ghost" size="icon"
-                                                className={cn("h-7 w-7 transition-colors",
-                                                    lic.status === 'blocked'
-                                                        ? "text-emerald-600 hover:bg-emerald-50"
-                                                        : "text-slate-400 hover:bg-slate-100 hover:text-slate-700"
-                                                )}
-                                                onClick={() => handleToggleStatus(lic.id, lic.status, lic.buyer_name)}
-                                                title={lic.status === 'blocked' ? "정지 해제" : "라이선스 정지"}
-                                            >
-                                                <Power className="w-3.5 h-3.5" />
-                                            </Button>
-                                            <Button variant="ghost" size="icon"
-                                                className="h-7 w-7 text-rose-400 hover:bg-rose-50 hover:text-rose-600 transition-colors"
-                                                onClick={() => handleDeleteLicense(lic.id, lic.buyer_name)}
-                                                title="라이선스 삭제"
-                                            >
-                                                <Trash2 className="w-3.5 h-3.5" />
-                                            </Button>
-                                        </div>
-                                    </td>
-                                </tr>
+                                    {/* 하위 히스토리 레코드 (펼침) */}
+                                    <AnimatePresence>
+                                        {isExpanded && hasHistory && (
+                                            <tr>
+                                                <td colSpan={11} className="p-0 border-none">
+                                                    <motion.div
+                                                        initial={{ height: 0, opacity: 0 }}
+                                                        animate={{ height: 'auto', opacity: 1 }}
+                                                        exit={{ height: 0, opacity: 0 }}
+                                                        transition={{ duration: 0.2 }}
+                                                        className="overflow-hidden bg-slate-50/80 border-b border-slate-200 shadow-inner"
+                                                    >
+                                                        <div className="py-2.5 px-6 pl-14">
+                                                            <div className="flex items-center gap-2 mb-2 text-[11px] font-black text-slate-500 uppercase tracking-wider">
+                                                                <Clock className="w-3.5 h-3.5" /> 이전 구매 히스토리
+                                                            </div>
+                                                            <table className="w-full text-xs">
+                                                                <colgroup>
+                                                                    <col style={{ width: '44px' }} />  {/* 메모 */}
+                                                                    <col style={{ width: '16%' }} />   {/* 제품 */}
+                                                                    <col style={{ width: '70px' }} />  {/* 시리얼(복사) */}
+                                                                    <col style={{ width: '10%' }}  />  {/* 구매일자 */}
+                                                                    <col style={{ width: '10%' }}  />  {/* 실행일자 */}
+                                                                    <col style={{ width: '11%' }}  />  {/* 만료일자 */}
+                                                                    <col style={{ width: '10%' }}  />  {/* 상태 */}
+                                                                    <col style={{ width: '60px' }} />  {/* 제어 */}
+                                                                </colgroup>
+                                                                <tbody className="divide-y divide-slate-200/50">
+                                                                    {group.history.map(histLic => (
+                                                                        <tr key={histLic.id} className="hover:bg-slate-100/50 transition-colors">
+                                                                            {renderLicenseRow(histLic)}
+                                                                        </tr>
+                                                                    ))}
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </motion.div>
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </AnimatePresence>
+                                </Fragment>
                             );
                         })}
-                        {!loading && filteredLicenses.length === 0 && (
+                        {!loading && groupedLicenses.length === 0 && (
                             <tr><td colSpan={11} className="py-12 text-center text-slate-400 font-medium">검색 결과가 없습니다.</td></tr>
                         )}
                     </tbody>
