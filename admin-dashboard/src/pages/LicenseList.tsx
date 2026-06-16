@@ -15,6 +15,7 @@ interface License {
     status: 'active' | 'used' | 'unused' | 'expired' | 'blocked';
     expire_date: string;
     created_at: string;
+    first_run_date?: string;
     bound_value?: string;
     price_sold?: number;
     license_type?: string;
@@ -185,15 +186,16 @@ export const LicenseList = () => {
                 <table className="w-full">
                     <colgroup>
                         <col style={{ width: '44px' }} />  {/* NO */}
-                        <col style={{ width: '10%' }} />   {/* 구매자 ID */}
-                        <col style={{ width: '13%' }} />   {/* 이메일 */}
+                        <col style={{ width: '10%' }} />   {/* 크몽 ID */}
+                        <col style={{ width: '12%' }} />   {/* 이메일 */}
                         <col style={{ width: '44px' }} />  {/* 메모 */}
-                        <col style={{ width: '18%' }} />   {/* 제품 */}
+                        <col style={{ width: '16%' }} />   {/* 제품 */}
                         <col style={{ width: '60px' }} />  {/* 시리얼(복사) */}
-                        <col style={{ width: '9%' }}  />   {/* 구매일자 */}
-                        <col style={{ width: '10%' }} />   {/* 만료일자 */}
-                        <col style={{ width: '9%' }}  />   {/* 상태 */}
-                        <col style={{ width: '68px' }} />  {/* 제어 */}
+                        <col style={{ width: '8%' }}  />   {/* 구매일자 */}
+                        <col style={{ width: '8%' }}  />   {/* 실행일자 */}
+                        <col style={{ width: '9%' }}  />   {/* 만료일자 */}
+                        <col style={{ width: '8%' }}  />   {/* 상태 */}
+                        <col style={{ width: '60px' }} />  {/* 제어 */}
                     </colgroup>
                     <thead className="bg-slate-900 text-white">
                         <tr className="text-[11px] font-black uppercase tracking-wide text-left">
@@ -204,6 +206,7 @@ export const LicenseList = () => {
                             <th className="px-3 py-2.5 text-slate-200">제품</th>
                             <th className="px-3 py-2.5 text-slate-200 text-center">시리얼</th>
                             <th className="px-3 py-2.5 text-slate-200">구매일자</th>
+                            <th className="px-3 py-2.5 text-slate-200">실행일자</th>
                             <th className="px-3 py-2.5 text-slate-200">만료일자</th>
                             <th className="px-3 py-2.5 text-slate-200">상태</th>
                             <th className="px-3 py-2.5 text-right text-slate-200">제어</th>
@@ -211,7 +214,7 @@ export const LicenseList = () => {
                     </thead>
                     <tbody className="divide-y divide-slate-100 text-xs">
                         {loading ? (
-                            <tr><td colSpan={10} className="py-14 text-center"><Loader2 className="mx-auto h-7 w-7 animate-spin text-indigo-200" /></td></tr>
+                            <tr><td colSpan={11} className="py-14 text-center"><Loader2 className="mx-auto h-7 w-7 animate-spin text-indigo-200" /></td></tr>
                         ) : filteredLicenses.map((lic, idx) => {
                             const status = getStatusInfo(lic);
                             const displayName = lic.buyer_name.replace(/\s*\(TRIAL\)\s*|\s*\(TEST\)\s*/gi, '').trim();
@@ -273,6 +276,11 @@ export const LicenseList = () => {
                                         {lic.created_at ? format(new Date(lic.created_at), 'yyyy.MM.dd') : '-'}
                                     </td>
 
+                                    {/* 실행일자 */}
+                                    <td className="px-3 py-2 font-bold text-slate-500">
+                                        {lic.first_run_date ? format(new Date(lic.first_run_date), 'yyyy.MM.dd') : <span className="text-slate-300 text-[10px]">대기</span>}
+                                    </td>
+
                                     {/* 만료일자 */}
                                     <td className="px-3 py-2 font-bold text-slate-500">
                                         <div className="flex items-center gap-1">
@@ -321,7 +329,7 @@ export const LicenseList = () => {
                             );
                         })}
                         {!loading && filteredLicenses.length === 0 && (
-                            <tr><td colSpan={10} className="py-12 text-center text-slate-400 font-medium">검색 결과가 없습니다.</td></tr>
+                            <tr><td colSpan={11} className="py-12 text-center text-slate-400 font-medium">검색 결과가 없습니다.</td></tr>
                         )}
                     </tbody>
                 </table>
