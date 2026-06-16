@@ -33,6 +33,7 @@ export const LicenseList = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [toasts, setToasts] = useState<Toast[]>([]);
+    const [memoTooltip, setMemoTooltip] = useState<{ text: string; x: number; y: number } | null>(null);
     let toastCounter = 0;
 
     const showToast = (message: string, type: 'info' | 'success' = 'info') => {
@@ -145,6 +146,16 @@ export const LicenseList = () => {
 
     return (
         <div className="space-y-5 relative">
+            {/* 메모 고정 툴팁 - overflow 클리핑 우회 */}
+            {memoTooltip && (
+                <div
+                    className="fixed z-[9999] bg-slate-900 text-white text-[11px] font-medium leading-relaxed rounded-xl shadow-2xl px-3 py-2.5 w-64 whitespace-pre-wrap pointer-events-none"
+                    style={{ left: memoTooltip.x, top: memoTooltip.y, transform: 'translateX(-50%)' }}
+                >
+                    <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-l-transparent border-r-transparent border-b-slate-900" />
+                    {memoTooltip.text}
+                </div>
+            )}
             {/* 복사 토스트 - 상단 중앙 */}
             <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none">
                 {toasts.map(t => (
@@ -220,20 +231,23 @@ export const LicenseList = () => {
                                         <span className="block truncate">{lic.contact || <span className="text-slate-300">-</span>}</span>
                                     </td>
 
-                                    {/* 메모 - hover 툴팁 */}
+                                    {/* 메모 - fixed position 툴팁 */}
                                     <td className="px-3 py-2 text-center">
                                         {lic.memo ? (
-                                            <div className="group relative inline-block">
-                                                <span className="cursor-default text-base select-none">📝</span>
-                                                <div className="pointer-events-none absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50
-                                                    hidden group-hover:block
-                                                    bg-slate-900 text-white text-[11px] font-medium leading-relaxed
-                                                    rounded-xl shadow-2xl p-3 w-60 whitespace-pre-wrap text-left
-                                                    before:content-[''] before:absolute before:bottom-full before:left-1/2 before:-translate-x-1/2
-                                                    before:border-4 before:border-transparent before:border-b-slate-900">
-                                                    {lic.memo}
-                                                </div>
-                                            </div>
+                                            <span
+                                                className="cursor-default text-base select-none"
+                                                onMouseEnter={(e) => {
+                                                    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                                                    setMemoTooltip({
+                                                        text: lic.memo!,
+                                                        x: rect.left + rect.width / 2,
+                                                        y: rect.bottom + 10,
+                                                    });
+                                                }}
+                                                onMouseLeave={() => setMemoTooltip(null)}
+                                            >
+                                                📝
+                                            </span>
                                         ) : <span className="text-slate-200 text-xs">-</span>}
                                     </td>
 
