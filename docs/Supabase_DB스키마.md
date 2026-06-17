@@ -102,6 +102,7 @@
 | **role** | TEXT | DEFAULT 'user' | 사용자 역할 권한 (`admin`, `buyer`, `user`) |
 | **name** | TEXT | NULLABLE | 구매자 이름 또는 크몽 닉네임 |
 | **channel** | TEXT | NULLABLE | 최초 연동/가입 채널 (예: `Kmong`, `Direct`, `Kmong (Pending)`) |
+| **memo** | TEXT | NULLABLE | 회원에 대한 관리자 특이사항 기록용 메모 |
 | **created_at** | TIMESTAMPTZ | DEFAULT now() | 가입/등록 일시 |
 
 ---
