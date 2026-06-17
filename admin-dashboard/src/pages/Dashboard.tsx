@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Card } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
 import { 
     Key, 
-    Search,
     Users as UsersIcon,
     XCircle,
     Award,
@@ -13,9 +11,6 @@ import {
     Loader2
 } from 'lucide-react';
 import { cn } from '../lib/utils';
-import { Modal } from '../components/ui/Modal';
-import { Input } from '../components/ui/Input';
-import { format } from 'date-fns';
 
 interface License {
     id: string;
@@ -45,20 +40,7 @@ export const Dashboard = () => {
     const [allUsers, setAllUsers] = useState<AppUser[]>([]);
     const [loading, setLoading] = useState(true);
 
-    // Filter and Search states for User list
-    const [userSearchTerm, setUserSearchTerm] = useState('');
-    const [userRoleFilter, setUserRoleFilter] = useState<'all' | 'buyer' | 'non-buyer' | 'admin'>('all');
-
-    // Period stats state
     const [statPeriod, setStatPeriod] = useState<'daily' | 'monthly'>('daily');
-
-    // Approve Modal states
-    const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
-    const [selectedUserForMapping, setSelectedUserForMapping] = useState<AppUser | null>(null);
-    const [availableLicenses, setAvailableLicenses] = useState<License[]>([]);
-    const [selectedLicenseId, setSelectedLicenseId] = useState('');
-    const [licenseSearchTerm, setLicenseSearchTerm] = useState('');
-    const [isLoadingLicenses, setIsLoadingLicenses] = useState(false);
 
     const fetchDashboardData = async () => {
         try {
@@ -235,119 +217,7 @@ export const Dashboard = () => {
     const periodData = statPeriod === 'daily' ? getDailyStats() : getMonthlyStats();
     const maxPeriodSales = Math.max(...periodData.map(d => d.sales || 1));
 
-    // 4. Calculate Stats & Filter user list
-    const nonAdminUsers = allUsers.filter(u => u.role !== 'admin');
-    
-    const totalMembers = nonAdminUsers.length;
-    const buyersCount = nonAdminUsers.filter(u => u.role === 'buyer' || allLicenses.some(l => l.contact?.toLowerCase() === u.email?.toLowerCase())).length;
-    const generalMembersCount = totalMembers - buyersCount;
-
-    const filteredUsers = nonAdminUsers.filter(u => {
-        const nameMatch = (u.name || '').toLowerCase().includes(userSearchTerm.toLowerCase());
-        const emailMatch = (u.email || '').toLowerCase().includes(userSearchTerm.toLowerCase());
-        const matchesSearch = nameMatch || emailMatch;
-
-        const isBuyer = u.role === 'buyer' || allLicenses.some(l => l.contact?.toLowerCase() === u.email?.toLowerCase());
-
-        if (userRoleFilter === 'buyer') return matchesSearch && isBuyer;
-        if (userRoleFilter === 'non-buyer') return matchesSearch && !isBuyer;
-        
-        return matchesSearch;
-    });
-
-    const getUserType = (u: AppUser) => {
-        if (u.role === 'admin') {
-            return { label: '관리자', color: 'bg-purple-50 text-purple-700 border-purple-200' };
-        }
-        const isBuyer = u.role === 'buyer' || allLicenses.some(l => l.contact?.toLowerCase() === u.email?.toLowerCase());
-        if (isBuyer) {
-            return { label: '구매자', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' };
-        }
-        return { label: '비구매자', color: 'bg-slate-50 text-slate-500 border-slate-200' };
-    };
-
-    // 5. License Matching Actions
-    const handleOpenApproveModal = async (userObj: AppUser) => {
-        setSelectedUserForMapping(userObj);
-        setIsApproveModalOpen(true);
-        setIsLoadingLicenses(true);
-        setLicenseSearchTerm('');
-        setSelectedLicenseId('');
-        
-        try {
-            const { data, error } = await supabase
-                .from('licenses')
-                .select('*')
-                .order('created_at', { ascending: false });
-            
-            if (error) throw error;
-            
-            // Available licenses (contact matches user email OR contact is blank/null)
-            const filtered = (data || []).filter(lic => {
-                const hasNoEmail = !lic.contact || lic.contact.trim() === '';
-                const isSameEmail = lic.contact?.toLowerCase() === userObj.email.toLowerCase();
-                return hasNoEmail || isSameEmail;
-            });
-
-            setAvailableLicenses(filtered as License[]);
-            
-            // Auto-select exact matching buyer_name or contact
-            const exactMatch = filtered.find(lic => 
-                (lic.buyer_name && userObj.name && lic.buyer_name.toLowerCase() === userObj.name.toLowerCase()) ||
-                (lic.contact && lic.contact.toLowerCase() === userObj.email.toLowerCase())
-            );
-            if (exactMatch) {
-                setSelectedLicenseId(exactMatch.id);
-            }
-        } catch (err) {
-            console.error("Error fetching licenses for mapping:", err);
-        } finally {
-            setIsLoadingLicenses(false);
-        }
-    };
-
-    const handleApproveAndMap = async () => {
-        if (!selectedUserForMapping) return;
-        if (!selectedLicenseId) {
-            alert("매칭할 라이선스를 선택해주세요.");
-            return;
-        }
-
-        try {
-            // 1. Map license email and name
-            const { error: licError } = await supabase
-                .from('licenses')
-                .update({ 
-                    contact: selectedUserForMapping.email.toLowerCase(),
-                    buyer_name: selectedUserForMapping.name || selectedUserForMapping.email.split('@')[0]
-                })
-                .eq('id', selectedLicenseId);
-
-            if (licError) throw licError;
-
-            // 2. Update user role and channel to approve
-            const nextChannel = selectedUserForMapping.channel 
-                ? selectedUserForMapping.channel.replace(/\s*\(Pending\)/g, '') 
-                : 'Direct';
-            
-            const { error: userError } = await supabase
-                .from('users')
-                .update({ 
-                    role: 'buyer',
-                    channel: nextChannel 
-                })
-                .eq('email', selectedUserForMapping.email);
-
-            if (userError) throw userError;
-
-            alert("라이선스 매칭 및 구매자 전환 승인이 완료되었습니다.");
-            setIsApproveModalOpen(false);
-            await fetchDashboardData();
-        } catch (err: any) {
-            console.error("Error mapping license to user:", err);
-            alert(`승인 처리 중 오류 발생: ${err.message}`);
-        }
-    };
+    // 4. Calculate Stats
 
     const productPackageRows = getProductPackageStats();
 
@@ -523,95 +393,7 @@ export const Dashboard = () => {
                 </div>
             </div>
 
-            {/* Approve / Match License Modal */}
-            <Modal
-                isOpen={isApproveModalOpen}
-                onClose={() => setIsApproveModalOpen(false)}
-                title="구매자 수동 승인 및 라이선스 매칭"
-                className="max-w-md bg-white border-none"
-            >
-                {selectedUserForMapping && (
-                    <div className="space-y-5">
-                        <div className="p-3.5 bg-slate-50 rounded-xl space-y-1.5">
-                            <p className="text-[9px] text-slate-400 font-black uppercase tracking-wider">대상 고객 정보</p>
-                            <div className="flex items-center gap-3">
-                                <img src={`https://ui-avatars.com/api/?name=${selectedUserForMapping.name || selectedUserForMapping.email}&background=EEF2FF&color=6366F1`} className="h-9 w-9 rounded-lg" alt={selectedUserForMapping.name} />
-                                <div className="text-left">
-                                    <p className="text-xs font-black text-slate-800">{selectedUserForMapping.name || '이름 없음'}</p>
-                                    <p className="text-[11px] text-slate-450 font-semibold">{selectedUserForMapping.email}</p>
-                                </div>
-                            </div>
-                            <div className="text-left mt-0.5">
-                                <span className="text-[9px] text-indigo-600 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded font-black uppercase tracking-wider">
-                                    현재 역할: {selectedUserForMapping.role || 'user'}
-                                </span>
-                            </div>
-                        </div>
 
-                        <div className="space-y-2.5 text-left">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
-                                매칭할 라이선스 검색 및 선택
-                            </label>
-                            <div className="relative">
-                                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-355" />
-                                <Input
-                                    placeholder="구매자명, 제품명, 시리얼로 검색..."
-                                    value={licenseSearchTerm}
-                                    onChange={e => setLicenseSearchTerm(e.target.value)}
-                                    className="pl-10 h-10 bg-slate-50 border-none rounded-xl text-xs font-bold focus:ring-2 focus:ring-indigo-100"
-                                />
-                            </div>
-
-                            {isLoadingLicenses ? (
-                                <p className="text-xs text-slate-400 animate-pulse py-2 text-center">라이선스 목록 불러오는 중...</p>
-                            ) : availableLicenses.filter(lic => 
-                                (lic.buyer_name || '').toLowerCase().includes(licenseSearchTerm.toLowerCase()) ||
-                                (lic.product_id || '').toLowerCase().includes(licenseSearchTerm.toLowerCase()) ||
-                                (lic.serial_key || '').toLowerCase().includes(licenseSearchTerm.toLowerCase())
-                            ).length > 0 ? (
-                                <select
-                                    required
-                                    className="w-full h-10 rounded-xl bg-slate-50 px-3.5 text-xs font-bold border-none outline-none focus:ring-2 focus:ring-indigo-100 transition-all appearance-none text-slate-800"
-                                    value={selectedLicenseId}
-                                    onChange={e => setSelectedLicenseId(e.target.value)}
-                                >
-                                    <option value="">-- 매칭할 라이선스를 선택하세요 --</option>
-                                    {availableLicenses.filter(lic => 
-                                        (lic.buyer_name || '').toLowerCase().includes(licenseSearchTerm.toLowerCase()) ||
-                                        (lic.product_id || '').toLowerCase().includes(licenseSearchTerm.toLowerCase()) ||
-                                        (lic.serial_key || '').toLowerCase().includes(licenseSearchTerm.toLowerCase())
-                                    ).map((lic) => (
-                                        <option key={lic.id} value={lic.id}>
-                                            [{normalizeProduct(lic.product_id)}] {lic.buyer_name || '미할당'} ({lic.serial_key ? lic.serial_key.substring(0, 8) + '...' : '시리얼 없음'})
-                                        </option>
-                                    ))}
-                                </select>
-                            ) : (
-                                <p className="text-xs text-rose-500 font-bold py-2 text-center">
-                                    매칭 가능한 미할당 라이선스가 없습니다.
-                                </p>
-                            )}
-                        </div>
-
-                        <div className="flex gap-2.5 pt-1.5">
-                            <Button
-                                onClick={() => setIsApproveModalOpen(false)}
-                                variant="ghost"
-                                className="flex-1 h-10 rounded-xl text-slate-500 font-bold text-xs"
-                            >
-                                취소
-                            </Button>
-                            <Button
-                                onClick={handleApproveAndMap}
-                                disabled={!selectedLicenseId}
-                                className="flex-1 h-10 bg-indigo-650 hover:bg-indigo-700 text-white font-black rounded-xl text-xs shadow-lg shadow-indigo-100"
-                            >
-                                승인 및 매칭 완료
-                            </Button>
-                        </div>
-                    </div>
-                )}
-            </Modal>
         </div>
     );
 };

@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
-import { Search, Loader2, Shield, Calendar, Users as UsersIcon } from 'lucide-react';
+import { Search, Loader2, Shield, Users as UsersIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '../lib/utils';
 import { Modal } from '../components/ui/Modal';
