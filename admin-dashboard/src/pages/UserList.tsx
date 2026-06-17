@@ -66,6 +66,29 @@ export const UserList = () => {
                 .order('created_at', { ascending: false });
             if (licensesError) throw licensesError;
             setAllLicenses(licensesData || []);
+
+            // [자동 매칭 로직]: 일반회원의 이메일과 라이선스의 연락처(이메일)가 일치하면 자동으로 구매자로 전환
+            const currentUsers = usersData || [];
+            const currentLicenses = licensesData || [];
+            const nonBuyers = currentUsers.filter((u: DbUser) => u.role === 'user' || !u.role);
+            
+            for (const user of nonBuyers) {
+                const matchedLicense = currentLicenses.find((l: License) => 
+                    l.contact && l.contact.trim() !== '' && l.contact.toLowerCase() === user.email.toLowerCase()
+                );
+                
+                if (matchedLicense) {
+                    try {
+                        await supabase
+                            .from('users')
+                            .update({ role: 'buyer', channel: 'Direct' })
+                            .eq('email', user.email);
+                    } catch (err) {
+                        console.error('Auto match failed for', user.email, err);
+                    }
+                }
+            }
+
         } catch (error) {
             console.error('Error fetching data:', error);
         } finally {
