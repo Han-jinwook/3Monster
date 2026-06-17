@@ -127,7 +127,7 @@ export const LicenseList = () => {
 
     const getProductLabel = (productId: string, licenseType?: string) => {
         const typeMap: Record<string, string> = {
-            'TRIAL':    '디럭스(체험판)',
+            'TRIAL':    '디럭스 (5일/1,000건)',
             '1M':       'Standard 1개월',
             '3M':       'Premium 3개월',
             '6M':       'Standard 6개월',
@@ -214,19 +214,15 @@ export const LicenseList = () => {
                     <span className="block truncate">{getProductLabel(lic.product_id, lic.license_type)}</span>
                 </td>
 
-                {/* 시리얼 - 체험판은 복사버튼 대신 안내문구 */}
+                {/* 시리얼 */}
                 <td className="px-3 py-2 text-center">
-                    {lic.license_type === 'TRIAL' ? (
-                        <span className="text-[10px] text-slate-400 font-medium bg-slate-50 px-2 py-0.5 rounded border border-slate-100">내장 인증</span>
-                    ) : (
-                        <button
-                            className="inline-flex items-center gap-1 font-bold text-slate-500 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-700 px-2 py-0.5 rounded border border-slate-200 hover:border-indigo-200 transition-colors"
-                            onClick={(e) => { e.stopPropagation(); handleCopySerial(lic.serial_key); }}
-                            title={lic.serial_key}
-                        >
-                            <Copy className="w-2.5 h-2.5" /> 복사
-                        </button>
-                    )}
+                    <button
+                        className="inline-flex items-center gap-1 font-bold text-slate-500 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-700 px-2 py-0.5 rounded border border-slate-200 hover:border-indigo-200 transition-colors"
+                        onClick={(e) => { e.stopPropagation(); handleCopySerial(lic.serial_key); }}
+                        title={lic.serial_key}
+                    >
+                        <Copy className="w-2.5 h-2.5" /> 복사
+                    </button>
                 </td>
 
                 {/* 구매일자 */}

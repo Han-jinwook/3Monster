@@ -69,23 +69,23 @@ export const LicenseGenerator = () => {
         }
         return [
             // 마케팅 몬스터
-            { id: 1, product: 'NPlace-DB', pkg: 'TRIAL', label: '[5일 체험판] NPlace_DB Pro (500건 제한)', price: 5000, status: '확정' },
+            { id: 1, product: 'NPlace-DB', pkg: 'TRIAL', label: '[디럭스] NPlace_DB Pro (5일/1,000건 제한)', price: 5000, status: '확정' },
             { id: 2, product: 'NPlace-DB', pkg: '1M', label: '[1개월 이용권] NPlace_DB Pro (무제한 수집)', price: 19000, status: '확정' },
             { id: 3, product: 'NPlace-DB', pkg: '3M', label: '[3개월 이용권] NPlace_DB Pro (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
-            { id: 4, product: 'ContentCrawler', pkg: 'TRIAL', label: '[5일 체험판] ContentCrawler (500건 제한)', price: 5000, status: '확정' },
+            { id: 4, product: 'ContentCrawler', pkg: 'TRIAL', label: '[디럭스] ContentCrawler (5일/1,000건 제한)', price: 5000, status: '확정' },
             { id: 5, product: 'ContentCrawler', pkg: '1M', label: '[1개월 이용권] ContentCrawler (무제한 수집)', price: 19000, status: '확정' },
             { id: 6, product: 'ContentCrawler', pkg: '3M', label: '[3개월 이용권] ContentCrawler (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
-            { id: 7, product: 'UserManager', pkg: 'TRIAL', label: '[5일 체험판] UserManager (500건 제한)', price: 5000, status: '확정' },
+            { id: 7, product: 'UserManager', pkg: 'TRIAL', label: '[디럭스] UserManager (5일/1,000건 제한)', price: 5000, status: '확정' },
             { id: 8, product: 'UserManager', pkg: '1M', label: '[1개월 이용권] UserManager (무제한 수집)', price: 19000, status: '확정' },
             { id: 9, product: 'UserManager', pkg: '3M', label: '[3개월 이용권] UserManager (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
             // 카페 몬스터
-            { id: 10, product: 'CafeCrawler', pkg: 'TRIAL', label: '[5일 체험판] CafeCrawler (500건 제한)', price: 5000, status: '확정' },
+            { id: 10, product: 'CafeCrawler', pkg: 'TRIAL', label: '[디럭스] CafeCrawler (5일/1,000건 제한)', price: 5000, status: '확정' },
             { id: 11, product: 'CafeCrawler', pkg: '1M', label: '[1개월 이용권] CafeCrawler (무제한 수집)', price: 19000, status: '확정' },
             { id: 12, product: 'CafeCrawler', pkg: '3M', label: '[3개월 이용권] CafeCrawler (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
-            { id: 13, product: 'CommentStats', pkg: 'TRIAL', label: '[5일 체험판] CommentStats (500건 제한)', price: 5000, status: '확정' },
+            { id: 13, product: 'CommentStats', pkg: 'TRIAL', label: '[디럭스] CommentStats (5일/1,000건 제한)', price: 5000, status: '확정' },
             { id: 14, product: 'CommentStats', pkg: '1M', label: '[1개월 이용권] CommentStats (무제한 수집)', price: 19000, status: '확정' },
             { id: 15, product: 'CommentStats', pkg: '3M', label: '[3개월 이용권] CommentStats (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
-            { id: 16, product: 'EventStats', pkg: 'TRIAL', label: '[5일 체험판] EventStats (500건 제한)', price: 5000, status: '확정' },
+            { id: 16, product: 'EventStats', pkg: 'TRIAL', label: '[디럭스] EventStats (5일/1,000건 제한)', price: 5000, status: '확정' },
             { id: 17, product: 'EventStats', pkg: '1M', label: '[1개월 이용권] EventStats (무제한 수집)', price: 19000, status: '확정' },
             { id: 18, product: 'EventStats', pkg: '3M', label: '[3개월 이용권] EventStats (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
         ];
@@ -209,7 +209,7 @@ export const LicenseGenerator = () => {
         if (isTest) {
             serial = `TEST-${generateSerial().split('-').slice(1).join('-')}`;
         } else if (isTrial) {
-            serial = `TRIAL-${generateSerial().split('-').slice(1).join('-')}`;
+            serial = `DLX-${generateSerial().split('-').slice(1).join('-')}`;
         } else {
             serial = generateSerial();
         }
@@ -223,7 +223,7 @@ export const LicenseGenerator = () => {
 
             if (formData.license_type === 'TRIAL') {
                 expireDate.setDate(now.getDate() + 5);
-                collectionLimit = 500;
+                collectionLimit = 1000;
             } else if (formData.license_type === 'TEST') {
                 expireDate.setDate(now.getDate() + 1);
                 collectionLimit = 100;
@@ -313,7 +313,7 @@ export const LicenseGenerator = () => {
                                             value={formData.license_type}
                                             onChange={(e) => handleLicenseTypeChange(e.target.value)}
                                         >
-                                            <option value="TRIAL">DELUXE (5일 체험판)</option>
+                                            <option value="TRIAL">DELUXE (5일 / 1,000건 제한)</option>
                                             <option value="1M">STANDARD (1개월 이용권)</option>
                                             <option value="3M">PREMIUM (3개월 이용권)</option>
                                         </select>
@@ -411,52 +411,26 @@ export const LicenseGenerator = () => {
                     <AnimatePresence>
                         {generatedKey && (
                             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-                                {generatedKey.startsWith('TRIAL-') ? (
-                                    <Card className="bg-emerald-600 text-white p-6 space-y-4 shadow-lg rounded-2xl border-none">
-                                        <div className="flex items-center gap-3">
-                                            <div className="h-9 w-9 rounded-xl bg-white/20 flex items-center justify-center">
-                                                <CheckCircle2 className="w-4 h-4" />
-                                            </div>
-                                            <h4 className="font-black text-sm">체험판 구매자 등록 완료</h4>
+                                <Card className={`${generatedKey.startsWith('TEST-') ? 'bg-emerald-600' : 'bg-indigo-600'} text-white p-6 space-y-4 shadow-lg rounded-2xl border-none`}>
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-9 w-9 rounded-xl bg-white/20 flex items-center justify-center">
+                                            {generatedKey.startsWith('TEST-') ? <Clock className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
                                         </div>
-                                        <div className="rounded-xl bg-white/10 p-4 text-xs space-y-2">
-                                            <p>• <b>구매자 ID</b>: {formData.buyer_name} / <b>이메일</b>: {formData.contact}</p>
-                                            <p>• <b>등록 제품</b>: {formData.product_id}</p>
-                                            <p>• <b>이용 유형</b>: DELUXE (5일 체험판)</p>
-                                            <p className="mt-2 text-emerald-100 font-bold border-t border-white/10 pt-2 text-[10px] leading-relaxed">
-                                                ※ 체험판은 프로그램 내에 기본 내장되어 작동하므로, 구매자에게 별도의 라이선스 키를 발급/전달할 필요가 없습니다. (Kmong ID 및 판매 대금 등록 완료)
-                                            </p>
-                                        </div>
-                                        <Button
-                                            onClick={() => setGeneratedKey('')}
-                                            fullWidth
-                                            className="bg-white text-emerald-800 hover:bg-slate-50 h-10 font-bold text-xs rounded-xl"
-                                        >
-                                            확인
-                                        </Button>
-                                    </Card>
-                                ) : (
-                                    <Card className={`${generatedKey.startsWith('TEST-') ? 'bg-emerald-600' : 'bg-indigo-600'} text-white p-6 space-y-4 shadow-lg rounded-2xl border-none`}>
-                                        <div className="flex items-center gap-3">
-                                            <div className="h-9 w-9 rounded-xl bg-white/20 flex items-center justify-center">
-                                                {generatedKey.startsWith('TEST-') ? <Clock className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
-                                            </div>
-                                            <h4 className="font-black text-sm">
-                                                {generatedKey.startsWith('TEST-') ? '테스트 라이선스 키 발급 완료' : '정식 라이선스 발급 완료'}
-                                            </h4>
-                                        </div>
-                                        <div className="rounded-xl bg-white/10 p-4 text-center">
-                                            <p className="font-mono text-base font-black tracking-wider">{generatedKey}</p>
-                                        </div>
-                                        <Button
-                                            onClick={() => { navigator.clipboard.writeText(generatedKey); alert('Copy Success!'); }}
-                                            fullWidth
-                                            className="bg-white text-slate-900 hover:bg-slate-50 h-12 font-bold text-xs rounded-xl"
-                                        >
-                                            <Copy className="mr-2 h-4 w-4" /> 키 복사하기
-                                        </Button>
-                                    </Card>
-                                )}
+                                        <h4 className="font-black text-sm">
+                                            {generatedKey.startsWith('TEST-') ? '테스트 라이선스 키 발급 완료' : '정식 라이선스 발급 완료'}
+                                        </h4>
+                                    </div>
+                                    <div className="rounded-xl bg-white/10 p-4 text-center">
+                                        <p className="font-mono text-base font-black tracking-wider">{generatedKey}</p>
+                                    </div>
+                                    <Button
+                                        onClick={() => { navigator.clipboard.writeText(generatedKey); alert('Copy Success!'); }}
+                                        fullWidth
+                                        className="bg-white text-slate-900 hover:bg-slate-50 h-12 font-bold text-xs rounded-xl"
+                                    >
+                                        <Copy className="mr-2 h-4 w-4" /> 키 복사하기
+                                    </Button>
+                                </Card>
                             </motion.div>
                         )}
                     </AnimatePresence>
