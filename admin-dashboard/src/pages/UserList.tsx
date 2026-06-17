@@ -67,7 +67,7 @@ export const UserList = () => {
             if (licensesError) throw licensesError;
             setAllLicenses(licensesData || []);
 
-            // [자동 매칭 로직]: 일반회원의 이메일과 라이선스의 연락처(이메일)가 일치하면 자동으로 구매자로 전환
+            // [자동 매칭 로직]: 일반회원의 이메일과 라이선스의 이메일이 일치하면 자동으로 구매자로 전환
             const currentUsers = usersData || [];
             const currentLicenses = licensesData || [];
             const nonBuyers = currentUsers.filter((u: DbUser) => u.role === 'user' || !u.role);
@@ -366,7 +366,7 @@ export const UserList = () => {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-700 block">사용 가능한 라이선스 선택 (연락처 매칭)</label>
+                        <label className="text-xs font-bold text-slate-700 block">사용 가능한 라이선스 선택 (이메일 매칭)</label>
                         <Input
                             placeholder="라이선스 구매자 검색..."
                             value={licenseSearchTerm}
@@ -400,14 +400,14 @@ export const UserList = () => {
                                             <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">{lic.status}</span>
                                         </div>
                                         <span className="text-[10px] font-mono text-slate-500">{lic.serial_key}</span>
-                                        {lic.contact && <span className="text-[10px] text-indigo-600 font-bold block mt-0.5">매칭된 연락처: {lic.contact}</span>}
+                                        {lic.contact && <span className="text-[10px] text-indigo-600 font-bold block mt-0.5">매칭된 이메일: {lic.contact}</span>}
                                     </div>
                                 ))
                             ) : (
                                 <div className="p-4 text-center text-xs text-slate-500 font-medium">검색된 라이선스가 없습니다.</div>
                             )}
                         </div>
-                        <p className="text-[10px] text-slate-400 mt-1">※ '구매자 이름' 또는 '매칭된 연락처'를 기반으로 검색됩니다.</p>
+                        <p className="text-[10px] text-slate-400 mt-1">※ '구매자 이름' 또는 '매칭된 이메일'을 기반으로 검색됩니다.</p>
                     </div>
 
                     <div className="flex justify-end gap-2 pt-2">
