@@ -1056,7 +1056,7 @@ export const Showroom = () => {
                                             </>
                                         )}
 
-                                        <div className="space-y-3 pt-3">
+                                        <div className="space-y-3 p-5 bg-slate-50/80 rounded-2xl border border-slate-100 mt-2">
                                             <h4 className="text-sm font-black text-emerald-600 uppercase tracking-wider flex items-center gap-1.5">
                                                 <span className="w-1.5 h-3.5 bg-emerald-500 rounded-full" />
                                                 주요 기능 및 스펙
