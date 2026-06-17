@@ -235,21 +235,23 @@ export const Dashboard = () => {
     const periodData = statPeriod === 'daily' ? getDailyStats() : getMonthlyStats();
     const maxPeriodSales = Math.max(...periodData.map(d => d.sales || 1));
 
-    // 4. Filter user list
-    const filteredUsers = allUsers.filter(u => {
+    // 4. Calculate Stats & Filter user list
+    const nonAdminUsers = allUsers.filter(u => u.role !== 'admin');
+    
+    const totalMembers = nonAdminUsers.length;
+    const buyersCount = nonAdminUsers.filter(u => u.role === 'buyer' || allLicenses.some(l => l.contact?.toLowerCase() === u.email?.toLowerCase())).length;
+    const generalMembersCount = totalMembers - buyersCount;
+
+    const filteredUsers = nonAdminUsers.filter(u => {
         const nameMatch = (u.name || '').toLowerCase().includes(userSearchTerm.toLowerCase());
         const emailMatch = (u.email || '').toLowerCase().includes(userSearchTerm.toLowerCase());
         const matchesSearch = nameMatch || emailMatch;
 
-        if (userRoleFilter === 'all') return matchesSearch;
-
         const isBuyer = u.role === 'buyer' || allLicenses.some(l => l.contact?.toLowerCase() === u.email?.toLowerCase());
-        const isAdminUser = u.role === 'admin';
 
-        if (userRoleFilter === 'buyer') return matchesSearch && isBuyer && !isAdminUser;
-        if (userRoleFilter === 'admin') return matchesSearch && isAdminUser;
-        if (userRoleFilter === 'non-buyer') return matchesSearch && !isBuyer && !isAdminUser;
-
+        if (userRoleFilter === 'buyer') return matchesSearch && isBuyer;
+        if (userRoleFilter === 'non-buyer') return matchesSearch && !isBuyer;
+        
         return matchesSearch;
     });
 
@@ -457,12 +459,35 @@ export const Dashboard = () => {
                         </div>
                     </Card>
 
+                    {/* App Registered Users Statistics */}
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                        <Card className="p-4 bg-white border border-slate-200 shadow-sm rounded-xl">
+                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">총 가입 고객</p>
+                            <h4 className="text-2xl font-black text-slate-800">{totalMembers}</h4>
+                        </Card>
+                        <Card className="p-4 bg-white border border-slate-200 shadow-sm rounded-xl">
+                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">현재 일반회원</p>
+                            <h4 className="text-2xl font-black text-indigo-600">{generalMembersCount}</h4>
+                        </Card>
+                        <Card className="p-4 bg-white border border-slate-200 shadow-sm rounded-xl">
+                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">구매자 전환</p>
+                            <h4 className="text-2xl font-black text-emerald-600">{buyersCount}</h4>
+                        </Card>
+                    </div>
+
                     {/* App Registered Users List Table */}
                     <Card className="p-5 bg-white border border-slate-300 shadow-[0_15px_45px_rgba(0,0,0,0.08)] rounded-2xl space-y-4">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                            <div className="flex items-center gap-2.5">
-                                <UsersIcon className="w-4.5 h-4.5 text-indigo-650" />
-                                <h3 className="text-base font-black text-slate-800">앱가입 고객 리스트</h3>
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
+                            <div className="flex flex-col gap-3">
+                                <div className="flex items-center gap-2.5">
+                                    <UsersIcon className="w-4.5 h-4.5 text-indigo-650" />
+                                    <h3 className="text-base font-black text-slate-800">앱가입 고객 리스트</h3>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    <button onClick={() => setUserRoleFilter('all')} className={cn("px-3 py-1.5 text-[11px] font-black rounded-lg transition-colors", userRoleFilter === 'all' ? "bg-slate-800 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200")}>전체보기</button>
+                                    <button onClick={() => setUserRoleFilter('non-buyer')} className={cn("px-3 py-1.5 text-[11px] font-black rounded-lg transition-colors", userRoleFilter === 'non-buyer' ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200")}>일반회원 (무료)</button>
+                                    <button onClick={() => setUserRoleFilter('buyer')} className={cn("px-3 py-1.5 text-[11px] font-black rounded-lg transition-colors", userRoleFilter === 'buyer' ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200")}>구매자 (유료)</button>
+                                </div>
                             </div>
 
                             {/* Search and Filters */}
@@ -476,16 +501,6 @@ export const Dashboard = () => {
                                         className="pl-8 h-8 text-[11px] font-bold bg-white border border-slate-400 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100"
                                     />
                                 </div>
-                                <select
-                                    value={userRoleFilter}
-                                    onChange={e => setUserRoleFilter(e.target.value as any)}
-                                    className="h-8 px-2 text-[11px] font-bold bg-white border border-slate-400 rounded-lg text-slate-700 outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600"
-                                >
-                                    <option value="all">구분 전체</option>
-                                    <option value="buyer">구매자</option>
-                                    <option value="non-buyer">비구매자</option>
-                                    <option value="admin">관리자</option>
-                                </select>
                             </div>
                         </div>
 
@@ -497,8 +512,6 @@ export const Dashboard = () => {
                                         <th className="px-3 py-3 text-slate-200">가입일자</th>
                                         <th className="px-3 py-3 text-slate-200">이름</th>
                                         <th className="px-3 py-3 text-slate-200">이메일</th>
-                                        <th className="px-3 py-3 text-slate-200">가입 경로</th>
-                                        <th className="px-3 py-3 text-slate-200">회원 구분</th>
                                         <th className="px-3 py-3 text-right text-slate-200">라이선스 제어</th>
                                     </tr>
                                 </thead>
@@ -509,19 +522,13 @@ export const Dashboard = () => {
                                             const isNonBuyer = type.label === '비구매자';
                                             return (
                                                 <tr key={u.id} className="hover:bg-slate-50/30 transition-colors">
-                                                    <td className="px-3 py-1 text-center text-slate-400 font-bold">{idx + 1}</td>
-                                                    <td className="px-3 py-1 text-slate-500 font-bold">
+                                                    <td className="px-3 py-2 text-center text-slate-400 font-bold">{idx + 1}</td>
+                                                    <td className="px-3 py-2 text-slate-500 font-bold">
                                                         {u.created_at ? format(new Date(u.created_at), 'yyyy.MM.dd HH:mm') : '-'}
                                                     </td>
-                                                    <td className="px-3 py-1 font-black text-slate-700">{u.name || '이름 없음'}</td>
-                                                    <td className="px-3 py-1 text-slate-600 font-mono">{u.email}</td>
-                                                    <td className="px-3 py-1 text-slate-500">{u.channel || 'Direct'}</td>
-                                                    <td className="px-3 py-1">
-                                                        <span className={cn("px-2 py-0.5 rounded text-[9px] font-black border uppercase tracking-wider", type.color)}>
-                                                            {type.label}
-                                                        </span>
-                                                    </td>
-                                                    <td className="px-3 py-1 text-right">
+                                                    <td className="px-3 py-2 font-black text-slate-700">{u.name || '이름 없음'}</td>
+                                                    <td className="px-3 py-2 text-slate-600 font-mono">{u.email}</td>
+                                                    <td className="px-3 py-2 text-right">
                                                         {u.role !== 'admin' && (
                                                             <Button
                                                                 size="sm"
