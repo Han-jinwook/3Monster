@@ -127,12 +127,8 @@ export const UserList = () => {
             
             if (error) throw error;
             
-            // Available licenses (contact matches user email OR contact is blank/null)
-            const filtered = (data || []).filter(lic => {
-                const hasNoEmail = !lic.contact || lic.contact.trim() === '';
-                const isSameEmail = lic.contact?.toLowerCase() === userObj.email.toLowerCase();
-                return hasNoEmail || isSameEmail;
-            });
+            // 모든 라이선스를 불러와서 관리자가 직접 '크몽 ID' 등을 검색하여 매칭할 수 있도록 허용
+            const filtered = data || [];
 
             setAvailableLicenses(filtered as License[]);
             
@@ -359,14 +355,14 @@ export const UserList = () => {
                             {isLoadingLicenses ? (
                                 <div className="p-4 text-center"><Loader2 className="w-5 h-5 animate-spin text-slate-400 mx-auto" /></div>
                             ) : availableLicenses.filter(lic => 
-                                lic.buyer_name.toLowerCase().includes(licenseSearchTerm.toLowerCase()) || 
-                                (lic.contact && lic.contact.toLowerCase().includes(licenseSearchTerm.toLowerCase())) ||
-                                lic.serial_key.toLowerCase().includes(licenseSearchTerm.toLowerCase())
+                                (lic.buyer_name || '').toLowerCase().includes(licenseSearchTerm.toLowerCase()) || 
+                                (lic.contact || '').toLowerCase().includes(licenseSearchTerm.toLowerCase()) ||
+                                (lic.serial_key || '').toLowerCase().includes(licenseSearchTerm.toLowerCase())
                             ).length > 0 ? (
                                 availableLicenses.filter(lic => 
-                                    lic.buyer_name.toLowerCase().includes(licenseSearchTerm.toLowerCase()) || 
-                                    (lic.contact && lic.contact.toLowerCase().includes(licenseSearchTerm.toLowerCase())) ||
-                                    lic.serial_key.toLowerCase().includes(licenseSearchTerm.toLowerCase())
+                                    (lic.buyer_name || '').toLowerCase().includes(licenseSearchTerm.toLowerCase()) || 
+                                    (lic.contact || '').toLowerCase().includes(licenseSearchTerm.toLowerCase()) ||
+                                    (lic.serial_key || '').toLowerCase().includes(licenseSearchTerm.toLowerCase())
                                 ).map(lic => (
                                     <div 
                                         key={lic.id}
