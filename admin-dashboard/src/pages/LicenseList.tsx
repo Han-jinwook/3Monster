@@ -184,16 +184,29 @@ export const LicenseList = () => {
         }
     };
 
+    const handleEditLicenseMemo = async (id: string, currentMemo: string | undefined, buyerName: string) => {
+        const newMemo = window.prompt(`"${buyerName}" 라이선스의 메모 작성/수정:`, currentMemo || '');
+        if (newMemo === null) return;
+        try {
+            const { error } = await supabase.from('licenses').update({ memo: newMemo }).eq('id', id);
+            if (error) throw error;
+            fetchLicenses();
+            showToast('메모가 저장되었습니다.', 'success');
+        } catch (err: any) {
+            alert(`메모 저장 오류: ${err.message}`);
+        }
+    };
+
     const renderLicenseRow = (lic: License) => {
         const status = getStatusInfo(lic);
 
         return (
             <Fragment key={lic.id}>
                 {/* 메모 - fixed position 툴팁 로직은 td 내부 유지 */}
-                <td className="px-3 py-2 text-center">
+                <td className="px-3 py-2 text-center cursor-pointer hover:bg-slate-100 transition-colors" onClick={() => handleEditLicenseMemo(lic.id, lic.memo, lic.buyer_name)}>
                     {lic.memo ? (
                         <span
-                            className="cursor-default text-base select-none"
+                            className="text-base select-none"
                             onMouseEnter={(e) => {
                                 const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
                                 setMemoTooltip({
@@ -206,7 +219,7 @@ export const LicenseList = () => {
                         >
                             📝
                         </span>
-                    ) : <span className="text-slate-200 text-xs">-</span>}
+                    ) : <span className="text-[10px] text-slate-400 border border-dashed border-slate-300 px-1.5 py-0.5 rounded hover:text-indigo-600 transition-colors">작성</span>}
                 </td>
 
                 {/* 제품 */}
