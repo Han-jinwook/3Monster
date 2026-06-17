@@ -659,7 +659,7 @@ export const Showroom = () => {
                                                 </div>
                                                 {product.icon && (
                                                     <div className={cn(
-                                                        "flex items-center gap-1.5 px-2.5 py-2 rounded-xl bg-indigo-50/80 border border-indigo-100 text-indigo-650 shadow-sm shrink-0 hover:bg-indigo-100 hover:text-indigo-700 transition-all"
+                                                        "flex items-center gap-1.5 px-2.5 py-2 rounded-xl bg-indigo-100 border border-indigo-200 text-indigo-700 shadow-sm shrink-0 hover:bg-indigo-200 transition-all"
                                                     )}>
                                                         <product.icon className="w-3.5 h-3.5" />
                                                         <span className="text-[10px] font-black tracking-wide">무료체험판 다운로드</span>
