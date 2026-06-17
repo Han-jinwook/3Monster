@@ -212,12 +212,12 @@ export const UserList = () => {
         }
     };
 
-    const handleEditUserMemo = async (userId: string | undefined, currentMemo: string | undefined, userName: string | undefined) => {
-        if (!userId) return;
+    const handleEditUserMemo = async (userEmail: string | undefined, currentMemo: string | undefined, userName: string | undefined) => {
+        if (!userEmail) return;
         const newMemo = window.prompt(`"${userName || '이름 없음'}" 회원의 메모 작성/수정:`, currentMemo || '');
         if (newMemo === null) return;
         try {
-            const { error } = await supabase.from('users').update({ memo: newMemo }).eq('id', userId);
+            const { error } = await supabase.from('users').update({ memo: newMemo }).eq('email', userEmail);
             if (error) {
                 if (error.code === '42703') throw new Error('데이터베이스에 memo 컬럼이 존재하지 않습니다. 먼저 추가해주세요.');
                 throw error;
@@ -315,7 +315,7 @@ export const UserList = () => {
                                             </td>
                                             <td className="px-3 py-2 font-black text-slate-700">{u.name || '이름 없음'}</td>
                                             <td className="px-3 py-2 text-slate-600 font-mono">{u.email}</td>
-                                            <td className="px-3 py-2 text-slate-600 max-w-[150px] truncate cursor-pointer hover:text-indigo-600 transition-colors" onClick={() => handleEditUserMemo(u.id, u.memo, u.name)}>
+                                            <td className="px-3 py-2 text-slate-600 max-w-[150px] truncate cursor-pointer hover:text-indigo-600 transition-colors" onClick={() => handleEditUserMemo(u.email, u.memo, u.name)}>
                                                 {u.memo ? <span className="text-xs">{u.memo}</span> : <span className="text-[10px] text-slate-400 border border-dashed border-slate-300 px-1.5 py-0.5 rounded">작성</span>}
                                             </td>
                                             <td className="px-3 py-2 text-right">
