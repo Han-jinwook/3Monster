@@ -55,11 +55,15 @@
 
 1. **라이선스 및 동기화 범위 최소화**
    - 3Monster 프로그램은 **1컴퓨터 1라이선스 원칙**으로 구동되므로, 다중 PC 간 설정 동기화나 클라우드 연동 등 추가 비용이 발생하는 고급 동기화 서비스는 개발 범위에서 제외합니다.
-2. **설정 저장소 경로 및 파일명 표준화**
-   - 프로그램 신규 버전 업데이트 혹은 실행 파일(EXE)의 폴더 위치 이동 시에도 사용자의 세팅 정보가 유실되지 않도록 다음 경로와 파일명을 유일한 저장 규격으로 지정합니다.
-     - **Windows 기준 타겟 샌드박스 경로**: `%APPDATA%/[PRODUCT_ID]/` (예: `%APPDATA%/MarketingMonster/`)
-     - **통일 설정 파일명**: `user_settings.json`
-   - 모든 3Monster 허브 출시 및 업데이트 예정 프로그램은 이 규격에 맞추어 `user_settings.json` 파일을 사용하여 로컬 설정을 저장 및 로드하도록 통일해야 합니다.
+2. **투트랙 저장 표준 경로 규격화**
+   - 프로그램 신규 버전 업데이트 혹은 실행 파일(EXE)의 폴더 위치 이동 시에도 사용자의 정보가 유실되거나 재인증을 요구하지 않도록 다음 두 가지 경로 규격을 유일한 표준으로 지정합니다.
+     - **트랙 1: 수집 결과 데이터 및 텍스트 로그**
+       - **Windows 기준 경로**: `%USERPROFILE%\Documents\MarketingMonster\[PRODUCT_ID]\` (내 문서 하위)
+       - **저장 대상**: `database.sqlite` (로컬 DB), `Logs/` (수집/작업 로그)
+     - **트랙 2: 라이선스 및 유저 설정 정보 (AppData 격리)**
+       - **Windows 기준 경로**: `%APPDATA%\MarketingMonster\[PRODUCT_ID]\` (또는 `%APPDATA%\[PRODUCT_ID]\`)
+       - **저장 대상**: `license.dat` (라이선스 인증키), `user_settings.json` (사용자 세팅), `templates.json` (메시지 템플릿)
+   - 모든 3Monster 제품군은 이 투트랙 규칙을 준수하여 구현되어야 합니다.
 
 ---
 *Updated on 2026-06-04 by Monster*
