@@ -68,24 +68,23 @@ export const LicenseGenerator = () => {
             } catch (e) {}
         }
         return [
-            // 마케팅 몬스터
-            { id: 1, product: 'NPlace-DB', pkg: 'TRIAL', label: '[디럭스] NPlace_DB Pro (5일/1,000건 제한)', price: 5000, status: '확정' },
+            { id: 1, product: 'NPlace-DB', pkg: 'TRIAL', label: '[디럭스] NPlace_DB Pro (1개월/1,000건 제한)', price: 5000, status: '확정' },
             { id: 2, product: 'NPlace-DB', pkg: '1M', label: '[1개월 이용권] NPlace_DB Pro (무제한 수집)', price: 19000, status: '확정' },
             { id: 3, product: 'NPlace-DB', pkg: '3M', label: '[3개월 이용권] NPlace_DB Pro (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
-            { id: 4, product: 'ContentCrawler', pkg: 'TRIAL', label: '[디럭스] ContentCrawler (5일/1,000건 제한)', price: 5000, status: '확정' },
+            { id: 4, product: 'ContentCrawler', pkg: 'TRIAL', label: '[디럭스] ContentCrawler (1개월/1,000건 제한)', price: 5000, status: '확정' },
             { id: 5, product: 'ContentCrawler', pkg: '1M', label: '[1개월 이용권] ContentCrawler (무제한 수집)', price: 19000, status: '확정' },
             { id: 6, product: 'ContentCrawler', pkg: '3M', label: '[3개월 이용권] ContentCrawler (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
-            { id: 7, product: 'UserManager', pkg: 'TRIAL', label: '[디럭스] UserManager (5일/1,000건 제한)', price: 5000, status: '확정' },
+            { id: 7, product: 'UserManager', pkg: 'TRIAL', label: '[디럭스] UserManager (1개월/1,000건 제한)', price: 5000, status: '확정' },
             { id: 8, product: 'UserManager', pkg: '1M', label: '[1개월 이용권] UserManager (무제한 수집)', price: 19000, status: '확정' },
             { id: 9, product: 'UserManager', pkg: '3M', label: '[3개월 이용권] UserManager (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
             // 카페 몬스터
-            { id: 10, product: 'CafeCrawler', pkg: 'TRIAL', label: '[디럭스] CafeCrawler (5일/1,000건 제한)', price: 5000, status: '확정' },
+            { id: 10, product: 'CafeCrawler', pkg: 'TRIAL', label: '[디럭스] CafeCrawler (1개월/1,000건 제한)', price: 5000, status: '확정' },
             { id: 11, product: 'CafeCrawler', pkg: '1M', label: '[1개월 이용권] CafeCrawler (무제한 수집)', price: 19000, status: '확정' },
             { id: 12, product: 'CafeCrawler', pkg: '3M', label: '[3개월 이용권] CafeCrawler (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
-            { id: 13, product: 'CommentStats', pkg: 'TRIAL', label: '[디럭스] CommentStats (5일/1,000건 제한)', price: 5000, status: '확정' },
+            { id: 13, product: 'CommentStats', pkg: 'TRIAL', label: '[디럭스] CommentStats (1개월/1,000건 제한)', price: 5000, status: '확정' },
             { id: 14, product: 'CommentStats', pkg: '1M', label: '[1개월 이용권] CommentStats (무제한 수집)', price: 19000, status: '확정' },
             { id: 15, product: 'CommentStats', pkg: '3M', label: '[3개월 이용권] CommentStats (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
-            { id: 16, product: 'EventStats', pkg: 'TRIAL', label: '[디럭스] EventStats (5일/1,000건 제한)', price: 5000, status: '확정' },
+            { id: 16, product: 'EventStats', pkg: 'TRIAL', label: '[디럭스] EventStats (1개월/1,000건 제한)', price: 5000, status: '확정' },
             { id: 17, product: 'EventStats', pkg: '1M', label: '[1개월 이용권] EventStats (무제한 수집)', price: 19000, status: '확정' },
             { id: 18, product: 'EventStats', pkg: '3M', label: '[3개월 이용권] EventStats (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
         ];
@@ -548,6 +547,44 @@ export const LicenseGenerator = () => {
                                     );
                                 })}
                             </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* 제품별 무료체험판 안내 섹션 */}
+                    <Card className="border-slate-200 mt-6 bg-blue-50/50">
+                        <CardHeader className="pb-3 border-b border-slate-100">
+                            <CardTitle className="text-sm text-slate-800 flex items-center gap-2">
+                                <span className="bg-blue-100 text-blue-700 p-1.5 rounded-md">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                </span>
+                                제품별 무료체험판 정책
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="pt-4 pb-4">
+                            <ul className="space-y-2 text-sm text-slate-600 font-medium">
+                                <li className="flex items-center justify-between p-2 bg-white rounded border border-slate-100">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                                        <span>NPlace-DB (네이버 플레이스 DB)</span>
+                                    </div>
+                                    <span className="text-slate-500 bg-slate-50 px-2 py-0.5 rounded text-xs font-bold border border-slate-200">
+                                        5일 / 50건 한도
+                                    </span>
+                                </li>
+                                <li className="flex items-center justify-between p-2 bg-white rounded border border-slate-100">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-slate-300"></div>
+                                        <span>추후 다른 제품들도 추가 예정</span>
+                                    </div>
+                                    <span className="text-slate-400 text-xs">
+                                        -
+                                    </span>
+                                </li>
+                            </ul>
+                            <p className="text-xs text-slate-400 mt-3 flex items-start gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 shrink-0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                                체험판 모드(TRIAL-MODE) 진입 시 자동으로 적용되는 한도입니다. 디럭스(1개월) 등과 혼동하지 마세요.
+                            </p>
                         </CardContent>
                     </Card>
                 </div>
