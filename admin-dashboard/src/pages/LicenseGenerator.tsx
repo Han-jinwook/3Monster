@@ -68,23 +68,23 @@ export const LicenseGenerator = () => {
             } catch (e) {}
         }
         return [
-            { id: 1, product: 'NPlace-DB', pkg: 'TRIAL', label: '[디럭스] NPlace_DB Pro (1개월/1,000건 제한)', price: 5000, status: '확정' },
+            { id: 1, product: 'NPlace-DB', pkg: 'DELUXE', label: '[디럭스] NPlace_DB Pro (1개월/1,000건 제한)', price: 5000, status: '확정' },
             { id: 2, product: 'NPlace-DB', pkg: '1M', label: '[1개월 이용권] NPlace_DB Pro (무제한 수집)', price: 19000, status: '확정' },
             { id: 3, product: 'NPlace-DB', pkg: '3M', label: '[3개월 이용권] NPlace_DB Pro (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
-            { id: 4, product: 'ContentCrawler', pkg: 'TRIAL', label: '[디럭스] ContentCrawler (1개월/1,000건 제한)', price: 5000, status: '확정' },
+            { id: 4, product: 'ContentCrawler', pkg: 'DELUXE', label: '[디럭스] ContentCrawler (1개월/1,000건 제한)', price: 5000, status: '확정' },
             { id: 5, product: 'ContentCrawler', pkg: '1M', label: '[1개월 이용권] ContentCrawler (무제한 수집)', price: 19000, status: '확정' },
             { id: 6, product: 'ContentCrawler', pkg: '3M', label: '[3개월 이용권] ContentCrawler (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
-            { id: 7, product: 'UserManager', pkg: 'TRIAL', label: '[디럭스] UserManager (1개월/1,000건 제한)', price: 5000, status: '확정' },
+            { id: 7, product: 'UserManager', pkg: 'DELUXE', label: '[디럭스] UserManager (1개월/1,000건 제한)', price: 5000, status: '확정' },
             { id: 8, product: 'UserManager', pkg: '1M', label: '[1개월 이용권] UserManager (무제한 수집)', price: 19000, status: '확정' },
             { id: 9, product: 'UserManager', pkg: '3M', label: '[3개월 이용권] UserManager (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
             // 카페 몬스터
-            { id: 10, product: 'CafeCrawler', pkg: 'TRIAL', label: '[디럭스] CafeCrawler (1개월/1,000건 제한)', price: 5000, status: '확정' },
+            { id: 10, product: 'CafeCrawler', pkg: 'DELUXE', label: '[디럭스] CafeCrawler (1개월/1,000건 제한)', price: 5000, status: '확정' },
             { id: 11, product: 'CafeCrawler', pkg: '1M', label: '[1개월 이용권] CafeCrawler (무제한 수집)', price: 19000, status: '확정' },
             { id: 12, product: 'CafeCrawler', pkg: '3M', label: '[3개월 이용권] CafeCrawler (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
-            { id: 13, product: 'CommentStats', pkg: 'TRIAL', label: '[디럭스] CommentStats (1개월/1,000건 제한)', price: 5000, status: '확정' },
+            { id: 13, product: 'CommentStats', pkg: 'DELUXE', label: '[디럭스] CommentStats (1개월/1,000건 제한)', price: 5000, status: '확정' },
             { id: 14, product: 'CommentStats', pkg: '1M', label: '[1개월 이용권] CommentStats (무제한 수집)', price: 19000, status: '확정' },
             { id: 15, product: 'CommentStats', pkg: '3M', label: '[3개월 이용권] CommentStats (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
-            { id: 16, product: 'EventStats', pkg: 'TRIAL', label: '[디럭스] EventStats (1개월/1,000건 제한)', price: 5000, status: '확정' },
+            { id: 16, product: 'EventStats', pkg: 'DELUXE', label: '[디럭스] EventStats (1개월/1,000건 제한)', price: 5000, status: '확정' },
             { id: 17, product: 'EventStats', pkg: '1M', label: '[1개월 이용권] EventStats (무제한 수집)', price: 19000, status: '확정' },
             { id: 18, product: 'EventStats', pkg: '3M', label: '[3개월 이용권] EventStats (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
         ];
