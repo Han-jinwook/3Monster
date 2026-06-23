@@ -90,6 +90,30 @@ export const LicenseGenerator = () => {
         ];
     });
 
+    // Force update localStorage whenever component mounts just in case they have old labels
+    useEffect(() => {
+        localStorage.setItem('3monster_pricing_policies', JSON.stringify([
+            { id: 1, product: 'NPlace-DB', pkg: 'DELUXE', label: '[디럭스] NPlace_DB Pro (1개월/1,000건 제한)', price: 5000, status: '확정' },
+            { id: 2, product: 'NPlace-DB', pkg: '1M', label: '[1개월 이용권] NPlace_DB Pro (무제한 수집)', price: 19000, status: '확정' },
+            { id: 3, product: 'NPlace-DB', pkg: '3M', label: '[3개월 이용권] NPlace_DB Pro (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
+            { id: 4, product: 'ContentCrawler', pkg: 'DELUXE', label: '[디럭스] ContentCrawler (1개월/1,000건 제한)', price: 5000, status: '확정' },
+            { id: 5, product: 'ContentCrawler', pkg: '1M', label: '[1개월 이용권] ContentCrawler (무제한 수집)', price: 19000, status: '확정' },
+            { id: 6, product: 'ContentCrawler', pkg: '3M', label: '[3개월 이용권] ContentCrawler (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
+            { id: 7, product: 'UserManager', pkg: 'DELUXE', label: '[디럭스] UserManager (1개월/1,000건 제한)', price: 5000, status: '확정' },
+            { id: 8, product: 'UserManager', pkg: '1M', label: '[1개월 이용권] UserManager (무제한 수집)', price: 19000, status: '확정' },
+            { id: 9, product: 'UserManager', pkg: '3M', label: '[3개월 이용권] UserManager (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
+            { id: 10, product: 'CafeCrawler', pkg: 'DELUXE', label: '[디럭스] CafeCrawler (1개월/1,000건 제한)', price: 5000, status: '확정' },
+            { id: 11, product: 'CafeCrawler', pkg: '1M', label: '[1개월 이용권] CafeCrawler (무제한 수집)', price: 19000, status: '확정' },
+            { id: 12, product: 'CafeCrawler', pkg: '3M', label: '[3개월 이용권] CafeCrawler (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
+            { id: 13, product: 'CommentStats', pkg: 'DELUXE', label: '[디럭스] CommentStats (1개월/1,000건 제한)', price: 5000, status: '확정' },
+            { id: 14, product: 'CommentStats', pkg: '1M', label: '[1개월 이용권] CommentStats (무제한 수집)', price: 19000, status: '확정' },
+            { id: 15, product: 'CommentStats', pkg: '3M', label: '[3개월 이용권] CommentStats (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
+            { id: 16, product: 'EventStats', pkg: 'DELUXE', label: '[디럭스] EventStats (1개월/1,000건 제한)', price: 5000, status: '확정' },
+            { id: 17, product: 'EventStats', pkg: '1M', label: '[1개월 이용권] EventStats (무제한 수집)', price: 19000, status: '확정' },
+            { id: 18, product: 'EventStats', pkg: '3M', label: '[3개월 이용권] EventStats (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' }
+        ]));
+    }, []);
+
     useEffect(() => {
         localStorage.setItem('3monster_pricing_policies', JSON.stringify(pricing));
     }, [pricing]);
@@ -401,6 +425,18 @@ export const LicenseGenerator = () => {
                             <Button type="submit" className="w-full h-16 text-white font-black text-lg shadow-md hover:bg-indigo-750 active:scale-[0.99] transition-all bg-indigo-600 rounded-xl border-b-4 border-indigo-900 border-none animate-none" isLoading={loading}>
                                 라이선스 즉시 발행하기 <ChevronRight className="ml-1 w-5 h-5" />
                             </Button>
+
+                            <div className="pt-4 border-t border-slate-200 mt-4 space-y-3">
+                                <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">최신 버전 다운로드 (고객 전달용)</label>
+                                <div className="flex gap-2">
+                                    <Button type="button" className="flex-1 h-14 bg-slate-800 hover:bg-slate-700 text-white rounded-xl shadow border-none text-sm font-bold" onClick={() => window.open('https://github.com/Han-jinwook/n-place-db/releases/latest/download/NPlace-DB-Pro.zip', '_blank')}>
+                                        💎 정식 제품 (.zip)
+                                    </Button>
+                                    <Button type="button" className="flex-1 h-14 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl shadow border-none text-sm font-bold" onClick={() => window.open('https://github.com/Han-jinwook/n-place-db/releases/latest/download/NPlace-DB-Trial.zip', '_blank')}>
+                                        🎁 무료 체험판 (.zip)
+                                    </Button>
+                                </div>
+                            </div>
                         </form>
                     </CardContent>
                 </Card>
