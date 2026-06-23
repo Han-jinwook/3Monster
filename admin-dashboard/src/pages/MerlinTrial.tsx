@@ -90,7 +90,7 @@ export const MerlinTrial = () => {
                 </div>
                 <Button 
                     onClick={handleDeleteAll} 
-                    variant="danger" 
+                    variant="destructive" 
                     className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white"
                 >
                     <Trash2 className="h-4 w-4" />
