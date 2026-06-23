@@ -568,7 +568,7 @@ export const LicenseGenerator = () => {
                                         <span>NPlace-DB (네이버 플레이스 DB)</span>
                                     </div>
                                     <span className="text-slate-500 bg-slate-50 px-2 py-0.5 rounded text-xs font-bold border border-slate-200">
-                                        5일 / 50건 한도
+                                        기한 무제한 / 50건 한도
                                     </span>
                                 </li>
                                 <li className="flex items-center justify-between p-2 bg-white rounded border border-slate-100">
