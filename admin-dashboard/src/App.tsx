@@ -12,6 +12,7 @@ import { Profile } from './pages/Profile';
 import { NotificationManager } from './pages/NotificationManager';
 import { SupportWrapper } from './components/SupportWrapper';
 import { UserList } from './pages/UserList';
+import { MerlinTrial } from './pages/MerlinTrial';
 
 function AppRoutes() {
     return (
@@ -55,6 +56,7 @@ function AppRoutes() {
                 <Route path="licenses" element={<LicenseList />} />
                 <Route path="users" element={<UserList />} />
                 <Route path="notifications" element={<NotificationManager />} />
+                <Route path="merlin-trial" element={<MerlinTrial />} />
             </Route>
 
             {/* Fallback Redirection */}

@@ -32,10 +32,13 @@
 1. **다운로드 경로의 일원화**: 모든 데이터 저장 및 다운로드 파일 출력은 사용자 시스템의 기본 `다운로드(Downloads)` 폴더 경로로만 수행한다.
 2. **파일명 명명 규칙 표준**: 생성일자/시간은 파일 메타데이터로 상시 파악 가능하므로 파일명 내의 일시(타임스탬프) 표기는 제외한다. 대신 각 앱별로 유저가 직관적으로 식별할 수 있는 의미 있는 한글 정보(식별자)로 파일명을 명명한다.
 3. **직접 저장(Direct Saving) 및 탐색기 자동 열기**: 수집과 동시에 다운로드 폴더 내 파일에 직접 쓰고, 완료 시 윈도우 탐색기를 자동 실행한다.
-4. **투트랙 저장 표준 (Two-Track Storage Standard)**:
+4. **로컬 DB 파일명 통일 규정**: 허브앱 산하의 개별 앱들의 로컬 데이터베이스(SQLite) 파일명은 'database.sqlite' 와 같은 일반적인 이름이 아니라, 반드시 `[PRODUCT_ID].sqlite` (예: NPlace-DB.sqlite, CafeCrawler.sqlite) 형태로 앱 고유 식별자와 통일되게 명명한다.
+5. **투트랙 저장 표준 (Two-Track Storage Standard)**:
    - **트랙 1 (수집 데이터 및 로그)**: 사용자 혼란 방지 및 백업 편의성을 위해 무조건 `내 문서\MarketingMonster\[PRODUCT_ID]\` 경로를 최종 권위로 삼아 저장한다.
    - **트랙 2 (사용자 설정 및 라이선스)**: 업데이트 시 유실 방지와 보안성 확보를 위해 무조건 Windows `%APPDATA%\MarketingMonster\[PRODUCT_ID]\` 경로에 격리 저장한다. (예: `user_settings.json`, `templates.json`, `license.dat` 등)
    - 1컴퓨터 1라이선스 원칙으로 다중 PC 간 설정 동기화/클라우드 연동 등 고급 동기화는 제외한다.
+6. **빌드 및 배포 표준 (Build & Deploy)**:
+   - 모든 앱의 실행 파일(exe) 빌드 시, 무조건 PyInstaller의 **onedir** 방식(`_internal` 폴더와 단일 실행파일로 분리)을 따른다. 단일 실행파일(`onefile`) 방식은 압축 해제 지연으로 인한 앱 실행 속도 저하 및 백신 오탐율을 높이므로 절대 지양한다.
 
 ## 5. UI/UX 및 창 배치 정책 (UI/UX & Window Spawning)
 - 모든 3Monster 프로그램은 [Monster_UI_규정](file:///d:/3Monster/docs/Monster_UI_%EA%B7%9C%EC%A0%95.md)을 준수해야 한다.
