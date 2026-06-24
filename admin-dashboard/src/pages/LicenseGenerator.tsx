@@ -339,7 +339,6 @@ export const LicenseGenerator = () => {
                                             <option value="DELUXE">디럭스 (1개월 / 1,000건 제한)</option>
                                             <option value="1M">STANDARD (1개월 이용권)</option>
                                             <option value="3M">PREMIUM (3개월 이용권)</option>
-                                            <option value="TEST">무료체험판 수동 발급 (무기한 / 50건 제한)</option>
                                         </select>
                                         <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
                                             <ChevronRight className="w-4 h-4 text-slate-400 rotate-90" />
