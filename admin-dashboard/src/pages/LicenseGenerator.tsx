@@ -289,6 +289,19 @@ export const LicenseGenerator = () => {
         }
     };
 
+    const getDownloadUrl = (productId: string, type: 'Pro' | 'Trial') => {
+        const repoMap: Record<string, string> = {
+            'NPlace-DB': 'n-place-db',
+            'ContentCrawler': 'content-crawler',
+            'UserManager': 'user-manager',
+            'CafeCrawler': 'cafe-crawler',
+            'CommentStats': 'comment-stats',
+            'EventStats': 'event-stats'
+        };
+        const repo = repoMap[productId] || productId.toLowerCase();
+        return `https://github.com/sundream7878/${repo}/releases/latest/download/${productId}-${type}.zip`;
+    };
+
     return (
         <div className="max-w-[1200px] mx-auto space-y-6 pt-0 pb-12 px-4">
             <div className="flex flex-col gap-1.5">
@@ -429,10 +442,10 @@ export const LicenseGenerator = () => {
                             <div className="pt-4 border-t border-slate-200 mt-4 space-y-3">
                                 <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">최신 버전 다운로드 (고객 전달용)</label>
                                 <div className="flex gap-2">
-                                    <Button type="button" className="flex-1 h-14 bg-slate-800 hover:bg-slate-700 text-white rounded-xl shadow border-none text-sm font-bold" onClick={() => window.open(`https://github.com/Han-jinwook/${formData.product_id.toLowerCase()}/releases/latest/download/${formData.product_id}-Pro.zip`, '_blank')}>
+                                    <Button type="button" className="flex-1 h-14 bg-slate-800 hover:bg-slate-700 text-white rounded-xl shadow border-none text-sm font-bold" onClick={() => window.open(getDownloadUrl(formData.product_id, 'Pro'), '_blank')}>
                                         💎 {formData.product_id} 정식
                                     </Button>
-                                    <Button type="button" className="flex-1 h-14 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl shadow border-none text-sm font-bold" onClick={() => window.open(`https://github.com/Han-jinwook/${formData.product_id.toLowerCase()}/releases/latest/download/${formData.product_id}-Trial.zip`, '_blank')}>
+                                    <Button type="button" className="flex-1 h-14 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl shadow border-none text-sm font-bold" onClick={() => window.open(getDownloadUrl(formData.product_id, 'Trial'), '_blank')}>
                                         🎁 {formData.product_id} 체험판
                                     </Button>
                                 </div>
