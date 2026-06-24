@@ -126,14 +126,15 @@ export const LicenseList = () => {
     };
 
     const getProductLabel = (productId: string, licenseType?: string) => {
-        const typeMap: Record<string, string> = {
-            'TRIAL':    '디럭스 (5일/1,000건)',
-            '1M':       'Standard 1개월',
-            '3M':       'Premium 3개월',
+        const mapping: Record<string, string> = {
+            'DELUXE':   '디럭스 (1개월/1,000건)',
+            'TRIAL':    '체험판 (무기한/50건)',
+            'TEST':     '테스트 발급 (무기한/50건)',
+            '1M':       'STANDARD (1개월)',
             '6M':       'Standard 6개월',
             'LIFETIME': 'Premium 영구',
         };
-        const typeLabel = licenseType ? (typeMap[licenseType] || licenseType) : '';
+        const typeLabel = licenseType ? (mapping[licenseType] || licenseType) : '';
         return typeLabel ? `${productId}(${typeLabel})` : productId;
     };
 

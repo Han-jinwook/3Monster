@@ -306,13 +306,13 @@ export const Dashboard = () => {
                                                 <td className="px-4 py-1 font-black text-slate-700">{row.product}</td>
                                                 <td className="px-4 py-1 text-slate-500">
                                                     <span className="px-2 py-0.5 text-[9px] font-black rounded bg-indigo-50 text-indigo-700 border border-indigo-100/50">
-                                                        {row.pkg === 'TRIAL' ? 'DELUXE (5일 체험판)' :
-                                                         row.pkg === '1M' ? 'STANDARD (1개월 이용권)' :
-                                                         row.pkg === '3M' ? 'PREMIUM (3개월 이용권)' :
-                                                         row.pkg === '6M' ? 'STANDARD (6개월)' :
-                                                         row.pkg === 'LIFETIME' ? 'PREMIUM (영구 소장)' :
-                                                         row.pkg === 'TEST' ? '임시 테스트 (1일)' :
-                                                         row.pkg === '1Y' ? '1년권' : row.pkg}
+                                                        {row.pkg === 'DELUXE' ? 'DELUXE (1개월 / 1,000건)' : 
+                                                         row.pkg === 'TRIAL' ? '체험판 (기한없음 / 50건)' : 
+                                                         row.pkg === 'TEST' ? '테스트 라이선스 (기한없음 / 50건)' :
+                                                         row.pkg === '1M' ? 'STANDARD (1개월)' : 
+                                                         row.pkg === '3M' ? 'PREMIUM (3개월)' : 
+                                                         row.pkg === '6M' ? 'PRO (6개월)' : 
+                                                         row.pkg === '1Y' ? 'BUSINESS (1년)' : row.pkg}
                                                     </span>
                                                 </td>
                                                 <td className="px-4 py-2.5 text-slate-600 font-bold">{row.count}건</td>

@@ -1143,7 +1143,7 @@ export const Showroom = () => {
                                                     {/* Deluxe */}
                                                     <div className="flex flex-col p-4 rounded-2xl border border-slate-200 bg-white hover:border-indigo-300 transition-all shadow-sm">
                                                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Deluxe</span>
-                                                        <h5 className="font-black text-slate-800 text-sm mb-1">디럭스 5일</h5>
+                                                        <h5 className="font-black text-slate-800 text-sm mb-1">디럭스 1개월</h5>
                                                         <p className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded w-fit mb-3">1,000건 추출 한도</p>
                                                         <div className="mt-auto">
                                                             <p className="text-lg font-black text-slate-900 mb-3">5,000<span className="text-xs text-slate-500 font-bold ml-0.5">원</span></p>

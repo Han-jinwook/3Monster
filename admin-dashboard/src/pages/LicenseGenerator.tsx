@@ -48,7 +48,7 @@ export const LicenseGenerator = () => {
     const [emailAutoFilled, setEmailAutoFilled] = useState(false);
     const [formData, setFormData] = useState({
         product_id: 'NPlace-DB',
-        license_type: 'TRIAL',
+        license_type: 'DELUXE',
         constraint_type: 'HWID',
         buyer_name: '',
         contact: '',
@@ -62,7 +62,7 @@ export const LicenseGenerator = () => {
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
-                if (Array.isArray(parsed) && parsed.every(p => ['TRIAL', '1M', '3M'].includes(p.pkg))) {
+                if (Array.isArray(parsed) && parsed.every(p => ['DELUXE', '1M', '3M'].includes(p.pkg))) {
                     return parsed;
                 }
             } catch (e) {}
@@ -225,13 +225,13 @@ export const LicenseGenerator = () => {
         e.preventDefault();
         setLoading(true);
 
-        const isTrial = formData.license_type === 'TRIAL';
+        const isDeluxe = formData.license_type === 'DELUXE';
         const isTest = formData.license_type === 'TEST';
         
         let serial = '';
         if (isTest) {
             serial = `TEST-${generateSerial().split('-').slice(1).join('-')}`;
-        } else if (isTrial) {
+        } else if (isDeluxe) {
             serial = `DLX-${generateSerial().split('-').slice(1).join('-')}`;
         } else {
             serial = generateSerial();
@@ -244,12 +244,12 @@ export const LicenseGenerator = () => {
             const expireDate = new Date();
             let collectionLimit = null;
 
-            if (formData.license_type === 'TRIAL') {
-                expireDate.setDate(now.getDate() + 5);
+            if (formData.license_type === 'DELUXE') {
+                expireDate.setMonth(now.getMonth() + 1);
                 collectionLimit = 1000;
             } else if (formData.license_type === 'TEST') {
-                expireDate.setDate(now.getDate() + 1);
-                collectionLimit = 100;
+                expireDate.setFullYear(now.getFullYear() + 100);
+                collectionLimit = 50;
             } else if (formData.license_type === '1M') {
                 expireDate.setMonth(now.getMonth() + 1);
             } else if (formData.license_type === '3M') {
@@ -336,9 +336,10 @@ export const LicenseGenerator = () => {
                                             value={formData.license_type}
                                             onChange={(e) => handleLicenseTypeChange(e.target.value)}
                                         >
-                                            <option value="TRIAL">DELUXE (5일 / 1,000건 제한)</option>
+                                            <option value="DELUXE">디럭스 (1개월 / 1,000건 제한)</option>
                                             <option value="1M">STANDARD (1개월 이용권)</option>
                                             <option value="3M">PREMIUM (3개월 이용권)</option>
+                                            <option value="TEST">무료체험판 수동 발급 (무기한 / 50건 제한)</option>
                                         </select>
                                         <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
                                             <ChevronRight className="w-4 h-4 text-slate-400 rotate-90" />
