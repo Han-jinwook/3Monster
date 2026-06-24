@@ -299,7 +299,7 @@ export const LicenseGenerator = () => {
             'EventStats': 'event-stats'
         };
         const repo = repoMap[productId] || productId.toLowerCase();
-        return `https://github.com/sundream7878/${repo}/releases/latest/download/${productId}-${type}.zip`;
+        return `https://github.com/Han-jinwook/${repo}/releases/latest/download/${productId}-${type}.zip`;
     };
 
     return (
