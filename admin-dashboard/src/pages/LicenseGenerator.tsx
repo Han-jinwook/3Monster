@@ -430,11 +430,11 @@ export const LicenseGenerator = () => {
                             <div className="pt-4 border-t border-slate-200 mt-4 space-y-3">
                                 <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">최신 버전 다운로드 (고객 전달용)</label>
                                 <div className="flex gap-2">
-                                    <Button type="button" className="flex-1 h-14 bg-slate-800 hover:bg-slate-700 text-white rounded-xl shadow border-none text-sm font-bold" onClick={() => window.open('https://github.com/Han-jinwook/n-place-db/releases/latest/download/NPlace-DB-Pro.zip', '_blank')}>
-                                        💎 정식 제품 (.zip)
+                                    <Button type="button" className="flex-1 h-14 bg-slate-800 hover:bg-slate-700 text-white rounded-xl shadow border-none text-sm font-bold" onClick={() => window.open(`https://github.com/Han-jinwook/${formData.product_id.toLowerCase()}/releases/latest/download/${formData.product_id}-Pro.zip`, '_blank')}>
+                                        💎 {formData.product_id} 정식
                                     </Button>
-                                    <Button type="button" className="flex-1 h-14 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl shadow border-none text-sm font-bold" onClick={() => window.open('https://github.com/Han-jinwook/n-place-db/releases/latest/download/NPlace-DB-Trial.zip', '_blank')}>
-                                        🎁 무료 체험판 (.zip)
+                                    <Button type="button" className="flex-1 h-14 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl shadow border-none text-sm font-bold" onClick={() => window.open(`https://github.com/Han-jinwook/${formData.product_id.toLowerCase()}/releases/latest/download/${formData.product_id}-Trial.zip`, '_blank')}>
+                                        🎁 {formData.product_id} 체험판
                                     </Button>
                                 </div>
                             </div>
