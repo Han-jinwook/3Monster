@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '../components/ui/Card';
-import { BookOpen, Download, MousePointerClick, Mail, MessageCircle, AlertCircle } from 'lucide-react';
+import { BookOpen, Download, MousePointerClick, Mail, MessageCircle, AlertCircle, ArrowLeft } from 'lucide-react';
 
 const tabs = [
     { id: 'install', label: '설치', icon: Download },
@@ -10,6 +11,8 @@ const tabs = [
 ];
 
 export function Docs() {
+    const { productId } = useParams<{ productId: string }>();
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('install');
 
     // Currently only NPlace-DB docs are fully populated, others will just show generic or coming soon.
@@ -17,11 +20,27 @@ export function Docs() {
     return (
         <div className="max-w-[1000px] mx-auto space-y-8 pt-0 pb-12 px-4">
             <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-3">
-                    <div className="bg-indigo-100 p-2 rounded-xl">
-                        <BookOpen className="w-6 h-6 text-indigo-600" />
+                <div className="flex items-center gap-3 justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="bg-indigo-100 p-2 rounded-xl">
+                            <BookOpen className="w-6 h-6 text-indigo-600" />
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <h1 className="text-2xl font-black text-slate-900 tracking-tight">설치 & 사용 가이드</h1>
+                            {(!productId || productId === 'nplace-db') && (
+                                <span className="bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-md text-sm font-bold border border-indigo-100">
+                                    N플레이스 DB 추출기
+                                </span>
+                            )}
+                        </div>
                     </div>
-                    <h1 className="text-2xl font-black text-slate-900 tracking-tight">설치 & 사용 가이드</h1>
+                    <button 
+                        onClick={() => navigate(-1)}
+                        className="flex items-center gap-1.5 text-sm font-bold text-slate-500 hover:text-slate-800 transition-colors bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        이전으로
+                    </button>
                 </div>
                 <p className="text-slate-500 font-bold ml-1">
                     프로그램 설치부터 핵심 기능 활용법까지 한 곳에서 확인하세요.
@@ -59,7 +78,7 @@ export function Docs() {
                             <div className="space-y-4 text-slate-600 leading-relaxed font-medium">
                                 <p>1. 쇼룸 페이지 하단의 <strong>[무료체험판 다운로드]</strong> 또는 발급받으신 <strong>[정식 제품]</strong> ZIP 파일을 다운로드합니다.</p>
                                 <p>2. 다운로드 받은 ZIP 파일의 압축을 해제합니다. (권장: C드라이브 또는 바탕화면의 전용 폴더)</p>
-                                <p>3. 압축이 해제된 폴더 내의 <code className="bg-slate-100 px-2 py-1 rounded text-pink-600 text-sm font-bold">NPlace-DB-실행.bat</code> (또는 프로그램 이름의 실행 파일)을 더블 클릭하여 실행합니다.</p>
+                                <p>3. 압축이 해제된 폴더 내의 <code className="bg-slate-100 px-2 py-1 rounded text-pink-600 text-sm font-bold">NPlace-DB-실행.bat</code>을 더블 클릭하여 실행합니다.</p>
                                 <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex gap-3 mt-6">
                                     <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
                                     <div className="space-y-1">

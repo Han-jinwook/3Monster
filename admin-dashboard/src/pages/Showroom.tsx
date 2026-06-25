@@ -172,7 +172,18 @@ export const Showroom = () => {
 
     // Q&A state management
     const [activeQnaProductId, setActiveQnaProductId] = useState<string | null>(null);
-    const [selectedProductIdForDetail, setSelectedProductIdForDetail] = useState<string | null>(null);
+    const [selectedProductIdForDetail, setSelectedProductIdForDetail] = useState<string | null>(() => {
+        return sessionStorage.getItem('selectedProductDetail') || null;
+    });
+
+    useEffect(() => {
+        if (selectedProductIdForDetail) {
+            sessionStorage.setItem('selectedProductDetail', selectedProductIdForDetail);
+        } else {
+            sessionStorage.removeItem('selectedProductDetail');
+        }
+    }, [selectedProductIdForDetail]);
+
     const [questions, setQuestions] = useState<any[]>([]);
     const [loadingQuestions, setLoadingQuestions] = useState(false);
     const [qnaCounts, setQnaCounts] = useState<{[productId: string]: {questions: number, replies: number}}>({});
