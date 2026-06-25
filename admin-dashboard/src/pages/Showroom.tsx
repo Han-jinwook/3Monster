@@ -1132,8 +1132,7 @@ export const Showroom = () => {
                                                     </Button>
                                                 </Link>
                                                 <a 
-                                                    href={`/downloads/${selectedProduct.id}-FreeTrial.zip`}
-                                                    download={`${selectedProduct.id}-FreeTrial.zip`}
+                                                    href={selectedProduct.id === 'nplace-db' ? "https://github.com/Han-jinwook/n-place-db/releases/latest/download/NPlace-DB-Trial.zip" : `/downloads/${selectedProduct.id}-FreeTrial.zip`}
                                                     className="w-full sm:w-1/2 block"
                                                 >
                                                     <Button variant="outline" className="w-full h-12 border-2 border-emerald-200 hover:border-emerald-300 text-emerald-650 hover:bg-emerald-50/50 rounded-2xl font-black transition-all flex items-center justify-center gap-2 text-xs sm:text-sm">
