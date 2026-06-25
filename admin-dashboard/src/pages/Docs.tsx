@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { useParams, Navigate } from 'react-router-dom';
+import { useState } from 'react';
 import { Card, CardContent } from '../components/ui/Card';
 import { BookOpen, Download, MousePointerClick, Mail, MessageCircle, AlertCircle } from 'lucide-react';
 
@@ -11,11 +10,9 @@ const tabs = [
 ];
 
 export function Docs() {
-    const { productId } = useParams<{ productId: string }>();
     const [activeTab, setActiveTab] = useState('install');
 
     // Currently only NPlace-DB docs are fully populated, others will just show generic or coming soon.
-    const isNPlaceDB = !productId || productId === 'nplace-db';
 
     return (
         <div className="max-w-[1000px] mx-auto space-y-8 pt-0 pb-12 px-4">

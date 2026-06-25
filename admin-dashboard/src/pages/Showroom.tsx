@@ -1114,7 +1114,7 @@ export const Showroom = () => {
                                                 <Link 
                                                     to={`/docs/${selectedProduct.id}`}
                                                     className="w-full sm:w-1/2 block"
-                                                    onClick={() => setIsModalOpen(false)}
+                                                    onClick={() => setSelectedProductIdForDetail(null)}
                                                 >
                                                     <Button variant="outline" className="w-full h-12 border-2 border-indigo-200 hover:border-indigo-300 text-indigo-600 hover:bg-indigo-50/50 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 text-xs sm:text-sm">
                                                         📖 설치 & 사용 가이드
