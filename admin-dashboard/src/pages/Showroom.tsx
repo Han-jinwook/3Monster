@@ -1111,24 +1111,22 @@ export const Showroom = () => {
 
                                         <div className="pt-6 space-y-6">
                                             <div className="flex flex-col sm:flex-row gap-3">
-                                                {selectedProduct.id === 'nplace-db' && (
-                                                    <a 
-                                                        href="/showroom/nplace/nplace-sample.csv" 
-                                                        download="nplace-sample.csv"
-                                                        className="w-full sm:w-1/2 block"
-                                                    >
-                                                        <Button variant="outline" className="w-full h-12 border-2 border-indigo-200 hover:border-indigo-300 text-indigo-600 hover:bg-indigo-50/50 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 text-xs sm:text-sm">
-                                                            📄 실제 수집 데이터 샘플 (.csv)
-                                                        </Button>
-                                                    </a>
-                                                )}
+                                                <Link 
+                                                    to={`/docs/${selectedProduct.id}`}
+                                                    className="w-full sm:w-1/2 block"
+                                                    onClick={() => setIsModalOpen(false)}
+                                                >
+                                                    <Button variant="outline" className="w-full h-12 border-2 border-indigo-200 hover:border-indigo-300 text-indigo-600 hover:bg-indigo-50/50 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 text-xs sm:text-sm">
+                                                        📖 설치 & 사용 가이드
+                                                    </Button>
+                                                </Link>
                                                 <a 
                                                     href={`/downloads/${selectedProduct.id}-FreeTrial.zip`}
                                                     download={`${selectedProduct.id}-FreeTrial.zip`}
-                                                    className={cn("block", selectedProduct.id === 'nplace-db' ? "w-full sm:w-1/2" : "w-full")}
+                                                    className="w-full sm:w-1/2 block"
                                                 >
                                                     <Button variant="outline" className="w-full h-12 border-2 border-emerald-200 hover:border-emerald-300 text-emerald-650 hover:bg-emerald-50/50 rounded-2xl font-black transition-all flex items-center justify-center gap-2 text-xs sm:text-sm">
-                                                        🎁 무료체험판 다운로드 (.zip)
+                                                        🎁 50건 무료체험판 다운로드 (.zip)
                                                     </Button>
                                                 </a>
                                             </div>

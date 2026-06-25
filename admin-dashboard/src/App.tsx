@@ -13,6 +13,7 @@ import { NotificationManager } from './pages/NotificationManager';
 import { SupportWrapper } from './components/SupportWrapper';
 import { UserList } from './pages/UserList';
 import { MerlinTrial } from './pages/MerlinTrial';
+import { Docs } from './pages/Docs';
 
 function AppRoutes() {
     return (
@@ -30,6 +31,18 @@ function AppRoutes() {
                     <SupportWrapper>
                         <CustomerSupport />
                     </SupportWrapper>
+                </PublicLayout>
+            } />
+
+            {/* Docs page */}
+            <Route path="/docs/:productId" element={
+                <PublicLayout>
+                    <Docs />
+                </PublicLayout>
+            } />
+            <Route path="/docs" element={
+                <PublicLayout>
+                    <Docs />
                 </PublicLayout>
             } />
 
