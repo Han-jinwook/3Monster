@@ -20,7 +20,7 @@ export const Login = () => {
     const navigate = useNavigate();
 
     const handleSendOTP = async () => {
-        if (!email) return;
+        if (!email || loading) return;
         setLoading(true);
         setError('');
         setInfoMessage('');
@@ -254,18 +254,21 @@ export const Login = () => {
                             </motion.div>
                         </AnimatePresence>
 
-                        {infoMessage && (
-                            <div className="flex gap-2 items-start text-xs text-emerald-600 font-bold bg-emerald-50 p-4 rounded-xl animate-in fade-in duration-200">
-                                <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500 mt-0.5" />
-                                <p className="leading-relaxed">{infoMessage}</p>
-                            </div>
-                        )}
+                        <div className="min-h-[10px] space-y-4">
+                            {infoMessage && (
+                                <div className="flex gap-2 items-start text-xs text-emerald-600 font-bold bg-emerald-50 p-4 rounded-xl animate-in fade-in duration-200">
+                                    <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500 mt-0.5" />
+                                    <p className="leading-relaxed">{infoMessage}</p>
+                                </div>
+                            )}
 
-                        {error && (
-                            <p className="text-xs text-red-500 font-bold text-center bg-red-50 py-3 rounded-2xl animate-in fade-in duration-200">
-                                {error}
-                            </p>
-                        )}
+                            {error && (
+                                <div className="flex gap-2 items-start text-xs text-red-500 font-bold bg-red-50 p-4 rounded-xl animate-in fade-in duration-200">
+                                    <AlertTriangle className="w-4 h-4 shrink-0 text-red-400 mt-0.5" />
+                                    <p className="leading-relaxed">{error}</p>
+                                </div>
+                            )}
+                        </div>
 
                         {otpStep === 1 ? (
                             <Button 
