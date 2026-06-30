@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { OtpInput } from '../components/ui/OtpInput';
-import { ChevronRight, Mail, CheckCircle2 } from 'lucide-react';
+import { Mail, ChevronRight, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { useAuth } from '../context/AuthContext';
