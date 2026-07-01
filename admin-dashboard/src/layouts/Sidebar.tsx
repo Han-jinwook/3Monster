@@ -13,7 +13,7 @@ export const Sidebar = () => {
         { icon: Users, label: '일반 회원', href: '/admin/users' },
         { icon: Bell, label: '알림 관리', href: '/admin/notifications' },
         { icon: HelpCircle, label: '고객센터', href: '/support' },
-        { icon: Key, label: '멀린 체험판', href: '/admin/merlin-trial' },
+        { icon: Key, label: '체험판 현황', href: '/admin/merlin-trial' },
     ];
 
     const buyerNavItems = [

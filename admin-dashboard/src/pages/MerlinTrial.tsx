@@ -82,11 +82,8 @@ export const MerlinTrial = () => {
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
                         <Key className="h-6 w-6 text-primary" />
-                        멀린 체험판 관리
+                        프로그램별 체험판 현황
                     </h1>
-                    <p className="text-sm text-slate-500 mt-1">
-                        체험판(N-Place-DB) 사용 기록을 확인하고 초기화할 수 있습니다.
-                    </p>
                 </div>
                 <Button 
                     onClick={handleDeleteAll} 
@@ -103,8 +100,10 @@ export const MerlinTrial = () => {
                     <table className="w-full text-left text-sm text-slate-600">
                         <thead className="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase text-slate-500">
                             <tr>
+                                <th className="px-4 py-3">프로그램명</th>
                                 <th className="px-4 py-3">HWID (기기 식별자)</th>
-                                <th className="px-4 py-3">누적 사용량</th>
+                                <th className="px-4 py-3">사용 시작일</th>
+                                <th className="px-4 py-3">누적사용량</th>
                                 <th className="px-4 py-3">최근 수집일</th>
                                 <th className="px-4 py-3 text-right">관리</th>
                             </tr>
@@ -112,7 +111,7 @@ export const MerlinTrial = () => {
                         <tbody className="divide-y divide-slate-100 bg-white">
                             {loading ? (
                                 <tr>
-                                    <td colSpan={4} className="px-4 py-8 text-center text-slate-500">
+                                    <td colSpan={6} className="px-4 py-8 text-center text-slate-500">
                                         <div className="flex flex-col items-center justify-center gap-2">
                                             <Loader2 className="h-6 w-6 animate-spin text-primary" />
                                             <span>데이터를 불러오는 중...</span>
@@ -121,14 +120,18 @@ export const MerlinTrial = () => {
                                 </tr>
                             ) : trials.length === 0 ? (
                                 <tr>
-                                    <td colSpan={4} className="px-4 py-8 text-center text-slate-500">
+                                    <td colSpan={6} className="px-4 py-8 text-center text-slate-500">
                                         기록된 체험판 사용자가 없습니다.
                                     </td>
                                 </tr>
                             ) : (
                                 trials.map((trial) => (
                                     <tr key={trial.id} className="hover:bg-slate-50 transition-colors">
-                                        <td className="px-4 py-3 font-mono text-xs">{trial.hwid}</td>
+                                        <td className="px-4 py-3 font-medium text-slate-700">N-Place-DB</td>
+                                        <td className="px-4 py-3 font-mono text-xs text-slate-500">{trial.hwid}</td>
+                                        <td className="px-4 py-3 text-slate-600">
+                                            {format(new Date(trial.created_at), 'yyyy-MM-dd HH:mm')}
+                                        </td>
                                         <td className="px-4 py-3">
                                             <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
                                                 trial.used_count >= 50 
@@ -138,7 +141,7 @@ export const MerlinTrial = () => {
                                                 {trial.used_count} / 50건
                                             </span>
                                         </td>
-                                        <td className="px-4 py-3">
+                                        <td className="px-4 py-3 text-slate-600">
                                             {format(new Date(trial.last_collected_at || trial.created_at), 'yyyy-MM-dd HH:mm')}
                                         </td>
                                         <td className="px-4 py-3 text-right">
