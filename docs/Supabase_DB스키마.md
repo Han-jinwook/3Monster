@@ -135,6 +135,22 @@
 
 ---
 
+### [테이블명: trial_logs]
+- **목적**: 시리얼 키 없이 가동되는 순수 무료 체험판 사용자의 기기별(HWID) 사용 이력 및 수집 건수 관리.
+- **테이블 구조**:
+
+| 컬럼명 | 타입 | 제약 조건 | 설명 |
+| :--- | :--- | :--- | :--- |
+| **hwid** | TEXT | PRIMARY KEY | 사용자의 고유 하드웨어 ID |
+| **product_id** | TEXT | PRIMARY KEY | 이용 중인 프로그램 식별자 (예: `NPlace-DB`) |
+| **used_count** | INTEGER | DEFAULT 0 | 현재까지 무료 체험으로 수집한 누적 건수 |
+| **created_at** | TIMESTAMPTZ | DEFAULT now() | 무료 체험 최초 시작(생성) 일시 |
+| **updated_at** | TIMESTAMPTZ | DEFAULT now() | 마지막 수집/업데이트 일시 |
+
+> **동작 규정**: 클라이언트 단에서 UPSERT(`POST` with `resolution=merge-duplicates`) 방식으로 동작하여 초기화 오류 방지 및 원활한 수집량 누적을 보장.
+
+---
+
 ### [비고: 미사용 테이블 정리]
 - **inquiries**: 레거시/구버전 문의 테이블로 현재 프로젝트에서 사용되지 않으며, `support_tickets`로 통합되어 삭제/정리 대상입니다.
 - **admins**: `users` 테이블 통합 후 삭제 완료되었습니다.
