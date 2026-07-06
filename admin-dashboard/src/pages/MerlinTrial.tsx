@@ -11,6 +11,7 @@ interface TrialLog {
     used_count: number;
     last_collected_at: string;
     created_at: string;
+    last_version: string | null;
 }
 
 export const MerlinTrial = () => {
@@ -102,6 +103,7 @@ export const MerlinTrial = () => {
                             <tr>
                                 <th className="px-4 py-3">프로그램명</th>
                                 <th className="px-4 py-3">HWID (기기 식별자)</th>
+                                <th className="px-4 py-3">앱 버전</th>
                                 <th className="px-4 py-3">사용 시작일</th>
                                 <th className="px-4 py-3">누적사용량</th>
                                 <th className="px-4 py-3">최근 수집일</th>
@@ -129,6 +131,7 @@ export const MerlinTrial = () => {
                                     <tr key={trial.id} className="hover:bg-slate-50 transition-colors">
                                         <td className="px-4 py-3 font-medium text-slate-700">N-Place-DB</td>
                                         <td className="px-4 py-3 font-mono text-xs text-slate-500">{trial.hwid}</td>
+                                        <td className="px-4 py-3 text-sm text-slate-700">{trial.last_version || 'N/A'}</td>
                                         <td className="px-4 py-3 text-slate-600">
                                             {format(new Date(trial.created_at), 'yyyy-MM-dd HH:mm')}
                                         </td>
