@@ -1135,12 +1135,8 @@ export const Showroom = () => {
                                                     href={
                                                         selectedProduct.id === 'nplace-db'
                                                             ? "https://github.com/Han-jinwook/n-place-db/releases/latest/download/NPlace-DB-Trial.zip"
-                                                            : selectedProduct.id === 'cafe-crawler'
-                                                            ? "https://github.com/Han-jinwook/CafeScraper/releases/latest/download/CafeCrawler-Trial.zip"
-                                                            : selectedProduct.id === 'event-activity-stats'
-                                                            ? "https://github.com/Han-jinwook/CafeScraper/releases/latest/download/EventStats-Trial.zip"
-                                                            : selectedProduct.id === 'comment-stats'
-                                                            ? "https://github.com/Han-jinwook/CafeScraper/releases/latest/download/AutoComment-Trial.zip"
+                                                            : (selectedProduct.id === 'cafe-crawler' || selectedProduct.id === 'event-activity-stats' || selectedProduct.id === 'comment-stats')
+                                                            ? "https://github.com/Han-jinwook/CafeScraper/releases/latest/download/CafeMonster-Trial.zip"
                                                             : `https://github.com/Han-jinwook/${selectedProduct.id}/releases/latest/download/${selectedProduct.id}-Trial.zip`
                                                     }
                                                     className="w-full sm:w-1/2 block"

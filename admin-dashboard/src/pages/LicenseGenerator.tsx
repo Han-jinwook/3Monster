@@ -299,6 +299,9 @@ export const LicenseGenerator = () => {
             'AutoComment': 'CafeScraper'
         };
         const repo = repoMap[productId] || productId.toLowerCase();
+        if (type === 'Trial' && (productId === 'CafeCrawler' || productId === 'EventStats' || productId === 'AutoComment')) {
+            return `https://github.com/Han-jinwook/CafeScraper/releases/latest/download/CafeMonster-Trial.zip`;
+        }
         return `https://github.com/Han-jinwook/${repo}/releases/latest/download/${productId}-${type}.zip`;
     };
 
