@@ -294,9 +294,9 @@ export const LicenseGenerator = () => {
             'NPlace-DB': 'n-place-db',
             'ContentCrawler': 'content-crawler',
             'UserManager': 'user-manager',
-            'CafeCrawler': 'cafe-crawler',
-            'EventStats': 'event-stats',
-            'AutoComment': 'auto-comment'
+            'CafeCrawler': 'CafeScraper',
+            'EventStats': 'CafeScraper',
+            'AutoComment': 'CafeScraper'
         };
         const repo = repoMap[productId] || productId.toLowerCase();
         return `https://github.com/Han-jinwook/${repo}/releases/latest/download/${productId}-${type}.zip`;
