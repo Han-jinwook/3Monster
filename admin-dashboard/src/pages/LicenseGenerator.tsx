@@ -84,9 +84,9 @@ export const LicenseGenerator = () => {
             { id: 13, product: 'EventStats', pkg: 'DELUXE', label: '[디럭스] EventStats 이벤트 활동 분석기 (1개월/1,000건 제한)', price: 5000, status: '확정' },
             { id: 14, product: 'EventStats', pkg: '1M', label: '[1개월 이용권] EventStats 이벤트 활동 분석기 (무제한 수집)', price: 19000, status: '확정' },
             { id: 15, product: 'EventStats', pkg: '3M', label: '[3개월 이용권] EventStats 이벤트 활동 분석기 (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
-            { id: 16, product: 'AutoComment', pkg: 'DELUXE', label: '[디럭스] AutoComment 스텔스 댓글러 (1개월/1,000건 제한)', price: 5000, status: '확정' },
-            { id: 17, product: 'AutoComment', pkg: '1M', label: '[1개월 이용권] AutoComment 스텔스 댓글러 (무제한 수집)', price: 19000, status: '확정' },
-            { id: 18, product: 'AutoComment', pkg: '3M', label: '[3개월 이용권] AutoComment 스텔스 댓글러 (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
+            { id: 16, product: 'AutoComment', pkg: 'DELUXE', label: '[디럭스] AutoComment 자동댓글러 (1개월/1,000건 제한)', price: 5000, status: '확정' },
+            { id: 17, product: 'AutoComment', pkg: '1M', label: '[1개월 이용권] AutoComment 자동댓글러 (무제한 수집)', price: 19000, status: '확정' },
+            { id: 18, product: 'AutoComment', pkg: '3M', label: '[3개월 이용권] AutoComment 자동댓글러 (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
         ];
     });
 
@@ -108,9 +108,9 @@ export const LicenseGenerator = () => {
             { id: 13, product: 'EventStats', pkg: 'DELUXE', label: '[디럭스] EventStats 이벤트 활동 분석기 (1개월/1,000건 제한)', price: 5000, status: '확정' },
             { id: 14, product: 'EventStats', pkg: '1M', label: '[1개월 이용권] EventStats 이벤트 활동 분석기 (무제한 수집)', price: 19000, status: '확정' },
             { id: 15, product: 'EventStats', pkg: '3M', label: '[3개월 이용권] EventStats 이벤트 활동 분석기 (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
-            { id: 16, product: 'AutoComment', pkg: 'DELUXE', label: '[디럭스] AutoComment 스텔스 댓글러 (1개월/1,000건 제한)', price: 5000, status: '확정' },
-            { id: 17, product: 'AutoComment', pkg: '1M', label: '[1개월 이용권] AutoComment 스텔스 댓글러 (무제한 수집)', price: 19000, status: '확정' },
-            { id: 18, product: 'AutoComment', pkg: '3M', label: '[3개월 이용권] AutoComment 스텔스 댓글러 (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' }
+            { id: 16, product: 'AutoComment', pkg: 'DELUXE', label: '[디럭스] AutoComment 자동댓글러 (1개월/1,000건 제한)', price: 5000, status: '확정' },
+            { id: 17, product: 'AutoComment', pkg: '1M', label: '[1개월 이용권] AutoComment 자동댓글러 (무제한 수집)', price: 19000, status: '확정' },
+            { id: 18, product: 'AutoComment', pkg: '3M', label: '[3개월 이용권] AutoComment 자동댓글러 (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' }
         ]));
     }, []);
 
@@ -154,7 +154,7 @@ export const LicenseGenerator = () => {
         cafe: [
             { id: 'CafeCrawler', name: '☕ 카페 수집기 Pro', desc: '카페 게시글/댓글 수집기' },
             { id: 'EventStats', name: '📊 이벤트 활동 분석기', desc: '회원 활동지수 집계·이벤트 추첨' },
-            { id: 'AutoComment', name: '🥷 스텔스 댓글러', desc: '자동 댓글 등록 자동화' },
+            { id: 'AutoComment', name: '🤖 자동댓글러', desc: '자동 댓글 등록 자동화' },
         ]
     };
 
@@ -333,7 +333,7 @@ export const LicenseGenerator = () => {
                                             <optgroup label="카페몬스터 제품군">
                                                 <option value="CafeCrawler">☕ CafeCrawler (카페 수집기 Pro)</option>
                                                 <option value="EventStats">📊 EventStats (이벤트 활동 분석기)</option>
-                                                <option value="AutoComment">🥷 AutoComment (스텔스 댓글러)</option>
+                                                <option value="AutoComment">🤖 AutoComment (자동댓글러)</option>
                                             </optgroup>
                                         </select>
                                         <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">

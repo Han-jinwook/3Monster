@@ -48,7 +48,7 @@ const products = [
     },
     {
         id: 'stealth-comment',
-        title: "스텔스 댓글",
+        title: "자동댓글러",
         subtitle: "스마트 자동 댓글 솔루션",
         description: "봇 탐지를 우회하는 정교한 알고리즘. 자연스러운 상호작용으로 도달률을 극대화합니다.",
         icon: Activity,
