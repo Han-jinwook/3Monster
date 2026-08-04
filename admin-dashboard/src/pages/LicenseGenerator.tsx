@@ -81,12 +81,12 @@ export const LicenseGenerator = () => {
             { id: 10, product: 'CafeCrawler', pkg: 'DELUXE', label: '[디럭스] CafeCrawler (1개월/1,000건 제한)', price: 5000, status: '확정' },
             { id: 11, product: 'CafeCrawler', pkg: '1M', label: '[1개월 이용권] CafeCrawler (무제한 수집)', price: 19000, status: '확정' },
             { id: 12, product: 'CafeCrawler', pkg: '3M', label: '[3개월 이용권] CafeCrawler (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
-            { id: 13, product: 'CommentStats', pkg: 'DELUXE', label: '[디럭스] CommentStats (1개월/1,000건 제한)', price: 5000, status: '확정' },
-            { id: 14, product: 'CommentStats', pkg: '1M', label: '[1개월 이용권] CommentStats (무제한 수집)', price: 19000, status: '확정' },
-            { id: 15, product: 'CommentStats', pkg: '3M', label: '[3개월 이용권] CommentStats (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
-            { id: 16, product: 'EventStats', pkg: 'DELUXE', label: '[디럭스] EventStats (1개월/1,000건 제한)', price: 5000, status: '확정' },
-            { id: 17, product: 'EventStats', pkg: '1M', label: '[1개월 이용권] EventStats (무제한 수집)', price: 19000, status: '확정' },
-            { id: 18, product: 'EventStats', pkg: '3M', label: '[3개월 이용권] EventStats (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
+            { id: 13, product: 'EventStats', pkg: 'DELUXE', label: '[디럭스] EventStats 이벤트 활동 분석기 (1개월/1,000건 제한)', price: 5000, status: '확정' },
+            { id: 14, product: 'EventStats', pkg: '1M', label: '[1개월 이용권] EventStats 이벤트 활동 분석기 (무제한 수집)', price: 19000, status: '확정' },
+            { id: 15, product: 'EventStats', pkg: '3M', label: '[3개월 이용권] EventStats 이벤트 활동 분석기 (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
+            { id: 16, product: 'AutoComment', pkg: 'DELUXE', label: '[디럭스] AutoComment 스텔스 댓글러 (1개월/1,000건 제한)', price: 5000, status: '확정' },
+            { id: 17, product: 'AutoComment', pkg: '1M', label: '[1개월 이용권] AutoComment 스텔스 댓글러 (무제한 수집)', price: 19000, status: '확정' },
+            { id: 18, product: 'AutoComment', pkg: '3M', label: '[3개월 이용권] AutoComment 스텔스 댓글러 (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
         ];
     });
 
@@ -105,12 +105,12 @@ export const LicenseGenerator = () => {
             { id: 10, product: 'CafeCrawler', pkg: 'DELUXE', label: '[디럭스] CafeCrawler (1개월/1,000건 제한)', price: 5000, status: '확정' },
             { id: 11, product: 'CafeCrawler', pkg: '1M', label: '[1개월 이용권] CafeCrawler (무제한 수집)', price: 19000, status: '확정' },
             { id: 12, product: 'CafeCrawler', pkg: '3M', label: '[3개월 이용권] CafeCrawler (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
-            { id: 13, product: 'CommentStats', pkg: 'DELUXE', label: '[디럭스] CommentStats (1개월/1,000건 제한)', price: 5000, status: '확정' },
-            { id: 14, product: 'CommentStats', pkg: '1M', label: '[1개월 이용권] CommentStats (무제한 수집)', price: 19000, status: '확정' },
-            { id: 15, product: 'CommentStats', pkg: '3M', label: '[3개월 이용권] CommentStats (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
-            { id: 16, product: 'EventStats', pkg: 'DELUXE', label: '[디럭스] EventStats (1개월/1,000건 제한)', price: 5000, status: '확정' },
-            { id: 17, product: 'EventStats', pkg: '1M', label: '[1개월 이용권] EventStats (무제한 수집)', price: 19000, status: '확정' },
-            { id: 18, product: 'EventStats', pkg: '3M', label: '[3개월 이용권] EventStats (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' }
+            { id: 13, product: 'EventStats', pkg: 'DELUXE', label: '[디럭스] EventStats 이벤트 활동 분석기 (1개월/1,000건 제한)', price: 5000, status: '확정' },
+            { id: 14, product: 'EventStats', pkg: '1M', label: '[1개월 이용권] EventStats 이벤트 활동 분석기 (무제한 수집)', price: 19000, status: '확정' },
+            { id: 15, product: 'EventStats', pkg: '3M', label: '[3개월 이용권] EventStats 이벤트 활동 분석기 (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
+            { id: 16, product: 'AutoComment', pkg: 'DELUXE', label: '[디럭스] AutoComment 스텔스 댓글러 (1개월/1,000건 제한)', price: 5000, status: '확정' },
+            { id: 17, product: 'AutoComment', pkg: '1M', label: '[1개월 이용권] AutoComment 스텔스 댓글러 (무제한 수집)', price: 19000, status: '확정' },
+            { id: 18, product: 'AutoComment', pkg: '3M', label: '[3개월 이용권] AutoComment 스텔스 댓글러 (무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' }
         ]));
     }, []);
 
@@ -152,9 +152,9 @@ export const LicenseGenerator = () => {
             { id: 'UserManager', name: '👥 회원관리프로그램 확장팩', desc: 'AI 검색 및 메시지 전송' },
         ],
         cafe: [
-            { id: 'CafeCrawler', name: '☕ 카페 크롤러', desc: '카페 게시글/댓글 크롤러' },
-            { id: 'CommentStats', name: '📊 카페 댓글 수집 통계', desc: '실시간 여론 반응 분석' },
-            { id: 'EventStats', name: '🔔 이벤트 활동 통계 집계', desc: '활동 기여 지표 분석' },
+            { id: 'CafeCrawler', name: '☕ 카페 수집기 Pro', desc: '카페 게시글/댓글 수집기' },
+            { id: 'EventStats', name: '📊 이벤트 활동 분석기', desc: '회원 활동지수 집계·이벤트 추첨' },
+            { id: 'AutoComment', name: '🥷 스텔스 댓글러', desc: '자동 댓글 등록 자동화' },
         ]
     };
 
@@ -295,8 +295,8 @@ export const LicenseGenerator = () => {
             'ContentCrawler': 'content-crawler',
             'UserManager': 'user-manager',
             'CafeCrawler': 'cafe-crawler',
-            'CommentStats': 'comment-stats',
-            'EventStats': 'event-stats'
+            'EventStats': 'event-stats',
+            'AutoComment': 'auto-comment'
         };
         const repo = repoMap[productId] || productId.toLowerCase();
         return `https://github.com/Han-jinwook/${repo}/releases/latest/download/${productId}-${type}.zip`;
@@ -331,9 +331,9 @@ export const LicenseGenerator = () => {
                                                 <option value="UserManager">👥 UserManager (회원관리 확장팩)</option>
                                             </optgroup>
                                             <optgroup label="카페몬스터 제품군">
-                                                <option value="CafeCrawler">☕ CafeCrawler (카페 크롤러)</option>
-                                                <option value="CommentStats">📊 CommentStats (카페 댓글 수집 통계)</option>
-                                                <option value="EventStats">🔔 EventStats (이벤트 활동 통계)</option>
+                                                <option value="CafeCrawler">☕ CafeCrawler (카페 수집기 Pro)</option>
+                                                <option value="EventStats">📊 EventStats (이벤트 활동 분석기)</option>
+                                                <option value="AutoComment">🥷 AutoComment (스텔스 댓글러)</option>
                                             </optgroup>
                                         </select>
                                         <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
