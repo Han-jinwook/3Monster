@@ -1134,7 +1134,7 @@ export const Showroom = () => {
                                                 <a 
                                                     href={
                                                         selectedProduct.id === 'nplace-db'
-                                                            ? "https://github.com/Han-jinwook/n-place-db/releases/latest/download/NPlace-DB-Trial.zip"
+                                                            ? "https://github.com/Han-jinwook/n-place-db/releases/latest/download/Map_DB-Trial.zip"
                                                             : (selectedProduct.id === 'cafe-crawler' || selectedProduct.id === 'event-activity-stats' || selectedProduct.id === 'comment-stats')
                                                             ? "https://github.com/Han-jinwook/CafeScraper/releases/latest/download/CafeMonster-Trial.zip"
                                                             : `https://github.com/Han-jinwook/${selectedProduct.id}/releases/latest/download/${selectedProduct.id}-Trial.zip`

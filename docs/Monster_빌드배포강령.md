@@ -27,13 +27,10 @@
    * `build_exe.py`가 작동하며 `config.py`의 `BUILD_TYPE`을 런타임에 동적으로 변경하여 `dist\Map_DB-PRO` 및 `dist\Map_DB-TRIAL`을 순차적으로 PyInstaller 컴파일합니다.
 3. **배포 및 업로드 (자동화)**:
    * 터미널에서 **`python deploy_ota.py`** 명령을 실행합니다.
-   * 이 스크립트는 릴리즈 호환성 및 업데이터 연동을 위해 **5종의 ZIP 패키지**를 자동 압축 및 업로드하고 Supabase를 동기화합니다:
-     1. `Map_DB-Pro-v{Version}.zip` (버전 정보가 포함된 정식판 패키지)
-     2. `Map_DB-Trial-v{Version}.zip` (버전 정보가 포함된 체험판 패키지)
-     3. `Map_DB-Pro.zip` (구버전 호환용 정적 정식판 패키지)
-     4. `Map_DB-Trial.zip` (구버전 호환용 정적 체험판 패키지)
-     5. `NPlace-DB-Trial.zip` (쇼룸 다운로드 링크 전용 패키지)
-   * 깃허브 Releases에 태그(`v{Version}`)를 생성하여 위 5개 자산을 업로드하고 Supabase `app_versions` 테이블을 최종 업데이트합니다.
+   * 이 스크립트는 **2종의 최종 ZIP 패키지**를 자동 압축 및 업로드하고 Supabase를 동기화합니다:
+     1. `Map_DB-Pro.zip` (정식판 패키지)
+     2. `Map_DB-Trial.zip` (체험판 패키지)
+   * 깃허브 Releases에 태그(`v{Version}`)를 생성하여 위 2개 자산을 업로드하고 Supabase `app_versions` 테이블을 최종 업데이트합니다.
 
 ---
 
@@ -89,11 +86,11 @@
      ```
 
 2. **N플레이스 DB 추출기 체험판**:
-   * **다운로드 연결 파일**: `NPlace-DB-Trial.zip` (또는 `Map_DB-Trial.zip`)
+   * **다운로드 연결 파일**: `Map_DB-Trial.zip`
    * **쇼룸 코드**:
      ```typescript
      selectedProduct.id === 'nplace-db'
-         ? "https://github.com/Han-jinwook/n-place-db/releases/latest/download/NPlace-DB-Trial.zip"
+         ? "https://github.com/Han-jinwook/n-place-db/releases/latest/download/Map_DB-Trial.zip"
      ```
 
 ---
