@@ -8,6 +8,7 @@ import { format } from 'date-fns';
 interface TrialLog {
     id: number;
     hwid: string;
+    product_id?: string;
     used_count: number;
     last_collected_at: string;
     created_at: string;
@@ -129,7 +130,12 @@ export const MerlinTrial = () => {
                             ) : (
                                 trials.map((trial) => (
                                     <tr key={trial.id} className="hover:bg-slate-50 transition-colors">
-                                        <td className="px-4 py-3 font-medium text-slate-700">N-Place-DB</td>
+                                        <td className="px-4 py-3 font-medium text-slate-700">
+                                            {trial.product_id === 'AutoComment' ? '자동댓글러' :
+                                             trial.product_id === 'CafeCrawler' ? '카페 수집기' :
+                                             trial.product_id === 'EventStats' ? '이벤트 활동 분석기' :
+                                             trial.product_id || 'N-Place-DB'}
+                                        </td>
                                         <td className="px-4 py-3 font-mono text-xs text-slate-500">{trial.hwid}</td>
                                         <td className="px-4 py-3 text-sm text-slate-700">{trial.last_version || 'N/A'}</td>
                                         <td className="px-4 py-3 text-slate-600">
