@@ -164,6 +164,25 @@ export const LicenseList = () => {
         } catch (error: any) { alert(`수정 오류: ${error.message}`); }
     };
 
+    const handleEditFirstRunDate = async (id: string, currentFirstRun: string | undefined, buyerName: string) => {
+        const newDate = window.prompt(`"${buyerName}" 새 실행일자 (YYYY-MM-DD):`, currentFirstRun ? currentFirstRun.split('T')[0] : '');
+        if (newDate === null) return;
+        
+        let firstRunPayload: string | null = null;
+        if (newDate) {
+            const parsedDate = new Date(newDate);
+            if (isNaN(parsedDate.getTime())) { alert('날짜 형식 오류 (YYYY-MM-DD)'); return; }
+            firstRunPayload = parsedDate.toISOString();
+        }
+        
+        try {
+            const { error } = await supabase.from('licenses').update({ first_run_date: firstRunPayload }).eq('id', id);
+            if (error) throw error;
+            fetchLicenses();
+            showToast(`실행일 변경: ${newDate || '대기 상태로 초기화'}`, 'success');
+        } catch (error: any) { alert(`수정 오류: ${error.message}`); }
+    };
+
     const handleToggleStatus = async (id: string, currentStatus: string, buyerName: string) => {
         if (currentStatus === 'blocked') {
             if (!window.confirm(`"${buyerName}" 차단 해제하시겠습니까?`)) return;
@@ -246,7 +265,16 @@ export const LicenseList = () => {
 
                 {/* 실행일자 */}
                 <td className="px-3 py-2 font-bold text-slate-500">
-                    {lic.first_run_date ? format(new Date(lic.first_run_date), 'yyyy.MM.dd') : <span className="text-slate-300 text-[10px]">대기</span>}
+                    <div className="flex items-center gap-1">
+                        <span>{lic.first_run_date ? format(new Date(lic.first_run_date), 'yyyy.MM.dd') : <span className="text-slate-300 text-[10px]">대기</span>}</span>
+                        <button
+                            className="text-slate-300 hover:text-indigo-500 transition-colors flex-shrink-0"
+                            onClick={(e) => { e.stopPropagation(); handleEditFirstRunDate(lic.id, lic.first_run_date, lic.buyer_name); }}
+                            title="실행일자 수정"
+                        >
+                            <Pencil className="w-2.5 h-2.5" />
+                        </button>
+                    </div>
                 </td>
 
                 {/* 만료일자 */}
