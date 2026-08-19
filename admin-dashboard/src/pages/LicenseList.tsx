@@ -109,12 +109,12 @@ export const LicenseList = () => {
 
     const getProductLabel = (productId: string, licenseType?: string) => {
         const mapping: Record<string, string> = {
-            'DELUXE':   'STANDARD (1개월/1,000건 제한)',
-            'TRIAL':    '체험판 (무기한/50건)',
-            'TEST':     '테스트 발급 (무기한/50건)',
-            '1M':       'DELUXE (1개월 무제한)',
-            '3M':       'PREMIUM (3개월 무제한)',
-            '6M':       'Standard 6개월',
+            'DELUXE':   'STANDARD (1,000건 제한)',
+            'TRIAL':    '체험판 (50건)',
+            'TEST':     '테스트 발급 (50건)',
+            '1M':       'DELUXE (무제한)',
+            '3M':       'PREMIUM (무제한)',
+            '6M':       'Standard',
             'LIFETIME': 'Premium 영구',
         };
         const typeLabel = licenseType ? (mapping[licenseType] || licenseType) : '';
@@ -212,6 +212,7 @@ export const LicenseList = () => {
 
         return (
             <Fragment key={lic.id}>
+                {/* 제품별 개별 메모 */}
                 <td className="px-3 py-2 text-center cursor-pointer hover:bg-slate-100 transition-colors" onClick={() => handleEditLicenseMemo(lic.id, lic.memo, lic.buyer_name, lic.product_id)}>
                     {lic.memo ? (
                         <span
@@ -231,10 +232,12 @@ export const LicenseList = () => {
                     ) : <span className="text-[10px] text-slate-400 border border-dashed border-slate-300 px-1.5 py-0.5 rounded hover:text-indigo-600 transition-colors">작성</span>}
                 </td>
 
+                {/* 구매 제품 */}
                 <td className="px-3 py-2 font-bold text-slate-700 truncate max-w-0">
                     <span className="block truncate">{getProductLabel(lic.product_id, lic.license_type)}</span>
                 </td>
 
+                {/* 시리얼 */}
                 <td className="px-3 py-2 text-center">
                     <button
                         className="inline-flex items-center gap-1 font-bold text-slate-500 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-700 px-2 py-0.5 rounded border border-slate-200 hover:border-indigo-200 transition-colors"
@@ -245,10 +248,12 @@ export const LicenseList = () => {
                     </button>
                 </td>
 
+                {/* 구매일자 */}
                 <td className="px-3 py-2 font-bold text-slate-500">
                     {lic.created_at ? format(new Date(lic.created_at), 'yyyy.MM.dd') : '-'}
                 </td>
 
+                {/* 실행일자 */}
                 <td className="px-3 py-2 font-bold text-slate-500">
                     <div className="flex items-center gap-1">
                         <span>{lic.first_run_date ? format(new Date(lic.first_run_date), 'yyyy.MM.dd') : <span className="text-slate-300 text-[10px]">대기</span>}</span>
@@ -262,6 +267,7 @@ export const LicenseList = () => {
                     </div>
                 </td>
 
+                {/* 만료일자 */}
                 <td className="px-3 py-2 font-bold text-slate-500">
                     <div className="flex items-center gap-1">
                         <span>{lic.expire_date ? format(new Date(lic.expire_date), 'yyyy.MM.dd') : '-'}</span>
@@ -275,21 +281,23 @@ export const LicenseList = () => {
                     </div>
                 </td>
 
+                {/* 상태 */}
                 <td className="px-3 py-2">
                     <div className={cn("inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-black border text-[10px]", status.color)}>
                         <status.icon className="w-3 h-3" /> {status.label}
                     </div>
                 </td>
 
+                {/* 제어 */}
                 <td className="px-3 py-2 text-right">
-                    <div className="flex justify-end gap-0.5">
-                        <Button variant="ghost" size="icon"
-                            className="h-7 w-7 text-indigo-600 hover:bg-indigo-50 hover:text-indigo-800 transition-colors"
+                    <div className="flex justify-end items-center gap-1">
+                        <button
+                            className="inline-flex items-center gap-1 font-black text-[10px] text-indigo-600 bg-indigo-50 hover:bg-indigo-100 hover:text-indigo-800 px-2 py-1 rounded-md border border-indigo-200/80 transition-colors whitespace-nowrap"
                             onClick={(e) => { e.stopPropagation(); handleAddLicenseForBuyer(lic.buyer_name, lic.contact); }}
                             title="이 구매자 정보로 추가 제품 라이선스 발급"
                         >
-                            <PlusCircle className="w-3.5 h-3.5" />
-                        </Button>
+                            <PlusCircle className="w-3 h-3" /> 추가 구매
+                        </button>
                         <Button variant="ghost" size="icon"
                             className={cn("h-7 w-7 transition-colors",
                                 lic.status === 'blocked'
@@ -363,7 +371,7 @@ export const LicenseList = () => {
                         <col style={{ width: '8%' }}  />   {/* 실행일자 */}
                         <col style={{ width: '9%' }}  />   {/* 만료일자 */}
                         <col style={{ width: '8%' }}  />   {/* 상태 */}
-                        <col style={{ width: '80px' }} />  {/* 제어 */}
+                        <col style={{ width: '135px' }} /> {/* 제어 */}
                     </colgroup>
                     <thead className="bg-slate-900 text-white">
                         <tr className="text-[11px] font-black uppercase tracking-wide text-left">
