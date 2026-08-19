@@ -58,35 +58,26 @@ export const LicenseGenerator = () => {
     });
 
     const [pricing, setPricing] = useState<PricingItem[]>(() => {
-        const saved = localStorage.getItem('3monster_pricing_policies');
-        if (saved) {
-            try {
-                const parsed = JSON.parse(saved);
-                if (Array.isArray(parsed) && parsed.every(p => ['DELUXE', '1M', '3M'].includes(p.pkg))) {
-                    return parsed;
-                }
-            } catch (e) {}
-        }
         return [
-            { id: 1, product: 'NPlace-DB', pkg: 'DELUXE', label: '[스탠다드] NPlace_DB Pro (1개월/1,000건 제한)', price: 5000, status: '확정' },
-            { id: 2, product: 'NPlace-DB', pkg: '1M', label: '[디럭스] NPlace_DB Pro (1개월/무제한 수집)', price: 19000, status: '확정' },
-            { id: 3, product: 'NPlace-DB', pkg: '3M', label: '[프리미엄] NPlace_DB Pro (3개월/무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
-            { id: 4, product: 'ContentCrawler', pkg: 'DELUXE', label: '[스탠다드] ContentCrawler (1개월/1,000건 제한)', price: 5000, status: '확정' },
-            { id: 5, product: 'ContentCrawler', pkg: '1M', label: '[디럭스] ContentCrawler (1개월/무제한 수집)', price: 19000, status: '확정' },
-            { id: 6, product: 'ContentCrawler', pkg: '3M', label: '[프리미엄] ContentCrawler (3개월/무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
-            { id: 7, product: 'UserManager', pkg: 'DELUXE', label: '[스탠다드] UserManager (1개월/1,000건 제한)', price: 5000, status: '확정' },
-            { id: 8, product: 'UserManager', pkg: '1M', label: '[디럭스] UserManager (1개월/무제한 수집)', price: 19000, status: '확정' },
-            { id: 9, product: 'UserManager', pkg: '3M', label: '[프리미엄] UserManager (3개월/무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
+            { id: 1, product: 'NPlace-DB', pkg: 'DELUXE', label: '[스탠다드] NPlace_DB Pro (1개월 / 1,000건 제한)', price: 5000, status: '확정' },
+            { id: 2, product: 'NPlace-DB', pkg: '1M', label: '[디럭스] NPlace_DB Pro (1개월 / 무제한 수집)', price: 19000, status: '확정' },
+            { id: 3, product: 'NPlace-DB', pkg: '3M', label: '[프리미엄] NPlace_DB Pro (3개월 / 무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
+            { id: 4, product: 'ContentCrawler', pkg: 'DELUXE', label: '[스탠다드] ContentCrawler (1개월 / 1,000건 제한)', price: 5000, status: '확정' },
+            { id: 5, product: 'ContentCrawler', pkg: '1M', label: '[디럭스] ContentCrawler (1개월 / 무제한 수집)', price: 19000, status: '확정' },
+            { id: 6, product: 'ContentCrawler', pkg: '3M', label: '[프리미엄] ContentCrawler (3개월 / 무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
+            { id: 7, product: 'UserManager', pkg: 'DELUXE', label: '[스탠다드] UserManager (1개월 / 1,000건 제한)', price: 5000, status: '확정' },
+            { id: 8, product: 'UserManager', pkg: '1M', label: '[디럭스] UserManager (1개월 / 무제한 수집)', price: 19000, status: '확정' },
+            { id: 9, product: 'UserManager', pkg: '3M', label: '[프리미엄] UserManager (3개월 / 무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
             // 카페 몬스터
-            { id: 10, product: 'CafeCrawler', pkg: 'DELUXE', label: '[스탠다드] CafeCrawler (1개월/1,000건 제한)', price: 5000, status: '확정' },
-            { id: 11, product: 'CafeCrawler', pkg: '1M', label: '[디럭스] CafeCrawler (1개월/무제한 수집)', price: 19000, status: '확정' },
-            { id: 12, product: 'CafeCrawler', pkg: '3M', label: '[프리미엄] CafeCrawler (3개월/무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
-            { id: 13, product: 'EventStats', pkg: 'DELUXE', label: '[스탠다드] EventStats 이벤트 활동 분석기 (1개월/1,000건 제한)', price: 5000, status: '확정' },
-            { id: 14, product: 'EventStats', pkg: '1M', label: '[디럭스] EventStats 이벤트 활동 분석기 (1개월/무제한 수집)', price: 19000, status: '확정' },
-            { id: 15, product: 'EventStats', pkg: '3M', label: '[프리미엄] EventStats 이벤트 활동 분석기 (3개월/무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
-            { id: 16, product: 'AutoComment', pkg: 'DELUXE', label: '[스탠다드] AutoComment 자동댓글러 (1개월/1,000건 제한)', price: 5000, status: '확정' },
-            { id: 17, product: 'AutoComment', pkg: '1M', label: '[디럭스] AutoComment 자동댓글러 (1개월/무제한 수집)', price: 19000, status: '확정' },
-            { id: 18, product: 'AutoComment', pkg: '3M', label: '[프리미엄] AutoComment 자동댓글러 (3개월/무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
+            { id: 10, product: 'CafeCrawler', pkg: 'DELUXE', label: '[스탠다드] CafeCrawler (1개월 / 1,000건 제한)', price: 5000, status: '확정' },
+            { id: 11, product: 'CafeCrawler', pkg: '1M', label: '[디럭스] CafeCrawler (1개월 / 무제한 수집)', price: 19000, status: '확정' },
+            { id: 12, product: 'CafeCrawler', pkg: '3M', label: '[프리미엄] CafeCrawler (3개월 / 무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
+            { id: 13, product: 'EventStats', pkg: 'DELUXE', label: '[스탠다드] EventStats 이벤트 활동 분석기 (1개월 / 1,000건 제한)', price: 5000, status: '확정' },
+            { id: 14, product: 'EventStats', pkg: '1M', label: '[디럭스] EventStats 이벤트 활동 분석기 (1개월 / 무제한 수집)', price: 19000, status: '확정' },
+            { id: 15, product: 'EventStats', pkg: '3M', label: '[프리미엄] EventStats 이벤트 활동 분석기 (3개월 / 무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
+            { id: 16, product: 'AutoComment', pkg: 'DELUXE', label: '[스탠다드] AutoComment 자동댓글러 (1개월 / 1,000건 제한)', price: 5000, status: '확정' },
+            { id: 17, product: 'AutoComment', pkg: '1M', label: '[디럭스] AutoComment 자동댓글러 (1개월 / 무제한 수집)', price: 19000, status: '확정' },
+            { id: 18, product: 'AutoComment', pkg: '3M', label: '[프리미엄] AutoComment 자동댓글러 (3개월 / 무제한 수집, 1.5만원 할인)', price: 45000, status: '확정' },
         ];
     });
 
@@ -352,9 +343,9 @@ export const LicenseGenerator = () => {
                                             value={formData.license_type}
                                             onChange={(e) => handleLicenseTypeChange(e.target.value)}
                                         >
-                                             <option value="1M">STANDARD (1개월 이용권)</option>
-                                             <option value="DELUXE">DELUXE (1개월 / 1,000건 제한)</option>
-                                             <option value="3M">PREMIUM (3개월 이용권)</option>
+                                             <option value="DELUXE">STANDARD (1개월 / 1,000건 제한)</option>
+                                             <option value="1M">DELUXE (1개월 / 무제한)</option>
+                                             <option value="3M">PREMIUM (3개월 / 무제한)</option>
                                         </select>
                                         <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
                                             <ChevronRight className="w-4 h-4 text-slate-400 rotate-90" />
