@@ -127,10 +127,11 @@ export const LicenseList = () => {
 
     const getProductLabel = (productId: string, licenseType?: string) => {
         const mapping: Record<string, string> = {
-            'DELUXE':   '디럭스 (1개월/1,000건)',
+            'DELUXE':   'STANDARD (1개월/1,000건 제한)',
             'TRIAL':    '체험판 (무기한/50건)',
             'TEST':     '테스트 발급 (무기한/50건)',
-            '1M':       'STANDARD (1개월)',
+            '1M':       'DELUXE (1개월 무제한)',
+            '3M':       'PREMIUM (3개월 무제한)',
             '6M':       'Standard 6개월',
             'LIFETIME': 'Premium 영구',
         };
