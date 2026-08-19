@@ -81,7 +81,8 @@ export const LicenseList = () => {
         });
 
         Array.from(groups.values()).forEach(group => {
-            group.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+            // 구매자별 최초 구매가 메인(위), 추가 구매가 서브(아래)로 오도록 오름차순 정렬
+            group.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
         });
 
         return Array.from(groups.entries()).map(([key, group]) => ({
@@ -109,16 +110,16 @@ export const LicenseList = () => {
 
     const getProductLabel = (productId: string, licenseType?: string) => {
         const mapping: Record<string, string> = {
-            'DELUXE':   'STANDARD (1,000건 제한)',
-            'TRIAL':    '체험판 (50건)',
-            'TEST':     '테스트 발급 (50건)',
-            '1M':       'DELUXE (무제한)',
-            '3M':       'PREMIUM (무제한)',
+            'DELUXE':   'STANDARD / 1,000건',
+            'TRIAL':    '체험판',
+            'TEST':     '테스트',
+            '1M':       'DELUXE',
+            '3M':       'PREMIUM',
             '6M':       'Standard',
-            'LIFETIME': 'Premium 영구',
+            'LIFETIME': 'Premium',
         };
         const typeLabel = licenseType ? (mapping[licenseType] || licenseType) : '';
-        return typeLabel ? `${productId}(${typeLabel})` : productId;
+        return typeLabel ? `${productId} (${typeLabel})` : productId;
     };
 
     const handleCopySerial = (serial: string) => {
