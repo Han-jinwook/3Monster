@@ -110,7 +110,7 @@ export const LicenseList = () => {
 
     const getProductLabel = (productId: string, licenseType?: string) => {
         const mapping: Record<string, string> = {
-            'DELUXE':   'STANDARD / 1,000건',
+            'DELUXE':   'STANDARD',
             'TRIAL':    '체험판',
             'TEST':     '테스트',
             '1M':       'DELUXE',
