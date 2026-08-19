@@ -48,7 +48,7 @@ export const LicenseGenerator = () => {
     const [emailAutoFilled, setEmailAutoFilled] = useState(false);
     const [formData, setFormData] = useState({
         product_id: 'NPlace-DB',
-        license_type: 'DELUXE',
+        license_type: '1M',
         constraint_type: 'HWID',
         buyer_name: '',
         contact: '',
@@ -352,9 +352,9 @@ export const LicenseGenerator = () => {
                                             value={formData.license_type}
                                             onChange={(e) => handleLicenseTypeChange(e.target.value)}
                                         >
-                                            <option value="DELUXE">디럭스 (1개월 / 1,000건 제한)</option>
-                                            <option value="1M">STANDARD (1개월 이용권)</option>
-                                            <option value="3M">PREMIUM (3개월 이용권)</option>
+                                             <option value="1M">STANDARD (1개월 이용권)</option>
+                                             <option value="DELUXE">DELUXE (1개월 / 1,000건 제한)</option>
+                                             <option value="3M">PREMIUM (3개월 이용권)</option>
                                         </select>
                                         <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
                                             <ChevronRight className="w-4 h-4 text-slate-400 rotate-90" />
