@@ -41,21 +41,66 @@ const defaultLegacyPrices: { [key: string]: number } = {
     '1Y': 270000
 };
 
+import { useSearchParams } from 'react-router-dom';
+
 export const LicenseGenerator = () => {
     const { user } = useAuth();
+    const [searchParams] = useSearchParams();
+    const queryBuyer = searchParams.get('buyer') || '';
+    const queryEmail = searchParams.get('email') || '';
+
     const [loading, setLoading] = useState(false);
     const [generatedKey, setGeneratedKey] = useState('');
-    const [emailAutoFilled, setEmailAutoFilled] = useState(false);
+    const [emailAutoFilled, setEmailAutoFilled] = useState(!!(queryEmail || queryBuyer));
+    const [existingBuyers, setExistingBuyers] = useState<Array<{ buyer_name: string; contact: string; channel?: string }>>([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+
     const [formData, setFormData] = useState({
         product_id: 'NPlace-DB',
         license_type: '1M',
         constraint_type: 'HWID',
-        buyer_name: '',
-        contact: '',
+        buyer_name: queryBuyer,
+        contact: queryEmail,
         channel: '크몽',
         price_sold: '',
         memo: ''
     });
+
+    // 기존 구매자 목록 불러오기 (자동완성용)
+    useEffect(() => {
+        const fetchBuyers = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('licenses')
+                    .select('buyer_name, contact, channel')
+                    .not('contact', 'is', null)
+                    .order('created_at', { ascending: false });
+                if (!error && data) {
+                    const uniqueMap = new Map<string, { buyer_name: string; contact: string; channel?: string }>();
+                    data.forEach(item => {
+                        const key = (item.contact || item.buyer_name || '').toLowerCase().trim();
+                        if (key && !uniqueMap.has(key)) {
+                            uniqueMap.set(key, { buyer_name: item.buyer_name, contact: item.contact || '', channel: item.channel });
+                        }
+                    });
+                    setExistingBuyers(Array.from(uniqueMap.values()));
+                }
+            } catch (e) {}
+        };
+        fetchBuyers();
+    }, []);
+
+    // URL 파라미터가 변경될 때 자동 채우기
+    useEffect(() => {
+        if (queryBuyer || queryEmail) {
+            setFormData(prev => ({
+                ...prev,
+                buyer_name: queryBuyer || prev.buyer_name,
+                contact: queryEmail || prev.contact,
+            }));
+            setEmailAutoFilled(true);
+        }
+    }, [queryBuyer, queryEmail]);
 
     const [pricing, setPricing] = useState<PricingItem[]>(() => {
         return [
@@ -389,21 +434,58 @@ export const LicenseGenerator = () => {
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
+                                <div className="space-y-2 relative">
                                     <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">구매자 ID (크몽 등)</label>
                                     <Input
                                         required
                                         placeholder="구매자의 ID를 입력하세요"
                                         className="h-14 bg-white border border-slate-400 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150 text-base font-extrabold px-4 rounded-xl text-slate-955 placeholder:text-slate-400 shadow-sm"
                                         value={formData.buyer_name}
-                                        onChange={e => setFormData({ ...formData, buyer_name: e.target.value })}
+                                        onFocus={() => setShowSuggestions(true)}
+                                        onChange={e => {
+                                            setShowSuggestions(true);
+                                            setFormData({ ...formData, buyer_name: e.target.value });
+                                        }}
                                     />
+                                    {showSuggestions && existingBuyers.length > 0 && (
+                                        <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-300 rounded-xl shadow-2xl z-50 max-h-48 overflow-y-auto divide-y divide-slate-100">
+                                            <div className="px-3 py-1.5 bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-wider">
+                                                기존 등록된 구매자 선택 (클릭 시 자동채움)
+                                            </div>
+                                            {existingBuyers
+                                                .filter(b => 
+                                                    !formData.buyer_name || 
+                                                    b.buyer_name.toLowerCase().includes(formData.buyer_name.toLowerCase()) || 
+                                                    b.contact.toLowerCase().includes(formData.buyer_name.toLowerCase())
+                                                )
+                                                .slice(0, 8)
+                                                .map((b, i) => (
+                                                    <div
+                                                        key={i}
+                                                        className="px-3 py-2 hover:bg-indigo-50 cursor-pointer flex justify-between items-center transition-colors"
+                                                        onClick={() => {
+                                                            setFormData(prev => ({
+                                                                ...prev,
+                                                                buyer_name: b.buyer_name,
+                                                                contact: b.contact,
+                                                                channel: b.channel || prev.channel
+                                                            }));
+                                                            setEmailAutoFilled(true);
+                                                            setShowSuggestions(false);
+                                                        }}
+                                                    >
+                                                        <div className="font-bold text-xs text-slate-800">{b.buyer_name}</div>
+                                                        <div className="text-[11px] font-medium text-slate-500 font-mono">{b.contact}</div>
+                                                    </div>
+                                                ))}
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="space-y-2 relative">
                                     <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">이메일 주소</label>
                                     {emailAutoFilled && (
                                         <span className="absolute right-0 top-0 text-[10px] font-black text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
-                                            ✓ 회원 자동완성
+                                            ✓ 기존 회원 자동연동
                                         </span>
                                     )}
                                     <Input
