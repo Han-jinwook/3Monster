@@ -183,8 +183,8 @@ export const LicenseGenerator = () => {
 
     const pricingProducts = {
         marketing: [
-            { id: 'NPlace-DB', name: '🏢 NPLace_DB', desc: '네이버 플레이스 DB 수집기' },
-            { id: 'ContentCrawler', name: '💻 사이트 컨텐츠 크롤러', desc: '웹 데이터 스크래핑 엔진' },
+            { id: 'NPlace-DB', name: '🏢 NPLace_DB', desc: '포털 지도 DB 추출기' },
+            { id: 'ContentCrawler', name: '💻 사이트 컨텐츠 추출기', desc: '웹 데이터 분석 엔진' },
             { id: 'UserManager', name: '👥 회원관리프로그램 확장팩', desc: 'AI 검색 및 메시지 전송' },
         ],
         cafe: [
@@ -365,7 +365,7 @@ export const LicenseGenerator = () => {
                                             onChange={(e) => handleProductChange(e.target.value)}
                                         >
                                             <optgroup label="마케팅몬스터 제품군">
-                                                <option value="NPlace-DB">🏢 NPlace-DB (네이버 플레이스 DB)</option>
+                                                <option value="NPlace-DB">🏢 NPlace-DB (포털 지도 DB)</option>
                                                 <option value="ContentCrawler">💻 ContentCrawler (사이트 콘텐츠 크롤러)</option>
                                                 <option value="UserManager">👥 UserManager (회원관리 확장팩)</option>
                                             </optgroup>
@@ -690,7 +690,7 @@ export const LicenseGenerator = () => {
                                 <li className="flex items-center justify-between p-2 bg-white rounded border border-slate-100">
                                     <div className="flex items-center gap-2">
                                         <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
-                                        <span>NPlace-DB (네이버 플레이스 DB)</span>
+                                        <span>NPlace-DB (포털 지도 DB)</span>
                                     </div>
                                     <span className="text-slate-500 bg-slate-50 px-2 py-0.5 rounded text-xs font-bold border border-slate-200">
                                         기한 무제한 / 50건 한도

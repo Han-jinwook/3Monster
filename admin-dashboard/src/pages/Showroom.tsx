@@ -42,16 +42,16 @@ const productCategories = [
         products: [
             {
                 id: 'nplace-db',
-                title: "N플레이스 DB 추출기",
+                title: "포털 지도 DB 추출기",
                 subtitle: "원하는 지역/업종별 실시간 타겟 DB 수집",
-                description: "네이버 N플레이스 상의 업체 연락처, 이메일, 홈페이지 주소를 포함한 고퀄리티 가망 고객 정보를 실시간 정밀 파싱하여 즉각 영업 가능한 DB로 변환합니다.",
+                description: "포털 지도 상의 업체 연락처, 이메일, 홈페이지 주소를 포함한 고퀄리티 가망 고객 정보를 실시간 정밀 파싱하여 즉각 영업 가능한 DB로 변환합니다.",
                 icon: MapPin,
                 color: "from-blue-600 to-indigo-700",
                 badge: "26년 7월 출시",
                 features: [
-                    "실시간 N플레이스 정보 추출",
+                    "실시간 포털 지도 정보 추출",
                     "무료 인스타그램 DM발송",
-                    "무료 이메일 발송 (네이버/구글 개인계정 연동)",
+                    "무료 이메일 발송 (포털/구글 개인계정 연동)",
                     "원클릭 Excel 내보내기"
                 ]
             },
@@ -1107,7 +1107,7 @@ export const Showroom = () => {
                                             <ul className="list-disc list-inside text-xs text-slate-400 space-y-1.5 font-semibold">
                                                 {selectedProduct.id === 'nplace-db' ? (
                                                     <>
-                                                        <li>네이버 N플레이스 차단 기준을 우회하기 위해 안전한 최적의 속도로 백그라운드 수집을 진행합니다. (퇴근하실 때 실행해 두시면 다음 날 아침 수천 건의 데이터 수집이 안전하게 완료됩니다.)</li>
+                                                        <li>포털 지도 서버 표준 규격을 준수하기 위해 안전한 최적의 속도로 백그라운드 수집을 진행합니다. (퇴근하실 때 실행해 두시면 다음 날 아침 수천 건의 데이터 수집이 안전하게 완료됩니다.)</li>
                                                         <li>자세한 사용 조작법은 프로그램 다운로드 패키지 내 동봉된 설명서를 참고해 주십시오.</li>
                                                     </>
                                                 ) : (

@@ -19,8 +19,8 @@ const products = [
     {
         id: 'nplace-db',
         title: "NPlace-DB Pro",
-        subtitle: "네이버 플레이스 정밀 수집기",
-        description: "국내 유일의 Apollo State 파싱 엔진 탑재. 가장 정확하고 풍부한 플레이스 DB를 광속으로 수집합니다.",
+        subtitle: "포털 지도 정밀 추출기",
+        description: "국내 유일의 Apollo State 파싱 엔진 탑재. 가장 정확하고 풍부한 포털 지도 DB를 광속으로 수집합니다.",
         icon: Layers,
         color: "from-blue-600 to-indigo-700",
         badge: "Best Seller",

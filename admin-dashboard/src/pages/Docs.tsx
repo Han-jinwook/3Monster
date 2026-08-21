@@ -92,9 +92,9 @@ export function Docs() {
 
                     {activeTab === 'collect' && (
                         <div className="space-y-6">
-                            <h2 className="text-xl font-black text-slate-800 border-b border-slate-100 pb-4">플레이스 데이터 수집 가이드</h2>
+                            <h2 className="text-xl font-black text-slate-800 border-b border-slate-100 pb-4">포털 지도 데이터 추출 가이드</h2>
                             <div className="space-y-4 text-slate-600 leading-relaxed font-medium">
-                                <p>NPlace-DB 수집 엔진은 네이버 스마트플레이스 데이터를 안전하게 실시간으로 수집합니다.</p>
+                                <p>NPlace-DB 추출 엔진은 포털 지도 데이터를 안전하게 실시간으로 추출합니다.</p>
                                 <div className="space-y-2 mt-4">
                                     <h4 className="font-black text-slate-800">기본 수집 방법</h4>
                                     <ul className="list-decimal pl-5 space-y-2">
@@ -121,10 +121,10 @@ export function Docs() {
                                 <p>수집된 고객 데이터베이스를 기반으로 타겟팅된 제안 메일을 자동으로 발송할 수 있습니다.</p>
                                 
                                 <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-5 mt-4 space-y-3">
-                                    <h4 className="font-black text-indigo-900">1. 네이버 메일 (SMTP) 설정 방법</h4>
-                                    <p className="text-sm text-indigo-800/80 mb-2">네이버 비밀번호를 그대로 입력하면 보안상 발송이 차단됩니다. 반드시 <strong>'앱 비밀번호'</strong>를 발급받아야 합니다.</p>
+                                    <h4 className="font-black text-indigo-900">1. 포털 메일 (SMTP) 설정 방법</h4>
+                                    <p className="text-sm text-indigo-800/80 mb-2">포털 비밀번호를 그대로 입력하면 보안상 발송이 차단될 수 있습니다. 필요시 <strong>'앱 비밀번호'</strong>를 발급받아 사용하세요.</p>
                                     <ul className="list-decimal pl-5 space-y-2 text-sm text-indigo-900">
-                                        <li>네이버 로그인 후 <strong>내정보 &gt; 보안설정</strong>으로 이동합니다.</li>
+                                        <li>포털 로그인 후 <strong>내정보 &gt; 보안설정</strong>으로 이동합니다.</li>
                                         <li><strong>2단계 인증</strong>을 활성화합니다.</li>
                                         <li>2단계 인증 관리 페이지 하단의 <strong>애플리케이션 비밀번호 관리</strong> 메뉴로 이동합니다.</li>
                                         <li>종류를 '기타(직접입력)'으로 선택하고 'NPlace-DB' 등 이름을 입력 후 <strong>[생성]</strong>을 클릭합니다.</li>
