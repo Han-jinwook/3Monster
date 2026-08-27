@@ -38,7 +38,7 @@ export const MerlinTrial = () => {
     };
 
     const handleDelete = async (hwid: string) => {
-        if (!confirm(`정말로 이 기기(${hwid})의 체험판 기록을 초기화하시겠습니까?\n앱 재시작 시 50건이 다시 충전됩니다.`)) return;
+        if (!confirm(`정말로 이 기기(${hwid})의 체험판 기록을 초기화하시겠습니까?\n앱 재시작 시 100건이 다시 충전됩니다.`)) return;
         
         try {
             const { error } = await supabase
@@ -143,11 +143,11 @@ export const MerlinTrial = () => {
                                         </td>
                                         <td className="px-4 py-3">
                                             <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-                                                trial.used_count >= 50 
+                                                trial.used_count >= 100 
                                                     ? 'bg-red-50 text-red-700' 
                                                     : 'bg-green-50 text-green-700'
                                             }`}>
-                                                {trial.used_count} / 50건
+                                                {trial.used_count} / 100건
                                             </span>
                                         </td>
                                         <td className="px-4 py-3 text-slate-600">

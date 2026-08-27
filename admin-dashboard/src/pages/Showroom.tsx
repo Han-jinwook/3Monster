@@ -1142,7 +1142,7 @@ export const Showroom = () => {
                                                     className="w-full sm:w-1/2 block"
                                                 >
                                                     <Button variant="outline" className="w-full h-12 border-2 border-emerald-200 hover:border-emerald-300 text-emerald-650 hover:bg-emerald-50/50 rounded-2xl font-black transition-all flex items-center justify-center gap-2 text-xs sm:text-sm">
-                                                        🎁 50건 무료체험판 다운로드 (.zip)
+                                                        🎁 100건 무료체험판 다운로드 (.zip)
                                                     </Button>
                                                 </a>
                                             </div>
@@ -1150,51 +1150,51 @@ export const Showroom = () => {
                                             {/* Pricing Section */}
                                             <div className="space-y-3 pt-3 border-t border-slate-100">
                                                 <h4 className="text-sm font-black text-slate-800 flex items-center justify-between">
-                                                    <span>크몽 정식 라이선스 구매</span>
+                                                    <span>크몽 & 3Monster 정식 라이선스</span>
                                                     <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">안전 결제</span>
                                                 </h4>
                                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                                    {/* Deluxe */}
+                                                    {/* Standard */}
                                                     <div className="flex flex-col p-4 rounded-2xl border border-slate-200 bg-white hover:border-indigo-300 transition-all shadow-sm">
-                                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Deluxe</span>
-                                                        <h5 className="font-black text-slate-800 text-sm mb-1">디럭스 1개월</h5>
+                                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Standard</span>
+                                                        <h5 className="font-black text-slate-800 text-sm mb-1">스탠다드 1개월</h5>
                                                         <p className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded w-fit mb-3">1,000건 추출 한도</p>
                                                         <div className="mt-auto">
                                                             <p className="text-lg font-black text-slate-900 mb-3">5,000<span className="text-xs text-slate-500 font-bold ml-0.5">원</span></p>
                                                             <a href="https://kmong.com" target="_blank" rel="noopener noreferrer" className="w-full block">
                                                                 <Button className="w-full h-9 bg-slate-900 hover:bg-indigo-600 text-white rounded-xl text-xs font-black transition-colors">
-                                                                    크몽 구매하기
+                                                                    구매하기
                                                                 </Button>
                                                             </a>
                                                         </div>
                                                     </div>
-                                                    {/* Standard */}
-                                                    <div className="flex flex-col p-4 rounded-2xl border-2 border-indigo-500 bg-indigo-50/20 shadow-md relative">
-                                                        <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-indigo-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest shadow-sm">
-                                                            Best
-                                                        </div>
-                                                        <span className="text-[10px] font-black text-indigo-500 uppercase tracking-wider mb-1">Standard</span>
-                                                        <h5 className="font-black text-slate-800 text-sm mb-1">스탠다드 1개월</h5>
+                                                    {/* Deluxe */}
+                                                    <div className="flex flex-col p-4 rounded-2xl border border-slate-200 bg-white hover:border-indigo-300 transition-all shadow-sm">
+                                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Deluxe</span>
+                                                        <h5 className="font-black text-slate-800 text-sm mb-1">디럭스 1개월</h5>
                                                         <p className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded w-fit mb-3">무제한 추출</p>
                                                         <div className="mt-auto">
-                                                            <p className="text-lg font-black text-slate-900 mb-3">19,000<span className="text-xs text-slate-500 font-bold ml-0.5">원</span></p>
+                                                            <p className="text-lg font-black text-slate-900 mb-3">9,900<span className="text-xs text-slate-500 font-bold ml-0.5">원</span></p>
                                                             <a href="https://kmong.com" target="_blank" rel="noopener noreferrer" className="w-full block">
-                                                                <Button className="w-full h-9 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black shadow-md shadow-indigo-200 transition-colors">
-                                                                    크몽 구매하기
+                                                                <Button className="w-full h-9 bg-slate-900 hover:bg-indigo-600 text-white rounded-xl text-xs font-black transition-colors">
+                                                                    구매하기
                                                                 </Button>
                                                             </a>
                                                         </div>
                                                     </div>
                                                     {/* Premium */}
-                                                    <div className="flex flex-col p-4 rounded-2xl border border-slate-200 bg-white hover:border-indigo-300 transition-all shadow-sm">
-                                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Premium</span>
+                                                    <div className="flex flex-col p-4 rounded-2xl border-2 border-indigo-500 bg-indigo-50/20 shadow-md relative">
+                                                        <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-indigo-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest shadow-sm">
+                                                            Best (월 8,300원)
+                                                        </div>
+                                                        <span className="text-[10px] font-black text-indigo-500 uppercase tracking-wider mb-1">Premium</span>
                                                         <h5 className="font-black text-slate-800 text-sm mb-1">프리미엄 3개월</h5>
-                                                        <p className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded w-fit mb-3">무제한 추출</p>
+                                                        <p className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded w-fit mb-3">무제한 추출 (파격특가)</p>
                                                         <div className="mt-auto">
-                                                            <p className="text-lg font-black text-slate-900 mb-3">45,000<span className="text-xs text-slate-500 font-bold ml-0.5">원</span></p>
+                                                            <p className="text-lg font-black text-slate-900 mb-3">24,900<span className="text-xs text-slate-500 font-bold ml-0.5">원</span></p>
                                                             <a href="https://kmong.com" target="_blank" rel="noopener noreferrer" className="w-full block">
-                                                                <Button className="w-full h-9 bg-slate-900 hover:bg-indigo-600 text-white rounded-xl text-xs font-black transition-colors">
-                                                                    크몽 구매하기
+                                                                <Button className="w-full h-9 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black shadow-md shadow-indigo-200 transition-colors">
+                                                                    구매하기
                                                                 </Button>
                                                             </a>
                                                         </div>
