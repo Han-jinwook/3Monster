@@ -1174,7 +1174,7 @@ export const Showroom = () => {
                                                         <h5 className="font-black text-slate-800 text-sm mb-1">디럭스 1개월</h5>
                                                         <p className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded w-fit mb-3">무제한 추출</p>
                                                         <div className="mt-auto">
-                                                            <p className="text-lg font-black text-slate-900 mb-3">9,900<span className="text-xs text-slate-500 font-bold ml-0.5">원</span></p>
+                                                            <p className="text-lg font-black text-slate-900 mb-3">9,000<span className="text-xs text-slate-500 font-bold ml-0.5">원</span></p>
                                                             <a href="https://kmong.com" target="_blank" rel="noopener noreferrer" className="w-full block">
                                                                 <Button className="w-full h-9 bg-slate-900 hover:bg-indigo-600 text-white rounded-xl text-xs font-black transition-colors">
                                                                     구매하기
@@ -1185,13 +1185,13 @@ export const Showroom = () => {
                                                     {/* Premium */}
                                                     <div className="flex flex-col p-4 rounded-2xl border-2 border-indigo-500 bg-indigo-50/20 shadow-md relative">
                                                         <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-indigo-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest shadow-sm">
-                                                            Best (월 8,300원)
+                                                            Best (월 7,000원)
                                                         </div>
                                                         <span className="text-[10px] font-black text-indigo-500 uppercase tracking-wider mb-1">Premium</span>
                                                         <h5 className="font-black text-slate-800 text-sm mb-1">프리미엄 3개월</h5>
                                                         <p className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded w-fit mb-3">무제한 추출 (파격특가)</p>
                                                         <div className="mt-auto">
-                                                            <p className="text-lg font-black text-slate-900 mb-3">24,900<span className="text-xs text-slate-500 font-bold ml-0.5">원</span></p>
+                                                            <p className="text-lg font-black text-slate-900 mb-3">21,000<span className="text-xs text-slate-500 font-bold ml-0.5">원</span></p>
                                                             <a href="https://kmong.com" target="_blank" rel="noopener noreferrer" className="w-full block">
                                                                 <Button className="w-full h-9 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black shadow-md shadow-indigo-200 transition-colors">
                                                                     구매하기
