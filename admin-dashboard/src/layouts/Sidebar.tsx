@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Key, Users, LogOut, HelpCircle, Bell } from 'lucide-react';
+import { LayoutDashboard, Key, Users, LogOut, HelpCircle, Bell, Video } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useAuth } from '../context/AuthContext';
 
@@ -8,12 +8,13 @@ export const Sidebar = () => {
 
     const adminNavItems = [
         { icon: LayoutDashboard, label: '대시보드', href: '/admin' },
-        { icon: Key, label: '발행 도구', href: '/admin/generator' },
+        { icon: Key, label: '시리얼 발행', href: '/admin/generator' },
         { icon: Users, label: '구매자 관리', href: '/admin/licenses' },
         { icon: Users, label: '일반 회원', href: '/admin/users' },
         { icon: Bell, label: '알림 관리', href: '/admin/notifications' },
         { icon: HelpCircle, label: '고객센터', href: '/support' },
         { icon: Key, label: '체험판 현황', href: '/admin/merlin-trial' },
+        { icon: Video, label: '숏폼 스튜디오', href: '/admin/shorts-studio' },
     ];
 
     const buyerNavItems = [

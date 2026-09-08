@@ -92,6 +92,8 @@ export const LicenseGenerator = () => {
     }, []);
 
     // URL 파라미터가 변경될 때 자동 채우기
+    const [isRepurchase, setIsRepurchase] = useState(false);
+
     useEffect(() => {
         if (queryBuyer || queryEmail) {
             setFormData(prev => ({
@@ -100,6 +102,7 @@ export const LicenseGenerator = () => {
                 contact: queryEmail || prev.contact,
             }));
             setEmailAutoFilled(true);
+            setIsRepurchase(true);
         }
     }, [queryBuyer, queryEmail]);
 
@@ -229,21 +232,37 @@ export const LicenseGenerator = () => {
         setExpandedProductId(productId);
     };
 
-    const handleLicenseTypeChange = (licenseType: string) => {
-        const matched = pricing.find(
-            p => p.product.toLowerCase() === formData.product_id.toLowerCase() && p.pkg === licenseType
-        );
-        let price = '';
-        if (matched) {
-            price = String(matched.price);
-        } else if (defaultLegacyPrices[licenseType] !== undefined) {
-            price = String(defaultLegacyPrices[licenseType]);
+    const repurchasePrices: { [key: string]: number } = {
+        'DELUXE': 4000,
+        '1M': 7000,
+        '3M': 15000,
+    };
+
+    const getCalculatedPrice = (licType: string, isRepurch: boolean) => {
+        if (isRepurch && repurchasePrices[licType] !== undefined) {
+            return String(repurchasePrices[licType]);
         }
+        const matched = pricing.find(
+            p => p.product.toLowerCase() === formData.product_id.toLowerCase() && p.pkg === licType
+        );
+        if (matched) return String(matched.price);
+        if (defaultLegacyPrices[licType] !== undefined) return String(defaultLegacyPrices[licType]);
+        return '5000';
+    };
+
+    const handleLicenseTypeChange = (licenseType: string) => {
+        const price = getCalculatedPrice(licenseType, isRepurchase);
         setFormData(prev => ({
             ...prev,
             license_type: licenseType,
             price_sold: price || prev.price_sold
         }));
+    };
+
+    const toggleRepurchase = (checked: boolean) => {
+        setIsRepurchase(checked);
+        const price = getCalculatedPrice(formData.license_type, checked);
+        setFormData(prev => ({ ...prev, price_sold: price }));
     };
 
     const handleToggleStatus = (id: number) => {
@@ -346,14 +365,33 @@ export const LicenseGenerator = () => {
     return (
         <div className="max-w-[1200px] mx-auto space-y-6 pt-0 pb-12 px-4">
             <div className="flex flex-col gap-1.5">
-                <h1 className="text-3xl font-black text-slate-900 tracking-tight">신규 라이선스 생성</h1>
+                <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
+                    시리얼 발행 
+                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+                        신규 구매 / 재구매 우대
+                    </span>
+                </h1>
             </div>
 
             <div className="grid gap-6 lg:grid-cols-12 items-start">
                 {/* Left Form Column */}
                 <Card className="lg:col-span-7 p-0 overflow-hidden border border-slate-200 rounded-2xl bg-white shadow-[0_15px_45px_rgba(0,0,0,0.07)]">
                     <CardHeader className="px-6 py-2 border-b border-slate-200 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white">
-                        <CardTitle className="text-xl font-black text-white tracking-tighter">라이선스 정보 입력</CardTitle>
+                        <div className="flex items-center justify-between">
+                            <CardTitle className="text-xl font-black text-white tracking-tighter">라이선스 정보 입력</CardTitle>
+                            <button
+                                type="button"
+                                onClick={() => toggleRepurchase(!isRepurchase)}
+                                className={cn(
+                                    "px-3 py-1 rounded-xl text-xs font-black transition-all flex items-center gap-1.5",
+                                    isRepurchase 
+                                        ? "bg-amber-400 text-slate-950 shadow-md ring-2 ring-amber-300" 
+                                        : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                                )}
+                            >
+                                {isRepurchase ? "🎁 재구매 우대가 적용 중 (4천/7천/1.5만)" : "⚡ 일반/신규 가격 (5천/9천/2.1만)"}
+                            </button>
+                        </div>
                     </CardHeader>
                     <CardContent className="p-6">
                         <form onSubmit={handleSubmit} className="space-y-6">
@@ -430,7 +468,14 @@ export const LicenseGenerator = () => {
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">판매 가격 (KRW)</label>
+                                    <div className="flex items-center justify-between">
+                                        <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">판매 가격 (KRW)</label>
+                                        {isRepurchase && (
+                                            <span className="text-[11px] font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                                                ★ 재구매 우대 할인 적용됨
+                                            </span>
+                                        )}
+                                    </div>
                                     <Input placeholder="금액 입력" className="h-14 bg-white border border-slate-400 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150 text-base font-extrabold px-4 text-slate-955 rounded-xl shadow-sm" value={formatPrice(formData.price_sold)} onChange={e => setFormData({ ...formData, price_sold: parsePrice(e.target.value) })} />
                                 </div>
                             </div>

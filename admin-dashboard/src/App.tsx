@@ -13,6 +13,7 @@ import { NotificationManager } from './pages/NotificationManager';
 import { SupportWrapper } from './components/SupportWrapper';
 import { UserList } from './pages/UserList';
 import { MerlinTrial } from './pages/MerlinTrial';
+import { ShortsStudio } from './pages/ShortsStudio';
 import { Docs } from './pages/Docs';
 
 function AppRoutes() {
@@ -70,6 +71,7 @@ function AppRoutes() {
                 <Route path="users" element={<UserList />} />
                 <Route path="notifications" element={<NotificationManager />} />
                 <Route path="merlin-trial" element={<MerlinTrial />} />
+                <Route path="shorts-studio" element={<ShortsStudio />} />
             </Route>
 
             {/* Fallback Redirection */}
