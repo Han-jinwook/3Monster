@@ -36,13 +36,11 @@ const initialScenarios: ScenarioItem[] = [
         voiceActor: '필재 (타입캐스트 20대 남성/자신감 톤)',
         hookCopy: '설마 아직도 네이버 지도 켜놓고 매장 번호 하나씩 복사해서 엑셀에 붙여넣고 계세요?',
         fullScript: '설마 아직도 네이버 지도 켜놓고 매장 번호 하나씩 복사해서 엑셀에 붙여넣고 계세요? 100개 복붙하는데 2시간? 이제 10초 만에 끝내세요. 원하는 지역과 키워드만 치면 상호명, 대표번호, 도로명 주소까지 엑셀로 한 방에 싹 정리됩니다. 지금 3Monster 허브에서 100건 무료로 직접 뽑아보세요!',
-        status: 'completed',
+        status: 'ready',
         videoUrl: '/showroom/nplace/nplace-demo.mp4',
-        youtubeStatus: 'published',
-        youtubeUrl: 'https://youtube.com/shorts/sample1',
-        reelsStatus: 'published',
-        tiktokStatus: 'pending',
-        views: 1840
+        youtubeStatus: 'draft',
+        reelsStatus: 'draft',
+        tiktokStatus: 'draft'
     },
     {
         id: 2,
@@ -53,13 +51,11 @@ const initialScenarios: ScenarioItem[] = [
         voiceActor: '필재 (타입캐스트 20대 남성/정보전달 톤)',
         hookCopy: '우리 동네 경쟁 매장들은 리뷰가 몇 개나 쌓여있을까?',
         fullScript: '우리 동네 경쟁 매장들은 리뷰가 몇 개나 쌓여있을까? 일일이 검색하지 마세요. 반경 내 모든 매장의 방문자 리뷰수, 블로그 리뷰수를 엑셀 한 페이지로 뽑아 비교할 수 있습니다. 상권 분석과 B2B 제안서 작성, 이제 데이터로 승부하세요. 100건 무료 체험판 배포 중!',
-        status: 'completed',
+        status: 'ready',
         videoUrl: '/showroom/nplace/nplace-demo.mp4',
-        youtubeStatus: 'published',
-        youtubeUrl: 'https://youtube.com/shorts/sample2',
-        reelsStatus: 'pending',
-        tiktokStatus: 'draft',
-        views: 920
+        youtubeStatus: 'draft',
+        reelsStatus: 'draft',
+        tiktokStatus: 'draft'
     },
     {
         id: 3,
