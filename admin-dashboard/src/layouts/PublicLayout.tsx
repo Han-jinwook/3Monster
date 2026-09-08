@@ -538,19 +538,15 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                                 마케팅 & 카페 & 앱 자동화 소프트웨어 생태계
                             </span>
                         </div>
-                        <div className="flex flex-wrap items-center gap-5 text-xs font-bold text-slate-400">
+                        <div className="flex flex-wrap items-center gap-5 text-xs font-semibold text-slate-400">
                             <Link to="/support" className="hover:text-white transition-colors">고객센터</Link>
                             <span className="text-slate-700">|</span>
-                            <button onClick={() => openLegal('terms')} className="hover:text-white transition-colors cursor-pointer text-slate-300">
-                                서비스 이용약관
-                            </button>
-                            <span className="text-slate-700">|</span>
-                            <button onClick={() => openLegal('privacy')} className="hover:text-indigo-400 transition-colors cursor-pointer text-slate-100 font-black">
+                            <button onClick={() => openLegal('privacy')} className="hover:text-white transition-colors cursor-pointer text-slate-300 font-semibold">
                                 개인정보 처리방침
                             </button>
                             <span className="text-slate-700">|</span>
-                            <button onClick={() => openLegal('refund')} className="hover:text-amber-400 transition-colors cursor-pointer text-slate-300">
-                                환불/청약철회 규정
+                            <button onClick={() => openLegal('terms')} className="hover:text-white transition-colors cursor-pointer text-slate-300 font-semibold">
+                                이용약관
                             </button>
                             <span className="text-slate-700">|</span>
                             <a href="https://sundreamer.app" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-300 transition-colors">
