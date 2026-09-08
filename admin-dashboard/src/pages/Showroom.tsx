@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { PaymentModal, PaymentProduct } from '../components/PaymentModal';
 
 interface ThreadMessage {
     id: string;
@@ -188,6 +189,8 @@ export const Showroom = () => {
     const [loadingQuestions, setLoadingQuestions] = useState(false);
     const [qnaCounts, setQnaCounts] = useState<{[productId: string]: {questions: number, replies: number}}>({});
     const [previewImageIndex, setPreviewImageIndex] = useState<number | null>(null);
+    const [paymentProduct, setPaymentProduct] = useState<PaymentProduct | null>(null);
+    const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
     const previewImages = [
         "/showroom/nplace/nplace-ui-1.png",
         "/showroom/nplace/nplace-ui-2.png",
@@ -1161,11 +1164,20 @@ export const Showroom = () => {
                                                         <p className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded w-fit mb-3">1,000건 추출 한도</p>
                                                         <div className="mt-auto">
                                                             <p className="text-lg font-black text-slate-900 mb-3">5,000<span className="text-xs text-slate-500 font-bold ml-0.5">원</span></p>
-                                                            <a href="https://kmong.com" target="_blank" rel="noopener noreferrer" className="w-full block">
-                                                                <Button className="w-full h-9 bg-slate-900 hover:bg-indigo-600 text-white rounded-xl text-xs font-black transition-colors">
-                                                                    구매하기
-                                                                </Button>
-                                                            </a>
+                                                            <Button 
+                                                                onClick={() => {
+                                                                    setPaymentProduct({
+                                                                        id: selectedProduct.id,
+                                                                        title: selectedProduct.title,
+                                                                        subtitle: selectedProduct.subtitle,
+                                                                        initialTier: 'DELUXE'
+                                                                    });
+                                                                    setIsPaymentModalOpen(true);
+                                                                }}
+                                                                className="w-full h-9 bg-slate-900 hover:bg-indigo-600 text-white rounded-xl text-xs font-black transition-colors"
+                                                            >
+                                                                구매하기
+                                                            </Button>
                                                         </div>
                                                     </div>
                                                     {/* Deluxe */}
@@ -1175,11 +1187,20 @@ export const Showroom = () => {
                                                         <p className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded w-fit mb-3">무제한 추출</p>
                                                         <div className="mt-auto">
                                                             <p className="text-lg font-black text-slate-900 mb-3">9,000<span className="text-xs text-slate-500 font-bold ml-0.5">원</span></p>
-                                                            <a href="https://kmong.com" target="_blank" rel="noopener noreferrer" className="w-full block">
-                                                                <Button className="w-full h-9 bg-slate-900 hover:bg-indigo-600 text-white rounded-xl text-xs font-black transition-colors">
-                                                                    구매하기
-                                                                </Button>
-                                                            </a>
+                                                            <Button 
+                                                                onClick={() => {
+                                                                    setPaymentProduct({
+                                                                        id: selectedProduct.id,
+                                                                        title: selectedProduct.title,
+                                                                        subtitle: selectedProduct.subtitle,
+                                                                        initialTier: '1M'
+                                                                    });
+                                                                    setIsPaymentModalOpen(true);
+                                                                }}
+                                                                className="w-full h-9 bg-slate-900 hover:bg-indigo-600 text-white rounded-xl text-xs font-black transition-colors"
+                                                            >
+                                                                구매하기
+                                                            </Button>
                                                         </div>
                                                     </div>
                                                     {/* Premium */}
@@ -1192,11 +1213,20 @@ export const Showroom = () => {
                                                         <p className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded w-fit mb-3">무제한 추출 (파격특가)</p>
                                                         <div className="mt-auto">
                                                             <p className="text-lg font-black text-slate-900 mb-3">21,000<span className="text-xs text-slate-500 font-bold ml-0.5">원</span></p>
-                                                            <a href="https://kmong.com" target="_blank" rel="noopener noreferrer" className="w-full block">
-                                                                <Button className="w-full h-9 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black shadow-md shadow-indigo-200 transition-colors">
-                                                                    구매하기
-                                                                </Button>
-                                                            </a>
+                                                            <Button 
+                                                                onClick={() => {
+                                                                    setPaymentProduct({
+                                                                        id: selectedProduct.id,
+                                                                        title: selectedProduct.title,
+                                                                        subtitle: selectedProduct.subtitle,
+                                                                        initialTier: '3M'
+                                                                    });
+                                                                    setIsPaymentModalOpen(true);
+                                                                }}
+                                                                className="w-full h-9 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black shadow-md shadow-indigo-200 transition-colors"
+                                                            >
+                                                                구매하기
+                                                            </Button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1285,6 +1315,13 @@ export const Showroom = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {/* KCP Direct Payment Modal */}
+            <PaymentModal 
+                isOpen={isPaymentModalOpen} 
+                onClose={() => setIsPaymentModalOpen(false)} 
+                product={paymentProduct} 
+            />
         </div>
     );
 };
