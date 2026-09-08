@@ -20,6 +20,7 @@ interface License {
     bound_value?: string;
     price_sold?: number;
     license_type?: string;
+    collection_limit?: number;
     contact?: string;
     memo?: string;
 }
@@ -108,18 +109,59 @@ export const LicenseList = () => {
         }
     };
 
-    const getProductLabel = (productId: string, licenseType?: string) => {
+    const getProductLabel = (productId: string, licenseType?: string, collectionLimit?: number) => {
+        if (collectionLimit && collectionLimit > 0) {
+            return `${productId} (STANDARD / ${collectionLimit.toLocaleString()}건)`;
+        }
         const mapping: Record<string, string> = {
-            'DELUXE':   'STANDARD',
+            'DELUXE':   'DELUXE (무제한)',
             'TRIAL':    '체험판',
             'TEST':     '테스트',
-            '1M':       'DELUXE',
-            '3M':       'PREMIUM',
-            '6M':       'Standard',
-            'LIFETIME': 'Premium',
+            '1M':       'DELUXE (무제한)',
+            '3M':       'PREMIUM (무제한)',
+            '6M':       '6개월 (무제한)',
+            'LIFETIME': '영구 (무제한)',
+            'PREMIUM':  'PREMIUM (무제한)',
+            'STANDARD': 'DELUXE (무제한)'
         };
         const typeLabel = licenseType ? (mapping[licenseType] || licenseType) : '';
         return typeLabel ? `${productId} (${typeLabel})` : productId;
+    };
+
+    const handleEditPlan = async (id: string, currentType: string, currentLimit: number | null | undefined, buyerName: string) => {
+        const choice = window.prompt(
+            `"${buyerName}" 플랜(무제한/제한) 변경:\n1: DELUXE (1개월 무제한)\n2: PREMIUM (3개월 무제한)\n3: STANDARD (1,000건 제한)\n\n번호(1, 2, 3)를 입력하세요:`,
+            currentLimit ? '3' : (currentType === 'PREMIUM' || currentType === '3M' ? '2' : '1')
+        );
+        if (!choice) return;
+
+        let newType = 'DELUXE';
+        let newLimit = 0;
+        if (choice.trim() === '1') {
+            newType = 'DELUXE';
+            newLimit = 0;
+        } else if (choice.trim() === '2') {
+            newType = 'PREMIUM';
+            newLimit = 0;
+        } else if (choice.trim() === '3') {
+            newType = 'STANDARD';
+            newLimit = 1000;
+        } else {
+            alert('잘못된 입력입니다. 1, 2, 3 중 하나를 입력하세요.');
+            return;
+        }
+
+        try {
+            const { error } = await supabase.from('licenses').update({
+                license_type: newType,
+                collection_limit: newLimit
+            }).eq('id', id);
+            if (error) throw error;
+            fetchLicenses();
+            showToast(`플랜 변경 완료: ${newType} (${newLimit === 0 ? '무제한' : newLimit + '건 제한'})`, 'success');
+        } catch (err: any) {
+            alert(`플랜 수정 오류: ${err.message}`);
+        }
     };
 
     const handleCopySerial = (serial: string) => {
@@ -235,7 +277,16 @@ export const LicenseList = () => {
 
                 {/* 구매 제품 */}
                 <td className="px-3 py-2 font-bold text-slate-700 truncate max-w-0">
-                    <span className="block truncate">{getProductLabel(lic.product_id, lic.license_type)}</span>
+                    <div className="flex items-center gap-1.5">
+                        <span className="block truncate">{getProductLabel(lic.product_id, lic.license_type, lic.collection_limit)}</span>
+                        <button
+                            className="text-slate-300 hover:text-indigo-600 transition-colors flex-shrink-0 cursor-pointer"
+                            onClick={(e) => { e.stopPropagation(); handleEditPlan(lic.id, lic.license_type || '', lic.collection_limit, lic.buyer_name); }}
+                            title="플랜(무제한/제한) 수정"
+                        >
+                            <Pencil className="w-2.5 h-2.5" />
+                        </button>
+                    </div>
                 </td>
 
                 {/* 시리얼 */}
