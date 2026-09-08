@@ -233,9 +233,9 @@ export const LicenseGenerator = () => {
     };
 
     const repurchasePrices: { [key: string]: number } = {
-        'DELUXE': 4000,
-        '1M': 7000,
-        '3M': 15000,
+        'DELUXE': 4200,
+        '1M': 7600,
+        '3M': 17900,
     };
 
     const getCalculatedPrice = (licType: string, isRepurch: boolean) => {
@@ -389,7 +389,7 @@ export const LicenseGenerator = () => {
                                         : "bg-slate-800 text-slate-300 hover:bg-slate-700"
                                 )}
                             >
-                                {isRepurchase ? "🎁 재구매 우대가 적용 중 (4천/7천/1.5만)" : "⚡ 일반/신규 가격 (5천/9천/2.1만)"}
+                                {isRepurchase ? "🎁 재구매 우대가 적용 중 (4.2천/7.6천/1.79만)" : "⚡ 일반/신규 가격 (5천/9천/2.1만)"}
                             </button>
                         </div>
                     </CardHeader>
