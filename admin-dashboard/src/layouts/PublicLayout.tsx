@@ -577,9 +577,6 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                                 <span className="text-slate-700">|</span>
                                 <span>개인정보관리책임자: 백은숙</span>
                             </p>
-                            <p className="text-[10px] text-slate-400 pt-1">
-                                🔒 NHN KCP 전자결제(PG) 및 에스크로 안전결제 시스템이 적용되어 있어 안심하고 결제하실 수 있습니다.
-                            </p>
                         </div>
                         <div className="text-left lg:text-right shrink-0">
                             <p className="text-xs text-slate-400 font-bold">
