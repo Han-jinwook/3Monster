@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { LayoutDashboard, HelpCircle, Menu, X, Bell } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Button } from '../components/ui/Button';
 import { cn } from '../lib/utils';
+import { LegalModal, LegalDocType } from '../components/LegalModal';
 
 const parseThread = (reply: any): any[] => {
     if (!reply) return [];
@@ -25,6 +26,15 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
     const [notifications, setNotifications] = React.useState<any[]>([]);
     const [bellDropdownOpen, setBellDropdownOpen] = React.useState(false);
     const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+    // Legal Modal state
+    const [legalModalOpen, setLegalModalOpen] = useState(false);
+    const [legalDocType, setLegalDocType] = useState<LegalDocType>('terms');
+
+    const openLegal = (type: LegalDocType) => {
+        setLegalDocType(type);
+        setLegalModalOpen(true);
+    };
 
     const unreadCount = React.useMemo(() => {
         if (role === 'admin') {
@@ -196,7 +206,7 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                         }}
                         className="flex items-center gap-3 group"
                     >
-                        <img src="/logo.png" alt="Logo" className="h-16 w-auto object-contain group-hover:scale-105 transition-transform duration-300" />
+                        <img src="/3Monster_logo.png" alt="3Monster Logo" className="h-16 w-auto object-contain group-hover:scale-105 transition-transform duration-300" />
                     </Link>
 
                     {/* Desktop Navigation */}
@@ -520,18 +530,28 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                 <div className="max-w-7xl mx-auto space-y-8">
                     {/* Top Row: Logo & Quick Links */}
                     <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-6 border-b border-slate-800/80">
-                        <div className="flex items-center gap-3">
-                            <img src="/logo.png" alt="3Monster Logo" className="h-10 w-auto object-contain brightness-0 invert" />
-                            <span className="text-xs font-bold text-slate-400 border-l border-slate-700 pl-3">
+                        <div className="flex items-center gap-4">
+                            <Link to="/" className="flex items-center">
+                                <img src="/3Monster_logo.png" alt="3Monster Logo" className="h-12 w-auto object-contain hover:scale-105 transition-transform" />
+                            </Link>
+                            <span className="text-xs font-bold text-slate-400 border-l border-slate-700 pl-4">
                                 마케팅 & 카페 & 앱 자동화 소프트웨어 생태계
                             </span>
                         </div>
                         <div className="flex flex-wrap items-center gap-5 text-xs font-bold text-slate-400">
                             <Link to="/support" className="hover:text-white transition-colors">고객센터</Link>
                             <span className="text-slate-700">|</span>
-                            <span className="text-slate-400">이용약관</span>
+                            <button onClick={() => openLegal('terms')} className="hover:text-white transition-colors cursor-pointer text-slate-300">
+                                서비스 이용약관
+                            </button>
                             <span className="text-slate-700">|</span>
-                            <span className="text-slate-300 font-black">개인정보처리방침</span>
+                            <button onClick={() => openLegal('privacy')} className="hover:text-indigo-400 transition-colors cursor-pointer text-slate-100 font-black">
+                                개인정보 처리방침
+                            </button>
+                            <span className="text-slate-700">|</span>
+                            <button onClick={() => openLegal('refund')} className="hover:text-amber-400 transition-colors cursor-pointer text-slate-300">
+                                환불/청약철회 규정
+                            </button>
                             <span className="text-slate-700">|</span>
                             <a href="https://sundreamer.app" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-300 transition-colors">
                                 패밀리허브 (SunDreamer) ↗
@@ -574,6 +594,13 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                     </div>
                 </div>
             </footer>
+
+            {/* Terms / Privacy / Refund Policy Modal */}
+            <LegalModal 
+                isOpen={legalModalOpen} 
+                onClose={() => setLegalModalOpen(false)} 
+                initialTab={legalDocType} 
+            />
         </div>
     );
 };
