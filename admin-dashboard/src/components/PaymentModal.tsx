@@ -203,7 +203,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
             return;
         }
         if (!buyerEmail.trim() && !buyerPhone.trim()) {
-            setErrorMsg('시리얼 키를 수신할 이메일 또는 연락처를 입력해 주세요.');
+            setErrorMsg('라이선스 키를 수신할 이메일 또는 연락처를 입력해 주세요.');
             return;
         }
 
@@ -282,7 +282,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title={successData ? "🎉 결제 및 시리얼 발급 완료" : `🛒 ${product.title} 라이선스 결제`}>
+        <Modal isOpen={isOpen} onClose={onClose} title={successData ? "🎉 결제 및 라이선스 키 발급 완료" : `🛒 ${product.title} 라이선스 결제`}>
             {/* NHN KCP Hidden Form */}
             <form name="kcp_order_form" ref={formRef} method="post" className="hidden">
                 <input type="hidden" name="ordr_idxx" value={kcpFormData?.ordr_idxx || ''} />
@@ -304,13 +304,13 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
             </form>
 
             {successData ? (
-                /* 결제 완료 및 시리얼 발급 성공 화면 */
+                /* 결제 완료 및 라이선스 키 발급 성공 화면 */
                 <div className="space-y-6 py-2">
                     <div className="text-center space-y-2 bg-emerald-50/80 p-6 rounded-2xl border border-emerald-200">
                         <CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto animate-bounce" />
                         <h3 className="text-xl font-black text-slate-900">결제가 안전하게 완료되었습니다!</h3>
                         <p className="text-xs text-slate-600 font-bold">
-                            고객님의 정식 라이선스 시리얼 키가 즉시 생성되었습니다.
+                            고객님의 정식 라이선스 키가 즉시 생성되었습니다.
                         </p>
                     </div>
 
@@ -320,7 +320,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                             <span>만료일: {successData.expireDate}</span>
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-[11px] font-black uppercase text-indigo-400 tracking-wider">발급된 시리얼 키</label>
+                            <label className="text-[11px] font-black uppercase text-indigo-400 tracking-wider">발급된 라이선스 키</label>
                             <div className="flex items-center gap-2">
                                 <input 
                                     readOnly 
@@ -345,7 +345,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                         <p className="font-black text-slate-800 flex items-center gap-1.5">
                             <Sparkles className="w-4 h-4 text-amber-500" /> 다음 사용 안내:
                         </p>
-                        <p>1. 다운로드받은 프로그램 실행 후 <strong>시리얼 키 입력창</strong>에 위 키를 붙여넣기(Ctrl+V) 하세요.</p>
+                        <p>1. 다운로드받은 프로그램 실행 후 <strong>라이선스 키 입력창</strong>에 위 키를 붙여넣기(Ctrl+V) 하세요.</p>
                         <p>2. 입력 즉시 정식 버전의 모든 기능이 즉시 활성화됩니다.</p>
                     </div>
 
@@ -427,7 +427,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                     {/* 구매자 정보 입력 */}
                     <div className="space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
                         <p className="text-xs font-black text-slate-800 flex items-center gap-1.5">
-                            <ShieldCheck className="w-4 h-4 text-indigo-600" /> 구매자 및 시리얼 수신 정보
+                            <ShieldCheck className="w-4 h-4 text-indigo-600" /> 구매자 및 라이선스 키 수신 정보
                         </p>
                         
                         <div className="space-y-2">
@@ -444,7 +444,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                 <div>
-                                    <label className="text-[11px] font-bold text-slate-600 block mb-1">이메일 (시리얼 수신용) *</label>
+                                    <label className="text-[11px] font-bold text-slate-600 block mb-1">이메일 (라이선스 키 수신용) *</label>
                                     <Input 
                                         type="email"
                                         placeholder="buyer@example.com" 
@@ -531,7 +531,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                             ) : (
                                 <>
                                     <Zap className="w-5 h-5 text-amber-300" />
-                                    <span>{finalPrice.toLocaleString()}원 즉시 결제 및 시리얼 발급</span>
+                                    <span>{finalPrice.toLocaleString()}원 즉시 결제 및 라이선스 키 발급</span>
                                 </>
                             )}
                         </Button>
