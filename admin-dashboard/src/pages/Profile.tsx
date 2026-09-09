@@ -241,10 +241,10 @@ export const Profile = () => {
         return prodId.toLowerCase();
     };
 
-    const handleJumpToProduct = (prodId: string, action: 'extend' | 'buy_more' = 'extend') => {
+    const handleJumpToProduct = (prodId: string) => {
         const showroomId = getShowroomProductId(prodId);
-        sessionStorage.setItem('selectedProductDetail', showroomId);
-        navigate(`/showroom?detail_product=${showroomId}&action=${action}#pricing-section`);
+        sessionStorage.removeItem('selectedProductDetail');
+        navigate(`/showroom?product=${showroomId}`);
     };
 
     const getPlanLabel = (_productId: string, licenseType?: string, collectionLimit?: number) => {
@@ -503,22 +503,22 @@ export const Profile = () => {
                                                                 </div>
                                                             </div>
 
-                                                            {/* 추가구매 / 연장 버튼 (쇼룸 결제 & 플랜 선택으로 즉시 점핑) */}
+                                                            {/* 추가구매 / 연장 버튼 (쇼룸 해당 제품 카드로 조용히 이동) */}
                                                             <div className="flex items-center gap-1.5 shrink-0">
                                                                 <button
                                                                     type="button"
-                                                                    onClick={() => handleJumpToProduct(productId, 'extend')}
+                                                                    onClick={() => handleJumpToProduct(productId)}
                                                                     className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black shadow-2xs hover:shadow-xs transition-all cursor-pointer whitespace-nowrap"
-                                                                    title="이 제품의 이용 기간 연장 (기존 회원 15% 재구매 할인가)"
+                                                                    title="해당 제품 쇼룸 카드로 이동"
                                                                 >
                                                                     <Sparkles className="w-3.5 h-3.5 text-emerald-200 shrink-0" />
                                                                     <span>기간 연장</span>
                                                                 </button>
                                                                 <button
                                                                     type="button"
-                                                                    onClick={() => handleJumpToProduct(productId, 'buy_more')}
+                                                                    onClick={() => handleJumpToProduct(productId)}
                                                                     className="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-xl text-xs font-black transition-all cursor-pointer whitespace-nowrap"
-                                                                    title="새 라이선스 추가 발급 또는 다른 플랜 구매"
+                                                                    title="해당 제품 쇼룸 카드로 이동"
                                                                 >
                                                                     <PlusCircle className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
                                                                     <span>추가 구매</span>

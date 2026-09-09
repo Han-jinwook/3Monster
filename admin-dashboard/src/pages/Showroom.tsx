@@ -175,17 +175,8 @@ export const Showroom = () => {
 
     // Q&A state management
     const [activeQnaProductId, setActiveQnaProductId] = useState<string | null>(null);
-    const [selectedProductIdForDetail, setSelectedProductIdForDetail] = useState<string | null>(() => {
-        return sessionStorage.getItem('selectedProductDetail') || null;
-    });
-
-    useEffect(() => {
-        if (selectedProductIdForDetail) {
-            sessionStorage.setItem('selectedProductDetail', selectedProductIdForDetail);
-        } else {
-            sessionStorage.removeItem('selectedProductDetail');
-        }
-    }, [selectedProductIdForDetail]);
+    const [selectedProductIdForDetail, setSelectedProductIdForDetail] = useState<string | null>(null);
+    const [highlightedProductId, setHighlightedProductId] = useState<string | null>(null);
 
     const [questions, setQuestions] = useState<any[]>([]);
     const [loadingQuestions, setLoadingQuestions] = useState(false);
@@ -332,9 +323,33 @@ export const Showroom = () => {
         const params = new URLSearchParams(location.search);
         const qnaProduct = params.get('qna_product');
         const ticketId = params.get('ticket_id');
-        const detailProduct = params.get('detail_product') || params.get('product');
+        const productParam = params.get('product') || params.get('target');
+        const detailProduct = params.get('detail_product');
 
-        if (detailProduct) {
+        if (productParam) {
+            // 상세는 펼치지 않고(닫힌 상태 유지), 해당 제품 카드로 조용히 스크롤 이동
+            setSelectedProductIdForDetail(null);
+            sessionStorage.removeItem('selectedProductDetail');
+
+            const allProducts = productCategories.flatMap(cat => cat.products);
+            const matched = allProducts.find(p => 
+                p.id.toLowerCase() === productParam.toLowerCase() ||
+                normalizeProdKey(p.id).toLowerCase() === normalizeProdKey(productParam).toLowerCase()
+            );
+            const targetId = matched ? matched.id : productParam;
+
+            setHighlightedProductId(targetId);
+            setTimeout(() => {
+                const element = document.getElementById(targetId);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 100);
+
+            setTimeout(() => {
+                setHighlightedProductId(null);
+            }, 2500);
+        } else if (detailProduct) {
             const allProducts = productCategories.flatMap(cat => cat.products);
             const matched = allProducts.find(p => 
                 p.id.toLowerCase() === detailProduct.toLowerCase() ||
@@ -721,7 +736,8 @@ export const Showroom = () => {
                                         id={product.id}
                                         className={cn(
                                             "group overflow-hidden border border-slate-200 shadow-[0_15px_45px_rgba(0,0,0,0.05)] hover:shadow-xl hover:border-indigo-400 transition-all duration-500 rounded-[2rem] bg-white flex flex-col cursor-pointer scroll-mt-24",
-                                            selectedProductIdForDetail === product.id ? "ring-2 ring-indigo-500 shadow-md" : ""
+                                            selectedProductIdForDetail === product.id ? "ring-2 ring-indigo-500 shadow-md" : "",
+                                            highlightedProductId === product.id ? "ring-4 ring-indigo-500 shadow-2xl scale-[1.01]" : ""
                                         )}
                                         onClick={() => {
                                             if (selectedProductIdForDetail === product.id) {
