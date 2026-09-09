@@ -332,6 +332,24 @@ export const Showroom = () => {
         const params = new URLSearchParams(location.search);
         const qnaProduct = params.get('qna_product');
         const ticketId = params.get('ticket_id');
+        const detailProduct = params.get('detail_product') || params.get('product');
+
+        if (detailProduct) {
+            const allProducts = productCategories.flatMap(cat => cat.products);
+            const matched = allProducts.find(p => 
+                p.id.toLowerCase() === detailProduct.toLowerCase() ||
+                normalizeProdKey(p.id).toLowerCase() === normalizeProdKey(detailProduct).toLowerCase()
+            );
+            const targetId = matched ? matched.id : detailProduct;
+            setSelectedProductIdForDetail(targetId);
+
+            setTimeout(() => {
+                const pricingEl = document.getElementById('pricing-section') || document.getElementById(targetId);
+                if (pricingEl) {
+                    pricingEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 350);
+        }
 
         if (qnaProduct) {
             setActiveQnaProductId(qnaProduct);
@@ -1239,7 +1257,7 @@ export const Showroom = () => {
                                                 }
 
                                                 return (
-                                                    <div className="space-y-3.5 pt-3 border-t border-slate-100 text-left">
+                                                    <div id="pricing-section" className="space-y-3.5 pt-3 border-t border-slate-100 text-left scroll-mt-28">
                                                         <div className="flex items-center justify-between flex-wrap gap-2">
                                                             <h4 className="text-sm font-black text-slate-800 flex items-center gap-2">
                                                                 <span>크몽 & 3Monster 정식 라이선스</span>

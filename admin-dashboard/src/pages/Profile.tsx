@@ -20,7 +20,8 @@ import {
     ChevronDown,
     ChevronUp,
     Clock,
-    RefreshCw
+    RefreshCw,
+    PlusCircle
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
@@ -229,6 +230,23 @@ export const Profile = () => {
         navigator.clipboard.writeText(serial).then(() => showToast(`시리얼 번호가 복사되었습니다: ${serial}`));
     };
 
+    const getShowroomProductId = (prodId: string): string => {
+        const clean = prodId.toLowerCase().replace(/[-_]/g, '');
+        if (clean.includes('cafe')) return 'cafe-crawler';
+        if (clean.includes('event')) return 'event-activity-stats';
+        if (clean.includes('comment') || clean.includes('stealth')) return 'comment-stats';
+        if (clean.includes('nplace') || clean.includes('map')) return 'nplace-db';
+        if (clean.includes('content')) return 'content-crawler';
+        if (clean.includes('user') || clean.includes('manager')) return 'user-manager-plus';
+        return prodId.toLowerCase();
+    };
+
+    const handleJumpToProduct = (prodId: string, action: 'extend' | 'buy_more' = 'extend') => {
+        const showroomId = getShowroomProductId(prodId);
+        sessionStorage.setItem('selectedProductDetail', showroomId);
+        navigate(`/showroom?detail_product=${showroomId}&action=${action}#pricing-section`);
+    };
+
     const getPlanLabel = (_productId: string, licenseType?: string, collectionLimit?: number) => {
         if (collectionLimit && collectionLimit > 0) {
             return {
@@ -401,6 +419,15 @@ export const Profile = () => {
                                     <ShoppingBag className="w-5 h-5 text-indigo-400" />
                                     <h3 className="text-sm font-black text-white">보유 라이선스 & 구매 리스트 ({groupedLicenses.length}개 제품)</h3>
                                 </div>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => navigate('/showroom')}
+                                    className="h-8 px-3 text-[11px] font-black text-white border-white/20 hover:bg-white/10 rounded-xl flex items-center gap-1.5 cursor-pointer"
+                                >
+                                    <PlusCircle className="w-3.5 h-3.5 text-indigo-300" />
+                                    새 제품 둘러보기
+                                </Button>
                             </div>
 
                             <div className="p-6">
@@ -464,14 +491,38 @@ export const Profile = () => {
                                                             {statusBadge}
                                                         </div>
 
-                                                        <div className="grid grid-cols-2 gap-4 text-[11px] pt-3 border-t border-slate-200/80">
-                                                            <div>
-                                                                <span className="block text-slate-400 font-bold text-[10px]">구매/발급 일시</span>
-                                                                <span className="font-extrabold text-slate-700">{createdDateStr}</span>
+                                                        <div className="flex items-center justify-between gap-3 text-[11px] pt-3 border-t border-slate-200/80 flex-wrap">
+                                                            <div className="flex items-center gap-6 sm:gap-8">
+                                                                <div>
+                                                                    <span className="block text-slate-400 font-bold text-[10px]">구매/발급 일시</span>
+                                                                    <span className="font-extrabold text-slate-700">{createdDateStr}</span>
+                                                                </div>
+                                                                <div>
+                                                                    <span className="block text-slate-400 font-bold text-[10px]">만료 일시</span>
+                                                                    <span className="font-extrabold text-slate-700">{expireDateStr}</span>
+                                                                </div>
                                                             </div>
-                                                            <div>
-                                                                <span className="block text-slate-400 font-bold text-[10px]">만료 일시</span>
-                                                                <span className="font-extrabold text-slate-700">{expireDateStr}</span>
+
+                                                            {/* 추가구매 / 연장 버튼 (쇼룸 결제 & 플랜 선택으로 즉시 점핑) */}
+                                                            <div className="flex items-center gap-1.5 shrink-0">
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleJumpToProduct(productId, 'extend')}
+                                                                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black shadow-2xs hover:shadow-xs transition-all cursor-pointer whitespace-nowrap"
+                                                                    title="이 제품의 이용 기간 연장 (기존 회원 15% 재구매 할인가)"
+                                                                >
+                                                                    <Sparkles className="w-3.5 h-3.5 text-emerald-200 shrink-0" />
+                                                                    <span>기간 연장</span>
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleJumpToProduct(productId, 'buy_more')}
+                                                                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-xl text-xs font-black transition-all cursor-pointer whitespace-nowrap"
+                                                                    title="새 라이선스 추가 발급 또는 다른 플랜 구매"
+                                                                >
+                                                                    <PlusCircle className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                                                                    <span>추가 구매</span>
+                                                                </button>
                                                             </div>
                                                         </div>
 
