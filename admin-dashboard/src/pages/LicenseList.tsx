@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo, Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
+import { supabase, supabasePublic } from '../lib/supabase';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
@@ -18,6 +18,7 @@ import {
     ChevronDown, 
     ChevronUp,
     Sparkles,
+    Receipt,
     X
 } from 'lucide-react';
 import { format, addMonths } from 'date-fns';
@@ -50,6 +51,9 @@ export const LicenseList = () => {
     const [memoTooltip, setMemoTooltip] = useState<{ text: string; x: number; y: number } | null>(null);
     const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
 
+    // 구매원장 모달 상태
+    const [selectedLedgerContact, setSelectedLedgerContact] = useState<string | null>(null);
+
     // 연장 / 신규 이력 발급 모달 상태
     const [extendModalLic, setExtendModalLic] = useState<License | null>(null);
     const [extendPlan, setExtendPlan] = useState<'DELUXE' | 'PREMIUM' | 'STANDARD'>('DELUXE');
@@ -80,7 +84,7 @@ export const LicenseList = () => {
     };
 
     const fetchLicenses = async () => {
-        const { data, error } = await supabase
+        const { data, error } = await supabasePublic
             .from('licenses')
             .select('*')
             .order('created_at', { ascending: false });
@@ -88,6 +92,31 @@ export const LicenseList = () => {
         else setLicenses(data as License[]);
         setLoading(false);
     };
+
+    // 선택된 고객의 전체 구매원장 목록 및 통계 집계
+    const ledgerLicenses = useMemo(() => {
+        if (!selectedLedgerContact) return [];
+        const target = selectedLedgerContact.toLowerCase().trim();
+        return licenses.filter(l => {
+            const contact = (l.contact || '').toLowerCase().trim();
+            const buyer = (l.buyer_name || '').toLowerCase().trim();
+            return contact === target || (!contact && buyer === target);
+        }).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    }, [licenses, selectedLedgerContact]);
+
+    const ledgerStats = useMemo(() => {
+        const totalSpent = ledgerLicenses.reduce((acc, l) => acc + (Number(l.price_sold) || 0), 0);
+        const activeCount = ledgerLicenses.filter(l => l.status === 'active' || l.status === 'used').length;
+        const buyerName = ledgerLicenses.find(l => l.buyer_name)?.buyer_name || '';
+        const primaryChannel = ledgerLicenses.find(l => l.channel)?.channel || '크몽';
+        return {
+            totalSpent,
+            totalCount: ledgerLicenses.length,
+            activeCount,
+            buyerName,
+            primaryChannel
+        };
+    }, [ledgerLicenses]);
 
     useEffect(() => {
         fetchLicenses();
@@ -365,10 +394,13 @@ export const LicenseList = () => {
                     ) : <span className="text-[10px] text-slate-400 border border-dashed border-slate-300 px-1.5 py-0.5 rounded hover:text-indigo-600 transition-colors">작성</span>}
                 </td>
 
-                {/* 구매 제품 & 히스토리 아코디언 토글 */}
-                <td className="px-3 py-2 font-bold text-slate-700 truncate max-w-0">
+                {/* 구매 제품 & 히스토리 아코디언 토글 - 풀 텍스트 완전 노출 (잘림 방지) */}
+                <td className="px-3 py-2 font-bold text-slate-800">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className={cn("block truncate", isHistorySubRow ? "text-slate-500 font-medium" : "text-slate-900 font-bold")}>
+                        <span className={cn(
+                            "font-black text-xs whitespace-nowrap",
+                            isHistorySubRow ? "text-slate-500 font-medium" : "text-slate-950 font-black"
+                        )}>
                             {getProductLabel(lic.product_id, lic.license_type, lic.collection_limit)}
                         </span>
 
@@ -516,6 +548,184 @@ export const LicenseList = () => {
                 ))}
             </div>
 
+            {/* 🧾 고객 구매원장 (Order Ledger) 모달 */}
+            {selectedLedgerContact && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/65 backdrop-blur-xs p-4 animate-in fade-in duration-200">
+                    <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden text-left animate-in zoom-in-95 duration-200">
+                        {/* Modal Header */}
+                        <div className="px-6 py-5 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white flex justify-between items-center shrink-0">
+                            <div className="space-y-1">
+                                <div className="flex items-center gap-2">
+                                    <div className="p-2 bg-indigo-500/20 text-indigo-300 rounded-xl border border-indigo-400/30">
+                                        <Receipt className="w-5 h-5" />
+                                    </div>
+                                    <h2 className="text-xl font-black text-white tracking-tight">고객 구매원장 (Order Ledger)</h2>
+                                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                                        건별 거래 & 정산 원장
+                                    </span>
+                                </div>
+                                <div className="text-xs text-slate-300 font-medium flex items-center gap-3 pt-0.5">
+                                    <span>고객 이메일: <b className="text-white underline">{selectedLedgerContact}</b></span>
+                                    {ledgerStats.buyerName && (
+                                        <span className="bg-white/10 px-2 py-0.5 rounded text-[11px] text-indigo-200">
+                                            크몽/구매자 ID: <b className="text-white">{ledgerStats.buyerName}</b>
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+                            <button 
+                                onClick={() => setSelectedLedgerContact(null)} 
+                                className="p-2 rounded-xl hover:bg-white/10 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        {/* Modal Body: Stats + Detailed Ledger Table */}
+                        <div className="p-6 space-y-6 overflow-y-auto flex-1">
+                            {/* Summary KPI Cards */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="p-4 rounded-2xl bg-indigo-50/70 border border-indigo-100 flex flex-col justify-between">
+                                    <span className="text-[11px] font-black text-indigo-600 uppercase tracking-wide">총 누적 결제금액</span>
+                                    <div className="mt-1">
+                                        <span className="text-2xl font-black text-indigo-950">
+                                            {ledgerStats.totalSpent.toLocaleString()}
+                                        </span>
+                                        <span className="text-xs font-black text-indigo-700 ml-1">원</span>
+                                    </div>
+                                </div>
+                                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
+                                    <span className="text-[11px] font-black text-slate-500 uppercase tracking-wide">총 결제/연장 건수</span>
+                                    <div className="mt-1">
+                                        <span className="text-2xl font-black text-slate-900">
+                                            {ledgerStats.totalCount}
+                                        </span>
+                                        <span className="text-xs font-bold text-slate-500 ml-1">건</span>
+                                    </div>
+                                </div>
+                                <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-100 flex flex-col justify-between">
+                                    <span className="text-[11px] font-black text-emerald-600 uppercase tracking-wide">활성 라이선스</span>
+                                    <div className="mt-1">
+                                        <span className="text-2xl font-black text-emerald-900">
+                                            {ledgerStats.activeCount}
+                                        </span>
+                                        <span className="text-xs font-bold text-emerald-600 ml-1">개 제품</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Detailed Purchase Ledger Table */}
+                            <div className="border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+                                <div className="px-4 py-3 bg-slate-100/80 border-b border-slate-200 flex justify-between items-center">
+                                    <h3 className="text-xs font-black text-slate-700 uppercase tracking-wide flex items-center gap-1.5">
+                                        <Clock className="w-3.5 h-3.5 text-slate-500" />
+                                        구매 건별 원장 내역 ({ledgerLicenses.length}건)
+                                    </h3>
+                                    <span className="text-[10px] text-slate-400 font-bold">
+                                        최신 결제일시 순 정렬
+                                    </span>
+                                </div>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left text-xs">
+                                        <thead className="bg-slate-50 border-b border-slate-200 text-[11px] font-black text-slate-600">
+                                            <tr>
+                                                <th className="px-3 py-2.5 text-center w-10">NO</th>
+                                                <th className="px-3 py-2.5">구매일시</th>
+                                                <th className="px-3 py-2.5">구매 제품 (플랜)</th>
+                                                <th className="px-3 py-2.5">구매처 / 채널</th>
+                                                <th className="px-3 py-2.5">크몽 ID</th>
+                                                <th className="px-3 py-2.5 text-right">결제 금액</th>
+                                                <th className="px-3 py-2.5 text-center">시리얼 번호</th>
+                                                <th className="px-3 py-2.5">만료일자</th>
+                                                <th className="px-3 py-2.5 text-center">상태</th>
+                                                <th className="px-3 py-2.5">비고/메모</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-100 font-medium">
+                                            {ledgerLicenses.map((lic, i) => {
+                                                const status = getStatusInfo(lic);
+                                                return (
+                                                    <tr key={lic.id} className="hover:bg-indigo-50/30 transition-colors">
+                                                        <td className="px-3 py-3 text-center text-slate-400 font-bold font-mono text-[11px]">
+                                                            {i + 1}
+                                                        </td>
+                                                        <td className="px-3 py-3 text-slate-600 font-mono text-[11px] whitespace-nowrap">
+                                                            {lic.created_at ? format(new Date(lic.created_at), 'yyyy.MM.dd HH:mm') : '-'}
+                                                        </td>
+                                                        <td className="px-3 py-3 font-black text-slate-900 whitespace-nowrap">
+                                                            {getProductLabel(lic.product_id, lic.license_type, lic.collection_limit)}
+                                                        </td>
+                                                        <td className="px-3 py-3 whitespace-nowrap">
+                                                            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                                                                {lic.channel || '크몽'}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-3 py-3 font-bold text-slate-700 whitespace-nowrap">
+                                                            {lic.buyer_name || '-'}
+                                                        </td>
+                                                        <td className="px-3 py-3 text-right font-black text-indigo-600 whitespace-nowrap">
+                                                            {(lic.price_sold || 0).toLocaleString()}원
+                                                        </td>
+                                                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                                                            <button
+                                                                onClick={() => handleCopySerial(lic.serial_key)}
+                                                                className="inline-flex items-center gap-1 font-mono text-[11px] font-bold text-slate-600 hover:text-indigo-600 bg-slate-50 hover:bg-indigo-50 px-2 py-0.5 rounded border border-slate-200 transition-colors cursor-pointer"
+                                                                title={lic.serial_key}
+                                                            >
+                                                                <Copy className="w-2.5 h-2.5" />
+                                                                {lic.serial_key}
+                                                            </button>
+                                                        </td>
+                                                        <td className="px-3 py-3 text-slate-600 font-mono text-[11px] whitespace-nowrap">
+                                                            {lic.expire_date ? format(new Date(lic.expire_date), 'yyyy.MM.dd') : '무제한'}
+                                                        </td>
+                                                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                                                            <span className={cn("inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-black border text-[10px]", status.color)}>
+                                                                <status.icon className="w-2.5 h-2.5" />
+                                                                {status.label}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-3 py-3 text-slate-500 text-[11px] max-w-[150px] truncate" title={lic.memo || ''}>
+                                                            {lic.memo || '-'}
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Modal Footer */}
+                        <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center shrink-0">
+                            <span className="text-xs text-slate-500 font-bold">
+                                총 <b className="text-indigo-600">{ledgerLicenses.length}</b>건의 구매 원장 거래 레코드가 등록되어 있습니다.
+                            </span>
+                            <div className="flex gap-2">
+                                <Button 
+                                    variant="outline"
+                                    onClick={() => setSelectedLedgerContact(null)}
+                                    className="h-10 px-4 text-xs font-bold"
+                                >
+                                    닫기
+                                </Button>
+                                <Button 
+                                    onClick={() => {
+                                        handleAddLicenseForBuyer(ledgerStats.buyerName, selectedLedgerContact);
+                                        setSelectedLedgerContact(null);
+                                    }}
+                                    className="h-10 px-5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black rounded-xl shadow-md shadow-indigo-600/20 flex items-center gap-1.5"
+                                >
+                                    <PlusCircle className="w-3.5 h-3.5" />
+                                    새 라이선스 발급
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* 기간 연장 & 신규 이력 발급 모달 */}
             {extendModalLic && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
@@ -652,22 +862,20 @@ export const LicenseList = () => {
                 <table className="w-full">
                     <colgroup>
                         <col style={{ width: '44px' }} />  {/* NO */}
-                        <col style={{ width: '10%' }} />   {/* 크몽 ID */}
-                        <col style={{ width: '12%' }} />   {/* 이메일 */}
+                        <col style={{ width: '22%' }} />   {/* 구매자 (이메일) */}
                         <col style={{ width: '44px' }} />  {/* 메모 */}
-                        <col style={{ width: '18%' }} />   {/* 제품 */}
+                        <col style={{ width: '26%' }} />   {/* 구매 제품 (풀 텍스트) */}
                         <col style={{ width: '70px' }} />  {/* 시리얼(복사) */}
-                        <col style={{ width: '8%' }}  />   {/* 구매일자 */}
-                        <col style={{ width: '8%' }}  />   {/* 실행일자 */}
-                        <col style={{ width: '9%' }}  />   {/* 만료일자 */}
-                        <col style={{ width: '8%' }}  />   {/* 상태 */}
-                        <col style={{ width: '190px' }} /> {/* 제어 */}
+                        <col style={{ width: '85px' }} />  {/* 구매일자 */}
+                        <col style={{ width: '85px' }} />  {/* 실행일자 */}
+                        <col style={{ width: '90px' }} />  {/* 만료일자 */}
+                        <col style={{ width: '75px' }} />  {/* 상태 */}
+                        <col style={{ width: '180px' }} /> {/* 제어 */}
                     </colgroup>
                     <thead className="bg-slate-900 text-white">
                         <tr className="text-[11px] font-black uppercase tracking-wide text-left">
                             <th className="px-3 py-2.5 text-slate-400 text-center">NO</th>
-                            <th className="px-3 py-2.5 text-slate-200">크몽 ID</th>
-                            <th className="px-3 py-2.5 text-slate-200">이메일</th>
+                            <th className="px-3 py-2.5 text-slate-200">구매자 (이메일 / 구매원장)</th>
                             <th className="px-3 py-2.5 text-slate-200 text-center">메모</th>
                             <th className="px-3 py-2.5 text-slate-200">구매 제품</th>
                             <th className="px-3 py-2.5 text-slate-200 text-center">시리얼</th>
@@ -680,10 +888,11 @@ export const LicenseList = () => {
                     </thead>
                     <tbody className="divide-y divide-slate-100 text-xs">
                         {loading ? (
-                            <tr><td colSpan={11} className="py-14 text-center"><Loader2 className="mx-auto h-7 w-7 animate-spin text-indigo-200" /></td></tr>
+                            <tr><td colSpan={10} className="py-14 text-center"><Loader2 className="mx-auto h-7 w-7 animate-spin text-indigo-200" /></td></tr>
                         ) : groupedLicenses.map((group, idx) => {
                             const isExpanded = expandedGroups.has(group.key);
                             const displayName = group.main.buyer_name.replace(/\s*\(TRIAL\)\s*|\s*\(TEST\)\s*/gi, '').trim();
+                            const contactEmail = group.main.contact || group.main.buyer_name;
 
                             return (
                                 <Fragment key={group.key}>
@@ -695,11 +904,30 @@ export const LicenseList = () => {
                                         <td className="px-3 py-2.5 text-slate-500 font-bold text-center">
                                             {idx + 1}
                                         </td>
-                                        <td className="px-3 py-2.5 font-bold text-slate-800 truncate max-w-0">
-                                            <span className="block truncate font-extrabold">{displayName}</span>
-                                        </td>
-                                        <td className="px-3 py-2.5 text-slate-600 truncate max-w-0 font-medium">
-                                            <span className="block truncate">{group.main.contact || <span className="text-slate-300">-</span>}</span>
+                                        {/* 이메일 기준 구매자 식별 컬럼 (클릭 시 구매원장 모달 오픈) */}
+                                        <td className="px-3 py-2.5">
+                                            <div 
+                                                className="group flex flex-col cursor-pointer text-left"
+                                                onClick={() => setSelectedLedgerContact(contactEmail)}
+                                                title="클릭 시 이 고객의 전체 구매원장(Order Ledger) 모달 보기"
+                                            >
+                                                <span className="font-black text-xs text-indigo-600 group-hover:text-indigo-800 group-hover:underline flex items-center gap-1.5">
+                                                    <Receipt className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+                                                    {contactEmail}
+                                                </span>
+                                                <div className="flex items-center gap-1.5 mt-0.5 pl-5">
+                                                    {group.main.buyer_name && group.main.buyer_name !== group.main.contact?.split('@')[0] && (
+                                                        <span className="text-[10px] font-bold text-slate-500">
+                                                            크몽ID: <span className="text-slate-800 font-extrabold">{displayName}</span>
+                                                        </span>
+                                                    )}
+                                                    {group.main.channel && (
+                                                        <span className="text-[9px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 px-1.5 py-0.2 rounded">
+                                                            {group.main.channel}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </td>
                                         {renderLicenseRow(group.main, false, group.history.length, isExpanded, () => toggleGroup(group.key))}
                                     </tr>
@@ -713,11 +941,13 @@ export const LicenseList = () => {
                                             </td>
 
                                             {/* 과거 이력 표기 */}
-                                            <td className="px-3 py-2 text-slate-400 font-medium text-[11px]" colSpan={2}>
-                                                <div className="flex items-center gap-1.5 text-slate-500">
+                                            <td className="px-3 py-2 text-slate-400 font-medium text-[11px]" colSpan={1}>
+                                                <div className="flex items-center gap-1.5 text-slate-500 pl-4">
                                                     <span className="text-indigo-400 font-bold text-xs">↳</span>
                                                     <span className="text-[10px] bg-slate-200/70 text-slate-600 font-bold px-1.5 py-0.5 rounded">과거 이력</span>
-                                                    <span className="text-[10px] text-slate-400">({displayName})</span>
+                                                    <span className="text-[10px] text-slate-400 font-mono">
+                                                        ({histLic.channel || '크몽'})
+                                                    </span>
                                                 </div>
                                             </td>
 
@@ -729,7 +959,7 @@ export const LicenseList = () => {
                             );
                         })}
                         {!loading && groupedLicenses.length === 0 && (
-                            <tr><td colSpan={11} className="py-12 text-center text-slate-400 font-medium">검색 결과가 없습니다.</td></tr>
+                            <tr><td colSpan={10} className="py-12 text-center text-slate-400 font-medium">검색 결과가 없습니다.</td></tr>
                         )}
                     </tbody>
                 </table>
