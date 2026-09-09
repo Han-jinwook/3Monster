@@ -542,17 +542,9 @@ export const LicenseList = () => {
                                         <Receipt className="w-5 h-5" />
                                     </div>
                                     <h2 className="text-xl font-black text-white tracking-tight">고객 구매원장 (Order Ledger)</h2>
-                                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
-                                        건별 거래 & 정산 원장
-                                    </span>
                                 </div>
-                                <div className="text-xs text-slate-300 font-medium flex items-center gap-3 pt-0.5">
+                                <div className="text-xs text-slate-300 font-medium pt-0.5">
                                     <span>고객 이메일: <b className="text-white underline">{selectedLedgerContact}</b></span>
-                                    {ledgerStats.buyerName && (
-                                        <span className="bg-white/10 px-2 py-0.5 rounded text-[11px] text-indigo-200">
-                                            크몽/구매자 ID: <b className="text-white">{ledgerStats.buyerName}</b>
-                                        </span>
-                                    )}
                                 </div>
                             </div>
                             <button 
@@ -611,77 +603,48 @@ export const LicenseList = () => {
                                     <table className="w-full text-left text-xs">
                                         <thead className="bg-slate-50 border-b border-slate-200 text-[11px] font-black text-slate-600">
                                             <tr>
-                                                <th className="px-3 py-2.5 text-center w-10">NO</th>
+                                                <th className="px-3 py-2.5 text-center w-12">NO</th>
                                                 <th className="px-3 py-2.5">구매일시</th>
                                                 <th className="px-3 py-2.5">구매 제품 (플랜)</th>
-                                                <th className="px-3 py-2.5">구매처 / 채널</th>
-                                                <th className="px-3 py-2.5">크몽 ID</th>
+                                                <th className="px-3 py-2.5">구매처</th>
                                                 <th className="px-3 py-2.5 text-right">결제 금액</th>
-                                                <th className="px-3 py-2.5 text-center">시리얼 번호</th>
-                                                <th className="px-3 py-2.5">만료일자</th>
-                                                <th className="px-3 py-2.5 text-center">상태</th>
                                                 <th className="px-3 py-2.5">비고/메모</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-100 font-medium">
-                                            {ledgerLicenses.map((lic, i) => {
-                                                const status = getStatusInfo(lic);
-                                                return (
-                                                    <tr key={lic.id} className="hover:bg-indigo-50/30 transition-colors">
-                                                        <td className="px-3 py-3 text-center text-slate-400 font-bold font-mono text-[11px]">
-                                                            {i + 1}
-                                                        </td>
-                                                        <td className="px-3 py-3 text-slate-600 font-mono text-[11px] whitespace-nowrap">
-                                                            {lic.created_at ? format(new Date(lic.created_at), 'yyyy.MM.dd HH:mm') : '-'}
-                                                        </td>
-                                                        <td className="px-3 py-3 font-black text-slate-900 whitespace-nowrap">
-                                                            {getProductLabel(lic.product_id, lic.license_type, lic.collection_limit)}
-                                                        </td>
-                                                        <td className="px-3 py-3 whitespace-nowrap">
-                                                            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
-                                                                {lic.channel || '크몽'}
+                                            {ledgerLicenses.map((lic, i) => (
+                                                <tr key={lic.id} className="hover:bg-indigo-50/30 transition-colors">
+                                                    <td className="px-3 py-3 text-center text-slate-400 font-bold font-mono text-[11px]">
+                                                        {i + 1}
+                                                    </td>
+                                                    <td className="px-3 py-3 text-slate-600 font-mono text-[11px] whitespace-nowrap">
+                                                        {lic.created_at ? format(new Date(lic.created_at), 'yyyy.MM.dd HH:mm') : '-'}
+                                                    </td>
+                                                    <td className="px-3 py-3 font-black text-slate-900 whitespace-nowrap">
+                                                        {getProductLabel(lic.product_id, lic.license_type, lic.collection_limit)}
+                                                    </td>
+                                                    <td className="px-3 py-3 whitespace-nowrap">
+                                                        <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                                                            {lic.channel || '크몽'}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-3 py-3 text-right font-black text-indigo-600 whitespace-nowrap">
+                                                        {(lic.price_sold || 0).toLocaleString()}원
+                                                    </td>
+                                                    <td 
+                                                        className="px-3 py-3 text-slate-600 text-[11px] max-w-[200px] cursor-pointer hover:bg-indigo-50/50 transition-colors group" 
+                                                        title="클릭하여 메모 작성/수정"
+                                                        onClick={() => handleEditLicenseMemo(lic.id, lic.memo, lic.buyer_name, lic.product_id)}
+                                                    >
+                                                        <div className="flex items-center justify-between gap-1.5">
+                                                            <span className={cn("truncate font-medium", !lic.memo && "text-slate-300 italic")}>
+                                                                {lic.memo || '메모 입력'}
                                                             </span>
-                                                        </td>
-                                                        <td className="px-3 py-3 font-bold text-slate-700 whitespace-nowrap">
-                                                            {lic.buyer_name || '-'}
-                                                        </td>
-                                                        <td className="px-3 py-3 text-right font-black text-indigo-600 whitespace-nowrap">
-                                                            {(lic.price_sold || 0).toLocaleString()}원
-                                                        </td>
-                                                        <td className="px-3 py-3 text-center whitespace-nowrap">
-                                                            <button
-                                                                onClick={() => handleCopySerial(lic.serial_key)}
-                                                                className="inline-flex items-center gap-1 font-mono text-[11px] font-bold text-slate-600 hover:text-indigo-600 bg-slate-50 hover:bg-indigo-50 px-2 py-0.5 rounded border border-slate-200 transition-colors cursor-pointer"
-                                                                title={lic.serial_key}
-                                                            >
-                                                                <Copy className="w-2.5 h-2.5" />
-                                                                {lic.serial_key}
-                                                            </button>
-                                                        </td>
-                                                        <td className="px-3 py-3 text-slate-600 font-mono text-[11px] whitespace-nowrap">
-                                                            {lic.expire_date ? format(new Date(lic.expire_date), 'yyyy.MM.dd') : '무제한'}
-                                                        </td>
-                                                        <td className="px-3 py-3 text-center whitespace-nowrap">
-                                                            <span className={cn("inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-black border text-[10px]", status.color)}>
-                                                                <status.icon className="w-2.5 h-2.5" />
-                                                                {status.label}
-                                                            </span>
-                                                        </td>
-                                                        <td 
-                                                            className="px-3 py-3 text-slate-600 text-[11px] max-w-[180px] cursor-pointer hover:bg-indigo-50/50 transition-colors group" 
-                                                            title="클릭하여 메모 작성/수정"
-                                                            onClick={() => handleEditLicenseMemo(lic.id, lic.memo, lic.buyer_name, lic.product_id)}
-                                                        >
-                                                            <div className="flex items-center justify-between gap-1.5">
-                                                                <span className={cn("truncate font-medium", !lic.memo && "text-slate-300 italic")}>
-                                                                    {lic.memo || '메모 입력'}
-                                                                </span>
-                                                                <Pencil className="w-2.5 h-2.5 text-slate-300 group-hover:text-indigo-600 shrink-0 opacity-40 group-hover:opacity-100 transition-opacity" />
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                );
-                                            })}
+                                                            <Pencil className="w-2.5 h-2.5 text-slate-300 group-hover:text-indigo-600 shrink-0 opacity-40 group-hover:opacity-100 transition-opacity" />
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))}
                                         </tbody>
                                     </table>
                                 </div>
@@ -689,10 +652,7 @@ export const LicenseList = () => {
                         </div>
 
                         {/* Modal Footer */}
-                        <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center shrink-0">
-                            <span className="text-xs text-slate-500 font-bold">
-                                총 <b className="text-indigo-600">{ledgerLicenses.length}</b>건의 구매 원장 거래 레코드가 등록되어 있습니다.
-                            </span>
+                        <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end items-center shrink-0">
                             <div className="flex gap-2">
                                 <Button 
                                     variant="outline"
