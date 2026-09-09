@@ -4,8 +4,23 @@ import { supabase } from '../lib/supabase';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
-import { Search, Loader2, Trash2, Power, CheckCircle2, Clock, AlertCircle, Pencil, Copy, PlusCircle, ChevronDown, ChevronUp } from 'lucide-react';
-import { format } from 'date-fns';
+import { 
+    Search, 
+    Loader2, 
+    Trash2, 
+    Power, 
+    CheckCircle2, 
+    Clock, 
+    AlertCircle, 
+    Pencil, 
+    Copy, 
+    PlusCircle, 
+    ChevronDown, 
+    ChevronUp,
+    Sparkles,
+    X
+} from 'lucide-react';
+import { format, addMonths } from 'date-fns';
 import { cn } from '../lib/utils';
 
 interface License {
@@ -23,6 +38,7 @@ interface License {
     collection_limit?: number;
     contact?: string;
     memo?: string;
+    channel?: string;
 }
 
 export const LicenseList = () => {
@@ -33,6 +49,15 @@ export const LicenseList = () => {
     const [toasts, setToasts] = useState<Array<{ id: number; message: string; type: 'success' | 'info' }>>([]);
     const [memoTooltip, setMemoTooltip] = useState<{ text: string; x: number; y: number } | null>(null);
     const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
+
+    // 연장 / 신규 이력 발급 모달 상태
+    const [extendModalLic, setExtendModalLic] = useState<License | null>(null);
+    const [extendPlan, setExtendPlan] = useState<'DELUXE' | 'PREMIUM' | 'STANDARD'>('DELUXE');
+    const [extendMonths, setExtendMonths] = useState<number>(1);
+    const [extendPrice, setExtendPrice] = useState<number>(7600);
+    const [extendChannel, setExtendChannel] = useState<string>('크몽 재결제');
+    const [extendMemo, setExtendMemo] = useState<string>('');
+    const [extending, setExtending] = useState(false);
 
     const showToast = (message: string, type: 'success' | 'info' = 'success') => {
         const id = Date.now();
@@ -157,39 +182,74 @@ export const LicenseList = () => {
         return typeLabel ? `${productId} (${typeLabel})` : productId;
     };
 
-    const handleEditPlan = async (id: string, currentType: string, currentLimit: number | null | undefined, buyerName: string) => {
-        const choice = window.prompt(
-            `"${buyerName}" 플랜(무제한/제한) 변경:\n1: DELUXE (1개월 무제한)\n2: PREMIUM (3개월 무제한)\n3: STANDARD (1,000건 제한)\n\n번호(1, 2, 3)를 입력하세요:`,
-            currentLimit ? '3' : (currentType === 'PREMIUM' || currentType === '3M' ? '2' : '1')
-        );
-        if (!choice) return;
+    const openExtendModal = (lic: License) => {
+        setExtendModalLic(lic);
+        setExtendPlan(lic.license_type === 'PREMIUM' || lic.license_type === '3M' ? 'PREMIUM' : 'DELUXE');
+        setExtendMonths(lic.license_type === 'PREMIUM' || lic.license_type === '3M' ? 3 : 1);
+        setExtendPrice(lic.license_type === 'PREMIUM' || lic.license_type === '3M' ? 17900 : 7600);
+        setExtendChannel('크몽 재결제');
+        setExtendMemo(`[연장] ${lic.product_id} 재결제 이력 추가`);
+    };
 
-        let newType = 'DELUXE';
-        let newLimit = 0;
-        if (choice.trim() === '1') {
-            newType = 'DELUXE';
-            newLimit = 0;
-        } else if (choice.trim() === '2') {
-            newType = 'PREMIUM';
-            newLimit = 0;
-        } else if (choice.trim() === '3') {
-            newType = 'STANDARD';
-            newLimit = 1000;
-        } else {
-            alert('잘못된 입력입니다. 1, 2, 3 중 하나를 입력하세요.');
-            return;
-        }
+    const generateSerialKey = (plan: string) => {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        const segment = (len = 4) => Array(len).fill(0).map(() => chars.charAt(Math.floor(Math.random() * chars.length))).join('');
+        const prefix = plan === 'PREMIUM' ? 'PM' : (plan === 'STANDARD' ? 'STD' : 'DLX');
+        return `${prefix}-${segment()}-${segment()}-${segment()}`;
+    };
 
+    const handleExecuteExtension = async () => {
+        if (!extendModalLic) return;
+        setExtending(true);
         try {
-            const { error } = await supabase.from('licenses').update({
-                license_type: newType,
-                collection_limit: newLimit
-            }).eq('id', id);
-            if (error) throw error;
+            const currentExpStr = extendModalLic.expire_date;
+            const now = new Date();
+            let baseDate = now;
+            if (currentExpStr) {
+                const curExp = new Date(currentExpStr);
+                if (curExp > now) {
+                    baseDate = curExp;
+                }
+            }
+
+            const newExpireDate = addMonths(baseDate, extendMonths);
+            const newSerialKey = generateSerialKey(extendPlan);
+            const newLimit = extendPlan === 'STANDARD' ? 1000 : 0;
+
+            // 1. 새 연장 라이선스 INSERT (신규 이력 레코드 생성)
+            const newRow = {
+                serial_key: newSerialKey,
+                product_id: extendModalLic.product_id,
+                buyer_name: extendModalLic.buyer_name,
+                contact: extendModalLic.contact,
+                channel: extendChannel,
+                price_sold: extendPrice,
+                license_type: extendPlan,
+                collection_limit: newLimit,
+                status: 'active',
+                expire_date: newExpireDate.toISOString(),
+                created_at: now.toISOString(),
+                constraint_type: 'HWID',
+                bound_value: extendModalLic.bound_value || null,
+                first_run_date: extendModalLic.first_run_date || now.toISOString(),
+                memo: extendMemo || `[관리자 연장] ${extendPlan} (+${extendMonths}개월)`
+            };
+
+            const { error: insertErr } = await supabase.from('licenses').insert([newRow]);
+            if (insertErr) throw insertErr;
+
+            // 2. 기존 라이선스는 used / 만료로 상태 보존 (덮어쓰지 않고 이력으로 전환)
+            await supabase.from('licenses').update({
+                status: 'used'
+            }).eq('id', extendModalLic.id);
+
+            setExtendModalLic(null);
             fetchLicenses();
-            showToast(`플랜 변경 완료: ${newType} (${newLimit === 0 ? '무제한' : newLimit + '건 제한'})`, 'success');
+            showToast(`신규 연장 발급 완료! (새 만료일: ${format(newExpireDate, 'yyyy-MM-dd')})`, 'success');
         } catch (err: any) {
-            alert(`플랜 수정 오류: ${err.message}`);
+            alert(`연장 등록 오류: ${err.message}`);
+        } finally {
+            setExtending(false);
         }
     };
 
@@ -207,7 +267,7 @@ export const LicenseList = () => {
     };
 
     const handleEditExpireDate = async (id: string, currentExpire: string, buyerName: string) => {
-        const newDate = window.prompt(`"${buyerName}" 새 만료일자 (YYYY-MM-DD):`, currentExpire ? currentExpire.split('T')[0] : '');
+        const newDate = window.prompt(`"${buyerName}" 만료일자 직접 수정 (YYYY-MM-DD):`, currentExpire ? currentExpire.split('T')[0] : '');
         if (!newDate) return;
         const parsedDate = new Date(newDate);
         if (isNaN(parsedDate.getTime())) { alert('날짜 형식 오류 (YYYY-MM-DD)'); return; }
@@ -215,7 +275,7 @@ export const LicenseList = () => {
             const { error } = await supabase.from('licenses').update({ expire_date: parsedDate.toISOString() }).eq('id', id);
             if (error) throw error;
             fetchLicenses();
-            showToast(`만료일 변경: ${newDate}`, 'success');
+            showToast(`만료일 수정: ${newDate}`, 'success');
         } catch (error: any) { alert(`수정 오류: ${error.message}`); }
     };
 
@@ -311,16 +371,6 @@ export const LicenseList = () => {
                         <span className={cn("block truncate", isHistorySubRow ? "text-slate-500 font-medium" : "text-slate-900 font-bold")}>
                             {getProductLabel(lic.product_id, lic.license_type, lic.collection_limit)}
                         </span>
-                        
-                        {!isHistorySubRow && (
-                            <button
-                                className="text-slate-300 hover:text-indigo-600 transition-colors flex-shrink-0 cursor-pointer"
-                                onClick={(e) => { e.stopPropagation(); handleEditPlan(lic.id, lic.license_type || '', lic.collection_limit, lic.buyer_name); }}
-                                title="플랜(무제한/제한) 수정"
-                            >
-                                <Pencil className="w-2.5 h-2.5" />
-                            </button>
-                        )}
 
                         {/* 아코디언 토글 버튼 */}
                         {!isHistorySubRow && historyCount > 0 && onToggleHistory && (
@@ -381,7 +431,7 @@ export const LicenseList = () => {
                         <button
                             className="text-slate-300 hover:text-indigo-500 transition-colors flex-shrink-0"
                             onClick={(e) => { e.stopPropagation(); handleEditExpireDate(lic.id, lic.expire_date, lic.buyer_name); }}
-                            title="만료일자 수정"
+                            title="만료일자 직접 수정"
                         >
                             <Pencil className="w-2.5 h-2.5" />
                         </button>
@@ -397,18 +447,30 @@ export const LicenseList = () => {
 
                 {/* 제어 */}
                 <td className="px-3 py-2 text-right">
-                    <div className="flex justify-end items-center gap-1">
+                    <div className="flex justify-end items-center gap-1.5 flex-nowrap">
                         {!isHistorySubRow && (
-                            <button
-                                className="inline-flex items-center gap-1 font-black text-[10px] text-indigo-600 bg-indigo-50 hover:bg-indigo-100 hover:text-indigo-800 px-2 py-1 rounded-md border border-indigo-200/80 transition-colors whitespace-nowrap"
-                                onClick={(e) => { e.stopPropagation(); handleAddLicenseForBuyer(lic.buyer_name, lic.contact, lic.product_id); }}
-                                title="이 구매자 정보로 추가 제품/재결제 라이선스 발급"
-                            >
-                                <PlusCircle className="w-3 h-3" /> 추가 구매
-                            </button>
+                            <>
+                                {/* 신규 연장 / 업그레이드 발급 버튼 */}
+                                <button
+                                    className="inline-flex items-center gap-1 font-black text-[10px] text-emerald-700 bg-emerald-50 hover:bg-emerald-100 hover:text-emerald-900 px-2 py-1 rounded-md border border-emerald-300 transition-all whitespace-nowrap shadow-xs"
+                                    onClick={(e) => { e.stopPropagation(); openExtendModal(lic); }}
+                                    title="이 고객의 구독 기간 연장 및 신규 이력 레코드 생성"
+                                >
+                                    <Sparkles className="w-3 h-3 text-emerald-600" /> 기간 연장
+                                </button>
+                                
+                                {/* 추가 제품 구매 */}
+                                <button
+                                    className="inline-flex items-center gap-1 font-black text-[10px] text-indigo-600 bg-indigo-50 hover:bg-indigo-100 hover:text-indigo-800 px-2 py-1 rounded-md border border-indigo-200/80 transition-colors whitespace-nowrap"
+                                    onClick={(e) => { e.stopPropagation(); handleAddLicenseForBuyer(lic.buyer_name, lic.contact, lic.product_id); }}
+                                    title="이 구매자 정보로 다른 제품 라이선스 신규 발급"
+                                >
+                                    <PlusCircle className="w-3 h-3" /> 추가 구매
+                                </button>
+                            </>
                         )}
                         <Button variant="ghost" size="icon"
-                            className={cn("h-7 w-7 transition-colors",
+                            className={cn("h-7 w-7 transition-colors shrink-0",
                                 lic.status === 'blocked'
                                     ? "text-emerald-600 hover:bg-emerald-50"
                                     : "text-slate-400 hover:bg-slate-100 hover:text-slate-700"
@@ -419,7 +481,7 @@ export const LicenseList = () => {
                             <Power className="w-3.5 h-3.5" />
                         </Button>
                         <Button variant="ghost" size="icon"
-                            className="h-7 w-7 text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-colors"
+                            className="h-7 w-7 text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-colors shrink-0"
                             onClick={(e) => { e.stopPropagation(); handleDeleteLicense(lic.id, lic.buyer_name); }}
                             title="라이선스 삭제"
                         >
@@ -454,6 +516,125 @@ export const LicenseList = () => {
                 ))}
             </div>
 
+            {/* 기간 연장 & 신규 이력 발급 모달 */}
+            {extendModalLic && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
+                    <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden text-left space-y-5 p-6 animate-in zoom-in-95 duration-200">
+                        <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+                            <div className="flex items-center gap-2">
+                                <div className="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
+                                    <Sparkles className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <h3 className="font-black text-slate-900 text-base">구독 기간 연장 & 신규 이력 생성</h3>
+                                    <p className="text-slate-400 text-xs font-bold">{extendModalLic.buyer_name} ({extendModalLic.product_id})</p>
+                                </div>
+                            </div>
+                            <button onClick={() => setExtendModalLic(null)} className="text-slate-400 hover:text-slate-700 p-1">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <div className="space-y-4 text-xs font-bold">
+                            {/* 1. 플랜 선택 */}
+                            <div>
+                                <label className="block text-slate-600 mb-1.5 font-extrabold">적용 플랜</label>
+                                <div className="grid grid-cols-3 gap-2">
+                                    {[
+                                        { id: 'DELUXE', label: 'DELUXE (무제한)', months: 1, price: 7600 },
+                                        { id: 'PREMIUM', label: 'PREMIUM (무제한)', months: 3, price: 17900 },
+                                        { id: 'STANDARD', label: 'STANDARD (1,000건)', months: 1, price: 4200 },
+                                    ].map(p => (
+                                        <button
+                                            key={p.id}
+                                            type="button"
+                                            onClick={() => {
+                                                setExtendPlan(p.id as any);
+                                                setExtendMonths(p.months);
+                                                setExtendPrice(p.price);
+                                            }}
+                                            className={cn(
+                                                "p-3 rounded-xl border text-center transition-all cursor-pointer",
+                                                extendPlan === p.id 
+                                                    ? "bg-indigo-600 text-white border-indigo-700 shadow-sm" 
+                                                    : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
+                                            )}
+                                        >
+                                            <span className="block font-black">{p.id}</span>
+                                            <span className="text-[10px] opacity-80 block mt-0.5">{p.months}개월 ({p.price.toLocaleString()}원)</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* 2. 연장 개월수 & 결제 금액 */}
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-slate-600 mb-1">연장 개월 수 (+N개월)</label>
+                                    <Input
+                                        type="number"
+                                        min={1}
+                                        value={extendMonths}
+                                        onChange={e => setExtendMonths(parseInt(e.target.value) || 1)}
+                                        className="h-10 bg-slate-50 font-bold"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-slate-600 mb-1">결제/판매 금액 (원)</label>
+                                    <Input
+                                        type="number"
+                                        value={extendPrice}
+                                        onChange={e => setExtendPrice(parseInt(e.target.value) || 0)}
+                                        className="h-10 bg-slate-50 font-bold"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* 3. 결제 채널 */}
+                            <div>
+                                <label className="block text-slate-600 mb-1">결제 채널 / 수단</label>
+                                <select
+                                    value={extendChannel}
+                                    onChange={e => setExtendChannel(e.target.value)}
+                                    className="w-full h-10 px-3 bg-slate-50 border border-slate-300 rounded-xl font-bold text-xs focus:ring-2 focus:ring-indigo-200 outline-none"
+                                >
+                                    <option value="크몽 재결제">크몽 재결제</option>
+                                    <option value="무통장/계좌이체">무통장 / 계좌이체</option>
+                                    <option value="스마트스토어">스마트스토어</option>
+                                    <option value="PG 카드결제">3Monster PG 카드결제</option>
+                                    <option value="관리자 무상연장">관리자 무상 지원/연장</option>
+                                    <option value="기타">기타</option>
+                                </select>
+                            </div>
+
+                            {/* 4. 메모 */}
+                            <div>
+                                <label className="block text-slate-600 mb-1">연장 기록 메모</label>
+                                <Input
+                                    placeholder="예: 크몽 2차 연장 결제건"
+                                    value={extendMemo}
+                                    onChange={e => setExtendMemo(e.target.value)}
+                                    className="h-10 bg-slate-50 text-xs"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                            <Button variant="ghost" onClick={() => setExtendModalLic(null)} className="h-10 px-4 text-xs font-bold">
+                                취소
+                            </Button>
+                            <Button 
+                                onClick={handleExecuteExtension} 
+                                disabled={extending}
+                                className="h-10 px-6 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-xl shadow-md shadow-emerald-600/20"
+                            >
+                                {extending ? '연장 처리중...' : '신규 연장 발급 및 이력 생성'}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-black text-slate-800 tracking-tight">구매자 관리</h1>
                 <div className="relative w-72">
@@ -480,7 +661,7 @@ export const LicenseList = () => {
                         <col style={{ width: '8%' }}  />   {/* 실행일자 */}
                         <col style={{ width: '9%' }}  />   {/* 만료일자 */}
                         <col style={{ width: '8%' }}  />   {/* 상태 */}
-                        <col style={{ width: '135px' }} /> {/* 제어 */}
+                        <col style={{ width: '190px' }} /> {/* 제어 */}
                     </colgroup>
                     <thead className="bg-slate-900 text-white">
                         <tr className="text-[11px] font-black uppercase tracking-wide text-left">

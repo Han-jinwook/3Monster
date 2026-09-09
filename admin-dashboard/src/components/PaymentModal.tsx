@@ -23,6 +23,7 @@ export interface PaymentProduct {
     title: string;
     subtitle: string;
     initialTier?: 'DELUXE' | '1M' | '3M';
+    isRepurchase?: boolean;
 }
 
 interface PaymentModalProps {
@@ -89,6 +90,9 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
     useEffect(() => {
         if (product?.initialTier) {
             setSelectedTier(product.initialTier);
+        }
+        if (product?.isRepurchase !== undefined) {
+            setIsRepurchase(product.isRepurchase);
         }
         setSuccessData(null);
         setErrorMsg(null);

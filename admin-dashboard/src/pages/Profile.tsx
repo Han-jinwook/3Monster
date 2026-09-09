@@ -153,6 +153,11 @@ export const Profile = () => {
 
     useEffect(() => {
         fetchProfileData();
+        const channel = supabase
+            .channel('profile-license-sync')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'licenses' }, fetchProfileData)
+            .subscribe();
+        return () => { supabase.removeChannel(channel); };
     }, [userEmail]);
 
     // [핵심] 제품(product_id) 단위로 그룹핑 & 최신 활성 라이선스를 Main 대표 카드로 배치
