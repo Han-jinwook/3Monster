@@ -102,7 +102,7 @@ export const Profile = () => {
                 .eq('email', userEmail.toLowerCase())
                 .maybeSingle();
 
-            if (userError) throw userError;
+            if (userError) console.warn("User data fetch warning:", userError);
 
             let currentUserName = '';
             if (userData) {
@@ -115,33 +115,39 @@ export const Profile = () => {
                 }
             }
 
-            // 2. Fetch Licenses details (스마트 다중 매칭: contact, buyer_name, 이메일 ID 등)
-            const emailClean = userEmail.toLowerCase();
-            const emailId = emailClean.split('@')[0];
-            const nameClean = currentUserName.trim().toLowerCase();
+            // 2. Fetch Licenses details (안전하고 완벽한 다중 매칭)
+            const emailClean = userEmail.toLowerCase().trim();
+            const emailId = emailClean.split('@')[0].trim();
+            const nameClean = currentUserName.toLowerCase().trim();
 
-            let query = supabase.from('licenses').select('*');
-            
-            if (role === 'admin') {
-                // 관리자인 경우 전체 또는 본인 매칭
-                query = query.order('created_at', { ascending: false });
-            } else {
-                // 구매자인 경우 contact 또는 buyer_name 매칭
-                const orConditions = [
-                    `contact.ilike.${emailClean}`,
-                    `buyer_name.ilike.${emailClean}`,
-                    `buyer_name.ilike.${emailId}`
-                ];
-                if (nameClean) {
-                    orConditions.push(`buyer_name.ilike.${nameClean}`);
-                    orConditions.push(`contact.ilike.${nameClean}`);
-                }
-                query = query.or(orConditions.join(',')).order('created_at', { ascending: false });
-            }
+            const { data: licenseData, error: licenseError } = await supabase
+                .from('licenses')
+                .select('*')
+                .order('created_at', { ascending: false });
 
-            const { data: licenseData, error: licenseError } = await query;
             if (licenseError) throw licenseError;
-            setLicenses((licenseData as LicenseItem[]) || []);
+
+            if (role === 'admin') {
+                // 관리자인 경우 전체 표시
+                setLicenses((licenseData as LicenseItem[]) || []);
+            } else {
+                // 구매자/일반유저인 경우 본인 정보와 일치하는 라이선스만 필터링
+                const matched = ((licenseData as LicenseItem[]) || []).filter(lic => {
+                    const licContact = (lic.contact || '').toLowerCase().trim();
+                    const licBuyer = (lic.buyer_name || '').toLowerCase().trim();
+                    const licContactId = licContact.split('@')[0].trim();
+
+                    return (
+                        (emailClean && licContact === emailClean) ||
+                        (emailClean && licBuyer === emailClean) ||
+                        (emailId && licBuyer === emailId) ||
+                        (emailId && licContactId === emailId) ||
+                        (nameClean && licBuyer === nameClean) ||
+                        (nameClean && licContact === nameClean)
+                    );
+                });
+                setLicenses(matched);
+            }
 
         } catch (err: any) {
             console.error("Error loading profile details:", err);
@@ -158,7 +164,7 @@ export const Profile = () => {
             .on('postgres_changes', { event: '*', schema: 'public', table: 'licenses' }, fetchProfileData)
             .subscribe();
         return () => { supabase.removeChannel(channel); };
-    }, [userEmail]);
+    }, [userEmail, role]);
 
     // [핵심] 제품(product_id) 단위로 그룹핑 & 최신 활성 라이선스를 Main 대표 카드로 배치
     const groupedLicenses = useMemo(() => {

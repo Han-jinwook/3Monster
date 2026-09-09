@@ -103,14 +103,23 @@ export const LicenseGenerator = () => {
         fetchBuyers();
     }, []);
 
-    // 타이핑된 검색어에 일치하는 구매자 필터링 (글자 입력 시에만 활성화)
+    // 타이핑된 검색어에 일치하는 구매자 필터링 (글자 입력 시에만 활성화 - 이메일 도메인 매칭 제외)
     const trimmedBuyer = formData.buyer_name ? formData.buyer_name.trim() : '';
     const matchingBuyers = useMemo(() => {
         if (!trimmedBuyer || trimmedBuyer.length < 1) return [];
-        return existingBuyers.filter(b => 
-            (b.buyer_name && b.buyer_name.toLowerCase().includes(trimmedBuyer.toLowerCase())) ||
-            (b.contact && b.contact.toLowerCase().includes(trimmedBuyer.toLowerCase()))
-        ).slice(0, 6);
+        const q = trimmedBuyer.toLowerCase();
+        return existingBuyers.filter(b => {
+            const bName = (b.buyer_name || '').toLowerCase().trim();
+            const contact = (b.contact || '').toLowerCase().trim();
+            const emailId = contact.split('@')[0];
+            
+            // If query contains '@', match full contact email
+            if (q.includes('@')) {
+                return contact.includes(q);
+            }
+            // Otherwise match only buyer_name or email ID (prefix before @)
+            return (bName && bName.includes(q)) || (emailId && emailId.includes(q));
+        }).slice(0, 6);
     }, [trimmedBuyer, existingBuyers]);
 
     // URL 파라미터가 변경될 때 자동 채우기
