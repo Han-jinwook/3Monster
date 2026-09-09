@@ -135,7 +135,7 @@ export const CustomerSupport = () => {
                     setKmongNickname('');
                 }
 
-                const matchSerial = found.description?.match(/\(시리얼:\s*([^\)]+)\)/);
+                const matchSerial = found.description?.match(/\((?:시리얼|라이선스 키|라이선스키):\s*([^\)]+)\)/);
                 if (matchSerial && matchSerial[1]) {
                     const lic = purchasedLicenses.find(l => l.serial_key === matchSerial[1]);
                     if (lic) {
@@ -320,7 +320,7 @@ export const CustomerSupport = () => {
             let finalDescription = description;
 
             if (selectedLic) {
-                finalDescription = `[문의 제품: ${selectedLic.product_id} (시리얼: ${selectedLic.serial_key})]\n${finalDescription}`;
+                finalDescription = `[문의 제품: ${selectedLic.product_id} (라이선스 키: ${selectedLic.serial_key})]\n${finalDescription}`;
             } else {
                 finalDescription = `[문의 제품: ${selectedProduct}]\n${finalDescription}`;
             }
@@ -381,7 +381,7 @@ export const CustomerSupport = () => {
             let finalDescription = description;
 
             if (selectedLic) {
-                finalDescription = `[문의 제품: ${selectedLic.product_id} (시리얼: ${selectedLic.serial_key})]\n${finalDescription}`;
+                finalDescription = `[문의 제품: ${selectedLic.product_id} (라이선스 키: ${selectedLic.serial_key})]\n${finalDescription}`;
             } else {
                 finalDescription = `[문의 제품: ${selectedProduct}]\n${finalDescription}`;
             }
@@ -1212,7 +1212,7 @@ export const CustomerSupport = () => {
                                                     <option value="">-- 문의할 보유 라이선스 선택 --</option>
                                                     {purchasedLicenses.map((lic) => (
                                                         <option key={lic.id} value={lic.id}>
-                                                            {lic.product_id} ({lic.serial_key ? lic.serial_key.substring(0, 8) + '...' : '시리얼 없음'}) - {lic.buyer_name || '이름 없음'}
+                                                            {lic.product_id} ({lic.serial_key ? lic.serial_key.substring(0, 8) + '...' : '라이선스 키 없음'}) - {lic.buyer_name || '이름 없음'}
                                                         </option>
                                                     ))}
                                                 </select>

@@ -282,7 +282,7 @@ export const LicenseList = () => {
     };
 
     const handleCopySerial = (serial: string) => {
-        navigator.clipboard.writeText(serial).then(() => showToast(`복사: ${serial}`, 'success'));
+        navigator.clipboard.writeText(serial).then(() => showToast(`라이선스 키 복사: ${serial}`, 'success'));
     };
 
     const handleDeleteLicense = async (id: string, buyerName: string) => {
@@ -406,7 +406,7 @@ export const LicenseList = () => {
                     </div>
                 </td>
 
-                {/* 시리얼 (복사) - 가로 1줄 단정하게 배치 */}
+                {/* 라이선스 키 (복사) - 가로 1줄 단정하게 배치 */}
                 <td className="px-2 py-2 text-center whitespace-nowrap">
                     <button
                         type="button"
@@ -801,7 +801,7 @@ export const LicenseList = () => {
                 <div className="relative w-72">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <Input
-                        placeholder="ID / 이메일 / 시리얼 검색"
+                        placeholder="ID / 이메일 / 라이선스 키 검색"
                         className="pl-11 bg-white border border-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 text-sm font-bold rounded-xl h-10"
                         value={searchTerm}
                         onChange={e => setSearchTerm(e.target.value)}
@@ -816,7 +816,7 @@ export const LicenseList = () => {
                             <col style={{ width: '44px' }} />  {/* NO */}
                             <col style={{ width: '220px' }} /> {/* 구매자 (이메일) */}
                             <col style={{ width: 'auto' }} />  {/* 구매 제품 (풀 텍스트) */}
-                            <col style={{ width: '80px' }} />  {/* 시리얼(복사) */}
+                            <col style={{ width: '80px' }} />  {/* 라이선스 키(복사) */}
                             <col style={{ width: '90px' }} />  {/* 구매일자 */}
                             <col style={{ width: '95px' }} />  {/* 실행일자 */}
                             <col style={{ width: '95px' }} />  {/* 만료일자 */}
@@ -828,7 +828,7 @@ export const LicenseList = () => {
                                 <th className="px-3 py-2.5 text-slate-400 text-center whitespace-nowrap">NO</th>
                                 <th className="px-3 py-2.5 text-slate-200 whitespace-nowrap">구매자 (이메일)</th>
                                 <th className="px-3 py-2.5 text-slate-200 whitespace-nowrap">구매 제품</th>
-                                <th className="px-3 py-2.5 text-slate-200 text-center whitespace-nowrap">시리얼</th>
+                                <th className="px-3 py-2.5 text-slate-200 text-center whitespace-nowrap">라이선스 키</th>
                                 <th className="px-3 py-2.5 text-slate-200 whitespace-nowrap">구매일자</th>
                                 <th className="px-3 py-2.5 text-slate-200 whitespace-nowrap">실행일자</th>
                                 <th className="px-3 py-2.5 text-slate-200 whitespace-nowrap">만료일자</th>

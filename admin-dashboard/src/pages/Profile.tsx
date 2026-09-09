@@ -227,7 +227,7 @@ export const Profile = () => {
     };
 
     const handleCopySerial = (serial: string) => {
-        navigator.clipboard.writeText(serial).then(() => showToast(`시리얼 번호가 복사되었습니다: ${serial}`));
+        navigator.clipboard.writeText(serial).then(() => showToast(`라이선스 키가 복사되었습니다: ${serial}`));
     };
 
     const getShowroomProductId = (prodId: string): string => {
@@ -475,14 +475,14 @@ export const Profile = () => {
                                                                 
                                                                 {/* Serial key with 1-click copy */}
                                                                 <div className="flex items-center gap-1.5 pt-1">
-                                                                    <span className="text-[11px] font-bold text-slate-500">시리얼:</span>
+                                                                    <span className="text-[11px] font-bold text-slate-500">라이선스 키:</span>
                                                                     <code className="bg-white px-2 py-0.5 rounded-md text-xs font-mono font-bold text-indigo-950 border border-slate-200">
                                                                         {main.serial_key}
                                                                     </code>
                                                                     <button
                                                                         onClick={() => handleCopySerial(main.serial_key)}
                                                                         className="p-1 hover:bg-slate-200 text-slate-400 hover:text-indigo-600 rounded transition-colors"
-                                                                        title="시리얼 복사"
+                                                                        title="라이선스 키 복사"
                                                                     >
                                                                         <Copy className="w-3.5 h-3.5" />
                                                                     </button>
@@ -575,7 +575,7 @@ export const Profile = () => {
                                                                                 <button
                                                                                     onClick={() => handleCopySerial(histLic.serial_key)}
                                                                                     className="p-1 hover:bg-slate-100 text-slate-400 hover:text-indigo-600 rounded"
-                                                                                    title="시리얼 복사"
+                                                                                    title="라이선스 키 복사"
                                                                                 >
                                                                                     <Copy className="w-3 h-3" />
                                                                                 </button>

@@ -123,8 +123,6 @@ export const LicenseGenerator = () => {
     }, [trimmedBuyer, existingBuyers]);
 
     // URL 파라미터가 변경될 때 자동 채우기
-    const [isRepurchase, setIsRepurchase] = useState(false);
-
     useEffect(() => {
         if (queryBuyer || queryEmail) {
             setFormData(prev => ({
@@ -133,7 +131,6 @@ export const LicenseGenerator = () => {
                 contact: queryEmail || prev.contact,
             }));
             setEmailAutoFilled(true);
-            setIsRepurchase(true);
         }
     }, [queryBuyer, queryEmail]);
 
@@ -263,16 +260,7 @@ export const LicenseGenerator = () => {
         setExpandedProductId(productId);
     };
 
-    const repurchasePrices: { [key: string]: number } = {
-        'DELUXE': 4200,
-        '1M': 7600,
-        '3M': 17900,
-    };
-
-    const getCalculatedPrice = (licType: string, isRepurch: boolean) => {
-        if (isRepurch && repurchasePrices[licType] !== undefined) {
-            return String(repurchasePrices[licType]);
-        }
+    const getCalculatedPrice = (licType: string) => {
         const matched = pricing.find(
             p => p.product.toLowerCase() === formData.product_id.toLowerCase() && p.pkg === licType
         );
@@ -282,18 +270,12 @@ export const LicenseGenerator = () => {
     };
 
     const handleLicenseTypeChange = (licenseType: string) => {
-        const price = getCalculatedPrice(licenseType, isRepurchase);
+        const price = getCalculatedPrice(licenseType);
         setFormData(prev => ({
             ...prev,
             license_type: licenseType,
             price_sold: price || prev.price_sold
         }));
-    };
-
-    const toggleRepurchase = (checked: boolean) => {
-        setIsRepurchase(checked);
-        const price = getCalculatedPrice(formData.license_type, checked);
-        setFormData(prev => ({ ...prev, price_sold: price }));
     };
 
     const handleToggleStatus = (id: number) => {
@@ -396,33 +378,16 @@ export const LicenseGenerator = () => {
     return (
         <div className="max-w-[1200px] mx-auto space-y-6 pt-0 pb-12 px-4">
             <div className="flex flex-col gap-1.5">
-                <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
-                    시리얼 발행 
-                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
-                        신규 구매 / 재구매 우대
-                    </span>
+                <h1 className="text-3xl font-black text-slate-900 tracking-tight">
+                    라이선스 키 발급
                 </h1>
             </div>
 
             <div className="grid gap-6 lg:grid-cols-12 items-start">
                 {/* Left Form Column */}
                 <Card className="lg:col-span-7 p-0 overflow-hidden border border-slate-200 rounded-2xl bg-white shadow-[0_15px_45px_rgba(0,0,0,0.07)]">
-                    <CardHeader className="px-6 py-2 border-b border-slate-200 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white">
-                        <div className="flex items-center justify-between">
-                            <CardTitle className="text-xl font-black text-white tracking-tighter">라이선스 정보 입력</CardTitle>
-                            <button
-                                type="button"
-                                onClick={() => toggleRepurchase(!isRepurchase)}
-                                className={cn(
-                                    "px-3 py-1 rounded-xl text-xs font-black transition-all flex items-center gap-1.5",
-                                    isRepurchase 
-                                        ? "bg-amber-400 text-slate-950 shadow-md ring-2 ring-amber-300" 
-                                        : "bg-slate-800 text-slate-300 hover:bg-slate-700"
-                                )}
-                            >
-                                {isRepurchase ? "🎁 재구매 우대가 적용 중 (4.2천/7.6천/1.79만)" : "⚡ 일반/신규 가격 (5천/9천/2.1만)"}
-                            </button>
-                        </div>
+                    <CardHeader className="px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white">
+                        <CardTitle className="text-xl font-black text-white tracking-tighter">라이선스 키 정보 입력</CardTitle>
                     </CardHeader>
                     <CardContent className="p-6">
                         <form onSubmit={handleSubmit} className="space-y-6">
@@ -499,14 +464,7 @@ export const LicenseGenerator = () => {
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <div className="flex items-center justify-between">
-                                        <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">판매 가격 (KRW)</label>
-                                        {isRepurchase && (
-                                            <span className="text-[11px] font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-                                                ★ 재구매 우대 할인 적용됨
-                                            </span>
-                                        )}
-                                    </div>
+                                    <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">판매 가격 (KRW)</label>
                                     <Input placeholder="금액 입력" className="h-14 bg-white border border-slate-400 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150 text-base font-extrabold px-4 text-slate-955 rounded-xl shadow-sm" value={formatPrice(formData.price_sold)} onChange={e => setFormData({ ...formData, price_sold: parsePrice(e.target.value) })} />
                                 </div>
                             </div>
@@ -596,7 +554,7 @@ export const LicenseGenerator = () => {
                             </div>
 
                             <Button type="submit" className="w-full h-16 text-white font-black text-lg shadow-md hover:bg-indigo-750 active:scale-[0.99] transition-all bg-indigo-600 rounded-xl border-b-4 border-indigo-900 border-none animate-none" isLoading={loading}>
-                                라이선스 즉시 발행하기 <ChevronRight className="ml-1 w-5 h-5" />
+                                라이선스 키 즉시 발급하기 <ChevronRight className="ml-1 w-5 h-5" />
                             </Button>
 
                             <div className="pt-4 border-t border-slate-200 mt-4 space-y-3">
@@ -625,7 +583,7 @@ export const LicenseGenerator = () => {
                                             {generatedKey.startsWith('TEST-') ? <Clock className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
                                         </div>
                                         <h4 className="font-black text-sm">
-                                            {generatedKey.startsWith('TEST-') ? '테스트 라이선스 키 발급 완료' : '정식 라이선스 발급 완료'}
+                                            {generatedKey.startsWith('TEST-') ? '테스트 라이선스 키 발급 완료' : '정식 라이선스 키 발급 완료'}
                                         </h4>
                                     </div>
                                     <div className="rounded-xl bg-white/10 p-4 text-center">
