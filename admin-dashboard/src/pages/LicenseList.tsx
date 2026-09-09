@@ -108,12 +108,49 @@ export const LicenseList = () => {
         const activeCount = ledgerLicenses.filter(l => l.status === 'active' || l.status === 'used').length;
         const buyerName = (ledgerLicenses.find(l => l.buyer_name)?.buyer_name || '').replace(/\s*\(TRIAL\)\s*|\s*\(TEST\)\s*/gi, '').trim();
         const primaryChannel = ledgerLicenses.find(l => l.channel)?.channel || '크몽';
+        // 1. 제품수: 구매한 고유 제품(Product ID) 개수
+        const productSet = new Set(ledgerLicenses.map(l => l.product_id).filter(Boolean));
+        const productCount = productSet.size;
+
+        // 2. 각 제품별 최초 구매 식별 (가장 오래된 1건은 신규 플랜 구매, 그 이후는 연장/재결제)
+        const productFirstPurchaseMap = new Map<string, string>();
+        const sortedAsc = [...ledgerLicenses].sort((a, b) => 
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        );
+        sortedAsc.forEach(l => {
+            const pId = l.product_id || 'UNKNOWN';
+            if (!productFirstPurchaseMap.has(pId)) {
+                productFirstPurchaseMap.set(pId, l.id);
+            }
+        });
+
+        let extensionCount = 0;
+        let planCount = 0;
+
+        ledgerLicenses.forEach(l => {
+            const pId = l.product_id || 'UNKNOWN';
+            const firstId = productFirstPurchaseMap.get(pId);
+            const isExplicitExtension = (
+                (l.memo && (l.memo.includes('연장') || l.memo.includes('재결제'))) ||
+                (l.channel && (l.channel.includes('연장') || l.channel.includes('재결제')))
+            );
+
+            if (isExplicitExtension || (firstId && l.id !== firstId)) {
+                extensionCount++;
+            } else {
+                planCount++;
+            }
+        });
+
         return {
             totalSpent,
             totalCount: ledgerLicenses.length,
             activeCount,
             buyerName,
-            primaryChannel
+            primaryChannel,
+            productCount,
+            planCount,
+            extensionCount
         };
     }, [ledgerLicenses]);
 
@@ -574,12 +611,34 @@ export const LicenseList = () => {
                                     </div>
                                 </div>
                                 <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
-                                    <span className="text-[11px] font-black text-slate-500 uppercase tracking-wide">총 결제/연장 건수</span>
-                                    <div className="mt-1">
-                                        <span className="text-2xl font-black text-slate-900">
-                                            {ledgerStats.totalCount}
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[11px] font-black text-slate-500 uppercase tracking-wide">총 결제/연장 내역</span>
+                                        <span className="text-[10px] font-black text-slate-500 bg-white px-2 py-0.5 rounded-full border border-slate-200">
+                                            총 {ledgerStats.totalCount}건
                                         </span>
-                                        <span className="text-xs font-bold text-slate-500 ml-1">건</span>
+                                    </div>
+                                    <div className="grid grid-cols-3 divide-x divide-slate-200 mt-2 py-0.5 text-center items-center">
+                                        <div className="pr-1.5">
+                                            <span className="block text-[10px] font-extrabold text-slate-500">제품수</span>
+                                            <div className="mt-0.5">
+                                                <span className="text-xl font-black text-slate-900">{ledgerStats.productCount}</span>
+                                                <span className="text-[11px] font-bold text-slate-500 ml-0.5">개</span>
+                                            </div>
+                                        </div>
+                                        <div className="px-1.5">
+                                            <span className="block text-[10px] font-extrabold text-indigo-600">플랜수</span>
+                                            <div className="mt-0.5">
+                                                <span className="text-xl font-black text-indigo-600">{ledgerStats.planCount}</span>
+                                                <span className="text-[11px] font-bold text-indigo-400 ml-0.5">건</span>
+                                            </div>
+                                        </div>
+                                        <div className="pl-1.5">
+                                            <span className="block text-[10px] font-extrabold text-emerald-600">연장 수</span>
+                                            <div className="mt-0.5">
+                                                <span className="text-xl font-black text-emerald-600">{ledgerStats.extensionCount}</span>
+                                                <span className="text-[11px] font-bold text-emerald-500 ml-0.5">건</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-100 flex flex-col justify-between">
