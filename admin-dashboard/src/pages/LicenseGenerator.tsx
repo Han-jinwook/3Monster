@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
@@ -55,6 +55,18 @@ export const LicenseGenerator = () => {
     const [emailAutoFilled, setEmailAutoFilled] = useState(!!(queryEmail || queryBuyer));
     const [existingBuyers, setExistingBuyers] = useState<Array<{ buyer_name: string; contact: string; channel?: string }>>([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
+    const buyerDropdownRef = useRef<HTMLDivElement>(null);
+
+    // 바깥 영역 클릭 시 자동완성 드롭다운 닫기
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (buyerDropdownRef.current && !buyerDropdownRef.current.contains(event.target as Node)) {
+                setShowSuggestions(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     const [formData, setFormData] = useState({
         product_id: 'NPlace-DB',
@@ -90,6 +102,16 @@ export const LicenseGenerator = () => {
         };
         fetchBuyers();
     }, []);
+
+    // 타이핑된 검색어에 일치하는 구매자 필터링 (글자 입력 시에만 활성화)
+    const trimmedBuyer = formData.buyer_name ? formData.buyer_name.trim() : '';
+    const matchingBuyers = useMemo(() => {
+        if (!trimmedBuyer || trimmedBuyer.length < 1) return [];
+        return existingBuyers.filter(b => 
+            (b.buyer_name && b.buyer_name.toLowerCase().includes(trimmedBuyer.toLowerCase())) ||
+            (b.contact && b.contact.toLowerCase().includes(trimmedBuyer.toLowerCase()))
+        ).slice(0, 6);
+    }, [trimmedBuyer, existingBuyers]);
 
     // URL 파라미터가 변경될 때 자동 채우기
     const [isRepurchase, setIsRepurchase] = useState(false);
@@ -481,50 +503,56 @@ export const LicenseGenerator = () => {
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-2 relative">
+                                <div ref={buyerDropdownRef} className="space-y-2 relative">
                                     <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">구매자 ID (크몽 등)</label>
                                     <Input
                                         required
                                         placeholder="구매자의 ID를 입력하세요"
                                         className="h-14 bg-white border border-slate-400 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150 text-base font-extrabold px-4 rounded-xl text-slate-955 placeholder:text-slate-400 shadow-sm"
                                         value={formData.buyer_name}
-                                        onFocus={() => setShowSuggestions(true)}
+                                        onFocus={() => {
+                                            if (trimmedBuyer.length >= 1) setShowSuggestions(true);
+                                        }}
                                         onChange={e => {
-                                            setShowSuggestions(true);
-                                            setFormData({ ...formData, buyer_name: e.target.value });
+                                            const val = e.target.value;
+                                            setFormData({ ...formData, buyer_name: val });
+                                            if (val.trim().length >= 1) {
+                                                setShowSuggestions(true);
+                                            } else {
+                                                setShowSuggestions(false);
+                                            }
                                         }}
                                     />
-                                    {showSuggestions && existingBuyers.length > 0 && (
-                                        <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-300 rounded-xl shadow-2xl z-50 max-h-48 overflow-y-auto divide-y divide-slate-100">
-                                            <div className="px-3 py-1.5 bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-wider">
-                                                기존 등록된 구매자 선택 (클릭 시 자동채움)
-                                            </div>
-                                            {existingBuyers
-                                                .filter(b => 
-                                                    !formData.buyer_name || 
-                                                    b.buyer_name.toLowerCase().includes(formData.buyer_name.toLowerCase()) || 
-                                                    b.contact.toLowerCase().includes(formData.buyer_name.toLowerCase())
-                                                )
-                                                .slice(0, 8)
-                                                .map((b, i) => (
-                                                    <div
-                                                        key={i}
-                                                        className="px-3 py-2 hover:bg-indigo-50 cursor-pointer flex justify-between items-center transition-colors"
-                                                        onClick={() => {
-                                                            setFormData(prev => ({
-                                                                ...prev,
-                                                                buyer_name: b.buyer_name,
-                                                                contact: b.contact,
-                                                                channel: b.channel || prev.channel
-                                                            }));
-                                                            setEmailAutoFilled(true);
-                                                            setShowSuggestions(false);
-                                                        }}
-                                                    >
-                                                        <div className="font-bold text-xs text-slate-800">{b.buyer_name}</div>
+                                    {/* 글자 입력 시에만 뜨는 슬림한 플로팅 자동완성 드롭다운 */}
+                                    {showSuggestions && trimmedBuyer.length >= 1 && matchingBuyers.length > 0 && (
+                                        <div className="absolute left-0 right-0 top-full mt-1.5 bg-white border border-slate-200 rounded-2xl shadow-2xl z-50 overflow-hidden divide-y divide-slate-100 max-h-56 overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
+                                            {matchingBuyers.map((b, i) => (
+                                                <div
+                                                    key={i}
+                                                    className="px-4 py-2.5 hover:bg-indigo-50/80 cursor-pointer flex justify-between items-center transition-colors text-left"
+                                                    onMouseDown={(e) => {
+                                                        e.preventDefault();
+                                                        setFormData(prev => ({
+                                                            ...prev,
+                                                            buyer_name: b.buyer_name,
+                                                            contact: b.contact,
+                                                            channel: b.channel || prev.channel
+                                                        }));
+                                                        setEmailAutoFilled(true);
+                                                        setShowSuggestions(false);
+                                                    }}
+                                                >
+                                                    <div>
+                                                        <div className="font-extrabold text-xs text-slate-900">{b.buyer_name}</div>
                                                         <div className="text-[11px] font-medium text-slate-500 font-mono">{b.contact}</div>
                                                     </div>
-                                                ))}
+                                                    {b.channel && (
+                                                        <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-full">
+                                                            {b.channel}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            ))}
                                         </div>
                                     )}
                                 </div>
