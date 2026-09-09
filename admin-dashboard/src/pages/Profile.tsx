@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import { supabase } from '../lib/supabase';
+import { useNavigate } from 'react-router-dom';
+import { supabase, supabasePublic } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -19,8 +20,6 @@ import {
     ChevronDown,
     ChevronUp,
     Clock,
-    Plus,
-    KeyRound,
     RefreshCw
 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -43,6 +42,7 @@ interface LicenseItem {
 }
 
 export const Profile = () => {
+    const navigate = useNavigate();
     const { email: authEmail, role, logout } = useAuth();
     const userEmail = authEmail || localStorage.getItem('user_email') || '';
 
@@ -66,10 +66,6 @@ export const Profile = () => {
     const [licenses, setLicenses] = useState<LicenseItem[]>([]);
     const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
 
-    // Register Key state
-    const [showRegisterKey, setShowRegisterKey] = useState(false);
-    const [inputSerialKey, setInputSerialKey] = useState('');
-    const [registeringKey, setRegisteringKey] = useState(false);
 
     const showToast = (message: string) => {
         const id = Date.now();
@@ -115,12 +111,12 @@ export const Profile = () => {
                 }
             }
 
-            // 2. Fetch Licenses details (안전하고 완벽한 다중 매칭)
+            // 2. Fetch Licenses details (안전하고 완벽한 다중 매칭 - RLS 세션 영향 없는 supabasePublic 사용)
             const emailClean = userEmail.toLowerCase().trim();
             const emailId = emailClean.split('@')[0].trim();
             const nameClean = currentUserName.toLowerCase().trim();
 
-            const { data: licenseData, error: licenseError } = await supabase
+            const { data: licenseData, error: licenseError } = await supabasePublic
                 .from('licenses')
                 .select('*')
                 .order('created_at', { ascending: false });
@@ -231,49 +227,6 @@ export const Profile = () => {
 
     const handleCopySerial = (serial: string) => {
         navigator.clipboard.writeText(serial).then(() => showToast(`시리얼 번호가 복사되었습니다: ${serial}`));
-    };
-
-    const handleRegisterSerialKey = async () => {
-        const key = inputSerialKey.trim();
-        if (!key) {
-            alert('라이선스 키를 입력해 주세요.');
-            return;
-        }
-        setRegisteringKey(true);
-        try {
-            // 1. 키 존재 여부 확인
-            const { data: keyData, error: fetchErr } = await supabase
-                .from('licenses')
-                .select('*')
-                .eq('serial_key', key)
-                .maybeSingle();
-
-            if (fetchErr) throw fetchErr;
-            if (!keyData) {
-                alert('유효하지 않거나 존재하지 않는 라이선스 키입니다.');
-                return;
-            }
-
-            // 2. 계정 귀속(contact & buyer_name 갱신)
-            const { error: updateErr } = await supabase
-                .from('licenses')
-                .update({
-                    contact: userEmail.toLowerCase(),
-                    buyer_name: name || keyData.buyer_name || userEmail.split('@')[0]
-                })
-                .eq('id', keyData.id);
-
-            if (updateErr) throw updateErr;
-
-            setInputSerialKey('');
-            setShowRegisterKey(false);
-            showToast('라이선스 키가 내 계정에 성공적으로 등록되었습니다!');
-            fetchProfileData();
-        } catch (err: any) {
-            alert(`라이선스 등록 오류: ${err.message}`);
-        } finally {
-            setRegisteringKey(false);
-        }
     };
 
     const getPlanLabel = (_productId: string, licenseType?: string, collectionLimit?: number) => {
@@ -402,58 +355,18 @@ export const Profile = () => {
                         </div>
                     </div>
 
-                    {/* Refresh & Register Key Button */}
+                    {/* Refresh Button */}
                     <div className="flex items-center gap-2">
                         <Button
                             variant="outline"
                             size="sm"
                             onClick={() => fetchProfileData()}
-                            className="h-9 px-3 text-xs font-bold text-slate-600 border-slate-300 hover:bg-slate-100 rounded-xl flex items-center gap-1.5"
+                            className="h-9 px-3 text-xs font-bold text-slate-600 border-slate-300 hover:bg-slate-100 rounded-xl flex items-center gap-1.5 shadow-sm"
                         >
                             <RefreshCw className="w-3.5 h-3.5" /> 새로고침
                         </Button>
-                        <Button
-                            size="sm"
-                            onClick={() => setShowRegisterKey(!showRegisterKey)}
-                            className="h-9 px-3 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl flex items-center gap-1.5 shadow-md shadow-indigo-600/10"
-                        >
-                            <KeyRound className="w-3.5 h-3.5" /> 라이선스 키 등록
-                        </Button>
                     </div>
                 </div>
-
-                {/* Register Key Box (Collapse / Toggle) */}
-                {showRegisterKey && (
-                    <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="p-5 bg-indigo-50/70 border border-indigo-200 rounded-2xl space-y-3"
-                    >
-                        <div className="flex items-center gap-2 text-indigo-950 font-black text-sm">
-                            <KeyRound className="w-4 h-4 text-indigo-600" />
-                            <span>외부 채널(크몽/스마트스토어 등)에서 발급받은 라이선스 키 등록</span>
-                        </div>
-                        <p className="text-xs text-indigo-700 font-medium">
-                            보유하신 시리얼 키(예: <code>DLX-XXXX-XXXX-XXXX</code>)를 입력하시면 현재 계정에 즉시 연결됩니다.
-                        </p>
-                        <div className="flex gap-2 max-w-lg">
-                            <Input
-                                placeholder="시리얼 번호 입력 (XXXX-XXXX-XXXX-XXXX)"
-                                value={inputSerialKey}
-                                onChange={e => setInputSerialKey(e.target.value)}
-                                className="h-10 bg-white border border-indigo-200 focus:border-indigo-600 font-mono text-xs font-bold rounded-xl"
-                            />
-                            <Button
-                                onClick={handleRegisterSerialKey}
-                                disabled={registeringKey || !inputSerialKey.trim()}
-                                className="h-10 px-5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shrink-0"
-                            >
-                                {registeringKey ? '등록중...' : '등록하기'}
-                            </Button>
-                        </div>
-                    </motion.div>
-                )}
 
                 {/* Status messages */}
                 {successMessage && (
@@ -500,10 +413,10 @@ export const Profile = () => {
                                         <Button
                                             variant="outline"
                                             size="sm"
-                                            onClick={() => setShowRegisterKey(true)}
+                                            onClick={() => navigate('/showroom')}
                                             className="text-xs text-indigo-600 border-indigo-200 hover:bg-indigo-50 font-bold rounded-xl"
                                         >
-                                            <Plus className="w-3.5 h-3.5 mr-1" /> 보유 키 직접 등록하기
+                                            <ShoppingBag className="w-3.5 h-3.5 mr-1" /> 제품 둘러보기
                                         </Button>
                                     </div>
                                 ) : (

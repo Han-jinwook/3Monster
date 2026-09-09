@@ -3,7 +3,7 @@ import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { supabase } from '../lib/supabase';
+import { supabase, supabasePublic } from '../lib/supabase';
 import { 
     Layers, 
     Smartphone, 
@@ -211,30 +211,33 @@ export const Showroom = () => {
             return;
         }
         try {
-            const emailClean = userEmail.toLowerCase();
-            const emailId = emailClean.split('@')[0];
+            const emailClean = userEmail.toLowerCase().trim();
+            const emailId = emailClean.split('@')[0].trim();
             
             const { data: uData } = await supabase.from('users').select('name').eq('email', emailClean).maybeSingle();
             const nameClean = (uData?.name || '').trim().toLowerCase();
 
-            const orConditions = [
-                `contact.ilike.${emailClean}`,
-                `buyer_name.ilike.${emailClean}`,
-                `buyer_name.ilike.${emailId}`
-            ];
-            if (nameClean) {
-                orConditions.push(`buyer_name.ilike.${nameClean}`);
-                orConditions.push(`contact.ilike.${nameClean}`);
-            }
-
-            const { data, error } = await supabase
+            const { data, error } = await supabasePublic
                 .from('licenses')
                 .select('*')
-                .or(orConditions.join(','))
                 .order('created_at', { ascending: false });
 
             if (!error && data) {
-                setUserLicenses(data);
+                const matched = data.filter((lic: any) => {
+                    const licContact = (lic.contact || '').toLowerCase().trim();
+                    const licBuyer = (lic.buyer_name || '').toLowerCase().trim();
+                    const licContactId = licContact.split('@')[0].trim();
+
+                    return (
+                        (emailClean && licContact === emailClean) ||
+                        (emailClean && licBuyer === emailClean) ||
+                        (emailId && licBuyer === emailId) ||
+                        (emailId && licContactId === emailId) ||
+                        (nameClean && licBuyer === nameClean) ||
+                        (nameClean && licContact === nameClean)
+                    );
+                });
+                setUserLicenses(matched);
             }
         } catch (e) {
             console.error('Error fetching user licenses in Showroom:', e);

@@ -8,3 +8,8 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '');
+
+// 세션 토큰에 영향받지 않는 퍼블릭 데이터 조회용 클라이언트 (라이선스 등 RLS 익명 우회)
+export const supabasePublic = createClient(supabaseUrl || '', supabaseAnonKey || '', {
+    auth: { persistSession: false, autoRefreshToken: false }
+});
