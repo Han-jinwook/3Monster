@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
-import { Search, Loader2, Trash2, Power, CheckCircle2, Clock, AlertCircle, Pencil, Copy, PlusCircle } from 'lucide-react';
+import { Search, Loader2, Trash2, Power, CheckCircle2, Clock, AlertCircle, Pencil, Copy, PlusCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '../lib/utils';
 
@@ -32,6 +32,7 @@ export const LicenseList = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [toasts, setToasts] = useState<Array<{ id: number; message: string; type: 'success' | 'info' }>>([]);
     const [memoTooltip, setMemoTooltip] = useState<{ text: string; x: number; y: number } | null>(null);
+    const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
 
     const showToast = (message: string, type: 'success' | 'info' = 'success') => {
         const id = Date.now();
@@ -39,6 +40,18 @@ export const LicenseList = () => {
         setTimeout(() => {
             setToasts(prev => prev.filter(t => t.id !== id));
         }, 2500);
+    };
+
+    const toggleGroup = (groupKey: string) => {
+        setExpandedGroups(prev => {
+            const next = new Set(prev);
+            if (next.has(groupKey)) {
+                next.delete(groupKey);
+            } else {
+                next.add(groupKey);
+            }
+            return next;
+        });
     };
 
     const fetchLicenses = async () => {
@@ -69,21 +82,37 @@ export const LicenseList = () => {
         );
     }, [licenses, searchTerm]);
 
+    // [핵심]: (구매자 + 제품ID) 단위로 고유 섹션 그룹핑 & 최신 활성 라이선스를 Main(대표)으로 배치
     const groupedLicenses = useMemo(() => {
         const groups = new Map<string, License[]>();
         filteredLicenses.forEach(lic => {
             const email = lic.contact?.trim().toLowerCase();
-            const key = email || lic.buyer_name.trim().toLowerCase();
+            const buyerKey = email || lic.buyer_name.trim().toLowerCase();
+            const prodKey = lic.product_id || 'UNKNOWN';
+            const groupKey = `${buyerKey}____${prodKey}`;
             
-            if (!groups.has(key)) {
-                groups.set(key, []);
+            if (!groups.has(groupKey)) {
+                groups.set(groupKey, []);
             }
-            groups.get(key)!.push(lic);
+            groups.get(groupKey)!.push(lic);
         });
 
+        const now = new Date().getTime();
         Array.from(groups.values()).forEach(group => {
-            // 구매자별 최초 구매가 메인(위), 추가 구매가 서브(아래)로 오도록 오름차순 정렬
-            group.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+            // 정렬 기준:
+            // 1) 활성 상태 (미만료 & active/used) 우선
+            // 2) 만료일이 가장 미래인 것 우선 (내림차순)
+            // 3) 생성일이 최신인 것 우선 (내림차순)
+            group.sort((a, b) => {
+                const aExp = a.expire_date ? new Date(a.expire_date).getTime() : 0;
+                const bExp = b.expire_date ? new Date(b.expire_date).getTime() : 0;
+                const aActive = (a.status === 'active' || a.status === 'used') && aExp >= now ? 1 : 0;
+                const bActive = (b.status === 'active' || b.status === 'used') && bExp >= now ? 1 : 0;
+
+                if (aActive !== bActive) return bActive - aActive;
+                if (aExp !== bExp) return bExp - aExp;
+                return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+            });
         });
 
         return Array.from(groups.entries()).map(([key, group]) => ({
@@ -243,19 +272,20 @@ export const LicenseList = () => {
         }
     };
 
-    const handleAddLicenseForBuyer = (buyerName: string, contactEmail?: string) => {
+    const handleAddLicenseForBuyer = (buyerName: string, contactEmail?: string, productId?: string) => {
         const params = new URLSearchParams();
         if (buyerName) params.set('buyer', buyerName);
         if (contactEmail) params.set('email', contactEmail);
+        if (productId) params.set('product', productId);
         navigate(`/admin/generator?${params.toString()}`);
     };
 
-    const renderLicenseRow = (lic: License) => {
+    const renderLicenseRow = (lic: License, isHistorySubRow: boolean = false, historyCount: number = 0, isExpanded: boolean = false, onToggleHistory?: () => void) => {
         const status = getStatusInfo(lic);
 
         return (
             <Fragment key={lic.id}>
-                {/* 제품별 개별 메모 */}
+                {/* 메모 아이콘 / 버튼 */}
                 <td className="px-3 py-2 text-center cursor-pointer hover:bg-slate-100 transition-colors" onClick={() => handleEditLicenseMemo(lic.id, lic.memo, lic.buyer_name, lic.product_id)}>
                     {lic.memo ? (
                         <span
@@ -275,24 +305,49 @@ export const LicenseList = () => {
                     ) : <span className="text-[10px] text-slate-400 border border-dashed border-slate-300 px-1.5 py-0.5 rounded hover:text-indigo-600 transition-colors">작성</span>}
                 </td>
 
-                {/* 구매 제품 */}
+                {/* 구매 제품 & 히스토리 아코디언 토글 */}
                 <td className="px-3 py-2 font-bold text-slate-700 truncate max-w-0">
-                    <div className="flex items-center gap-1.5">
-                        <span className="block truncate">{getProductLabel(lic.product_id, lic.license_type, lic.collection_limit)}</span>
-                        <button
-                            className="text-slate-300 hover:text-indigo-600 transition-colors flex-shrink-0 cursor-pointer"
-                            onClick={(e) => { e.stopPropagation(); handleEditPlan(lic.id, lic.license_type || '', lic.collection_limit, lic.buyer_name); }}
-                            title="플랜(무제한/제한) 수정"
-                        >
-                            <Pencil className="w-2.5 h-2.5" />
-                        </button>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className={cn("block truncate", isHistorySubRow ? "text-slate-500 font-medium" : "text-slate-900 font-bold")}>
+                            {getProductLabel(lic.product_id, lic.license_type, lic.collection_limit)}
+                        </span>
+                        
+                        {!isHistorySubRow && (
+                            <button
+                                className="text-slate-300 hover:text-indigo-600 transition-colors flex-shrink-0 cursor-pointer"
+                                onClick={(e) => { e.stopPropagation(); handleEditPlan(lic.id, lic.license_type || '', lic.collection_limit, lic.buyer_name); }}
+                                title="플랜(무제한/제한) 수정"
+                            >
+                                <Pencil className="w-2.5 h-2.5" />
+                            </button>
+                        )}
+
+                        {/* 아코디언 토글 버튼 */}
+                        {!isHistorySubRow && historyCount > 0 && onToggleHistory && (
+                            <button
+                                onClick={(e) => { e.stopPropagation(); onToggleHistory(); }}
+                                className={cn(
+                                    "inline-flex items-center gap-1 text-[10px] font-black px-1.5 py-0.5 rounded transition-all cursor-pointer shadow-xs ml-1",
+                                    isExpanded 
+                                        ? "bg-indigo-600 text-white border border-indigo-700 hover:bg-indigo-700"
+                                        : "bg-indigo-50 text-indigo-700 border border-indigo-200/80 hover:bg-indigo-100"
+                                )}
+                                title="과거 플랜 및 결제/연장 히스토리 보기"
+                            >
+                                {isExpanded ? (
+                                    <><ChevronUp className="w-2.5 h-2.5" /> 이력 접기 ({historyCount})</>
+                                ) : (
+                                    <><ChevronDown className="w-2.5 h-2.5" /> 이력 {historyCount}건</>
+                                )}
+                            </button>
+                        )}
                     </div>
                 </td>
 
                 {/* 시리얼 */}
                 <td className="px-3 py-2 text-center">
                     <button
-                        className="inline-flex items-center gap-1 font-bold text-slate-500 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-700 px-2 py-0.5 rounded border border-slate-200 hover:border-indigo-200 transition-colors"
+                        className="inline-flex items-center gap-1 font-bold text-slate-500 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-700 px-2 py-0.5 rounded border border-slate-200 hover:border-indigo-200 transition-colors text-[11px]"
                         onClick={(e) => { e.stopPropagation(); handleCopySerial(lic.serial_key); }}
                         title={lic.serial_key}
                     >
@@ -343,13 +398,15 @@ export const LicenseList = () => {
                 {/* 제어 */}
                 <td className="px-3 py-2 text-right">
                     <div className="flex justify-end items-center gap-1">
-                        <button
-                            className="inline-flex items-center gap-1 font-black text-[10px] text-indigo-600 bg-indigo-50 hover:bg-indigo-100 hover:text-indigo-800 px-2 py-1 rounded-md border border-indigo-200/80 transition-colors whitespace-nowrap"
-                            onClick={(e) => { e.stopPropagation(); handleAddLicenseForBuyer(lic.buyer_name, lic.contact); }}
-                            title="이 구매자 정보로 추가 제품 라이선스 발급"
-                        >
-                            <PlusCircle className="w-3 h-3" /> 추가 구매
-                        </button>
+                        {!isHistorySubRow && (
+                            <button
+                                className="inline-flex items-center gap-1 font-black text-[10px] text-indigo-600 bg-indigo-50 hover:bg-indigo-100 hover:text-indigo-800 px-2 py-1 rounded-md border border-indigo-200/80 transition-colors whitespace-nowrap"
+                                onClick={(e) => { e.stopPropagation(); handleAddLicenseForBuyer(lic.buyer_name, lic.contact, lic.product_id); }}
+                                title="이 구매자 정보로 추가 제품/재결제 라이선스 발급"
+                            >
+                                <PlusCircle className="w-3 h-3" /> 추가 구매
+                            </button>
+                        )}
                         <Button variant="ghost" size="icon"
                             className={cn("h-7 w-7 transition-colors",
                                 lic.status === 'blocked'
@@ -362,7 +419,7 @@ export const LicenseList = () => {
                             <Power className="w-3.5 h-3.5" />
                         </Button>
                         <Button variant="ghost" size="icon"
-                            className="h-7 w-7 text-rose-400 hover:bg-rose-50 hover:text-rose-600 transition-colors"
+                            className="h-7 w-7 text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-colors"
                             onClick={(e) => { e.stopPropagation(); handleDeleteLicense(lic.id, lic.buyer_name); }}
                             title="라이선스 삭제"
                         >
@@ -375,7 +432,7 @@ export const LicenseList = () => {
     };
 
     return (
-        <div className="space-y-5 relative">
+        <div className="p-8 max-w-7xl mx-auto space-y-6 animate-in fade-in duration-300">
             {memoTooltip && (
                 <div
                     className="fixed z-[9999] bg-white text-slate-700 text-[11px] font-medium leading-relaxed rounded-xl shadow-2xl border border-slate-200 px-3 py-2.5 w-64 whitespace-pre-wrap pointer-events-none"
@@ -417,7 +474,7 @@ export const LicenseList = () => {
                         <col style={{ width: '10%' }} />   {/* 크몽 ID */}
                         <col style={{ width: '12%' }} />   {/* 이메일 */}
                         <col style={{ width: '44px' }} />  {/* 메모 */}
-                        <col style={{ width: '16%' }} />   {/* 제품 */}
+                        <col style={{ width: '18%' }} />   {/* 제품 */}
                         <col style={{ width: '70px' }} />  {/* 시리얼(복사) */}
                         <col style={{ width: '8%' }}  />   {/* 구매일자 */}
                         <col style={{ width: '8%' }}  />   {/* 실행일자 */}
@@ -444,49 +501,47 @@ export const LicenseList = () => {
                         {loading ? (
                             <tr><td colSpan={11} className="py-14 text-center"><Loader2 className="mx-auto h-7 w-7 animate-spin text-indigo-200" /></td></tr>
                         ) : groupedLicenses.map((group, idx) => {
-                            const hasHistory = group.history.length > 0;
+                            const isExpanded = expandedGroups.has(group.key);
                             const displayName = group.main.buyer_name.replace(/\s*\(TRIAL\)\s*|\s*\(TEST\)\s*/gi, '').trim();
 
                             return (
                                 <Fragment key={group.key}>
-                                    <tr className="hover:bg-slate-50 transition-colors align-middle border-t border-slate-200">
+                                    {/* 메인 대표 행 (현재 최신 활성 라이선스) */}
+                                    <tr className={cn(
+                                        "transition-colors align-middle border-t border-slate-200",
+                                        isExpanded ? "bg-indigo-50/30" : "hover:bg-slate-50"
+                                    )}>
                                         <td className="px-3 py-2.5 text-slate-500 font-bold text-center">
                                             {idx + 1}
                                         </td>
                                         <td className="px-3 py-2.5 font-bold text-slate-800 truncate max-w-0">
-                                            <div className="flex items-center gap-1.5">
-                                                <span className="block truncate font-extrabold">{displayName}</span>
-                                                {hasHistory && (
-                                                    <span className="bg-indigo-100 text-indigo-700 text-[9px] px-1.5 py-0.5 rounded-full font-black">
-                                                        +{group.history.length}
-                                                    </span>
-                                                )}
-                                            </div>
+                                            <span className="block truncate font-extrabold">{displayName}</span>
                                         </td>
                                         <td className="px-3 py-2.5 text-slate-600 truncate max-w-0 font-medium">
                                             <span className="block truncate">{group.main.contact || <span className="text-slate-300">-</span>}</span>
                                         </td>
-                                        {renderLicenseRow(group.main)}
+                                        {renderLicenseRow(group.main, false, group.history.length, isExpanded, () => toggleGroup(group.key))}
                                     </tr>
 
-                                    {/* 서브 레코드들 (동일 구매자의 다른/과거 구매 이력 - 바로 나란히 아래 노출) */}
-                                    {group.history.map((histLic) => (
-                                        <tr key={histLic.id} className="bg-slate-50/50 hover:bg-slate-100/60 transition-colors align-middle border-t border-dashed border-slate-200/80">
-                                            {/* NO (구분 아이콘) */}
-                                            <td className="px-3 py-2 text-slate-300 font-mono text-[10px] text-center">↳</td>
-
-                                            {/* 구매자 ID (공통 - 서브표시) */}
-                                            <td className="px-3 py-2 text-slate-400 font-medium text-[11px]">
-                                                <span className="text-slate-400 text-[10px] flex items-center gap-1">
-                                                    <span className="text-indigo-400 font-bold">↳</span> 추가 구매
-                                                </span>
+                                    {/* 아코디언 펼침: 이 제품의 과거 구매 및 변경 히스토리 서브 행 */}
+                                    {isExpanded && group.history.map((histLic, hIdx) => (
+                                        <tr key={histLic.id} className="bg-slate-50/80 hover:bg-slate-100/80 transition-colors align-middle border-t border-dashed border-slate-200/90">
+                                            {/* 구분 인덱스 */}
+                                            <td className="px-3 py-2 text-slate-300 font-mono text-[10px] text-center">
+                                                ↳ {hIdx + 1}
                                             </td>
 
-                                            {/* 이메일 (공통 - 비워둠) */}
-                                            <td className="px-3 py-2 text-slate-300 text-[11px]"></td>
+                                            {/* 과거 이력 표기 */}
+                                            <td className="px-3 py-2 text-slate-400 font-medium text-[11px]" colSpan={2}>
+                                                <div className="flex items-center gap-1.5 text-slate-500">
+                                                    <span className="text-indigo-400 font-bold text-xs">↳</span>
+                                                    <span className="text-[10px] bg-slate-200/70 text-slate-600 font-bold px-1.5 py-0.5 rounded">과거 이력</span>
+                                                    <span className="text-[10px] text-slate-400">({displayName})</span>
+                                                </div>
+                                            </td>
 
-                                            {/* 구매 제품별 개별 메모 ~ 제어 */}
-                                            {renderLicenseRow(histLic)}
+                                            {/* 과거 제품별 메모 ~ 제어 */}
+                                            {renderLicenseRow(histLic, true)}
                                         </tr>
                                     ))}
                                 </Fragment>
