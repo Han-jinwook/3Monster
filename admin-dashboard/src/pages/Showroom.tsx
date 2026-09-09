@@ -339,16 +339,22 @@ export const Showroom = () => {
             const targetId = matched ? matched.id : productParam;
 
             setHighlightedProductId(targetId);
-            setTimeout(() => {
+
+            const performScroll = () => {
                 const element = document.getElementById(targetId);
                 if (element) {
                     element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return true;
                 }
-            }, 100);
+                return false;
+            };
+
+            setTimeout(performScroll, 150);
+            setTimeout(performScroll, 450);
 
             setTimeout(() => {
                 setHighlightedProductId(null);
-            }, 2500);
+            }, 3000);
         } else if (detailProduct) {
             const allProducts = productCategories.flatMap(cat => cat.products);
             const matched = allProducts.find(p => 

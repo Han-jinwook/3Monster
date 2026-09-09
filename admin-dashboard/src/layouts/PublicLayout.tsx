@@ -131,6 +131,15 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
     const isFirstRender = React.useRef(true);
 
     React.useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const hasTargetParam = params.get('product') || params.get('target') || params.get('detail_product') || params.get('qna_product');
+
+        if (hasTargetParam) {
+            // 쇼룸 특정 제품 또는 문의 위치로 이동해야 하므로 상단 초기화(0,0) 스크롤 방지
+            isFirstRender.current = false;
+            return;
+        }
+
         if (isFirstRender.current) {
             isFirstRender.current = false;
             if (location.hash) {
@@ -140,7 +149,7 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
             return;
         }
 
-        if (location.hash && location.pathname === '/') {
+        if (location.hash && (location.pathname === '/' || location.pathname === '/showroom')) {
             const id = location.hash.replace('#', '');
             const element = document.getElementById(id);
             if (element) {

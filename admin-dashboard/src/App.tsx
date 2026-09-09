@@ -25,6 +25,11 @@ function AppRoutes() {
                     <Showroom />
                 </PublicLayout>
             } />
+            <Route path="/showroom" element={
+                <PublicLayout>
+                    <Showroom />
+                </PublicLayout>
+            } />
 
             {/* Publicly accessible Support page (Auth validation is done inline in SupportWrapper) */}
             <Route path="/support" element={
