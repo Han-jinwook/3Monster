@@ -106,7 +106,7 @@ export const LicenseList = () => {
     const ledgerStats = useMemo(() => {
         const totalSpent = ledgerLicenses.reduce((acc, l) => acc + (Number(l.price_sold) || 0), 0);
         const activeCount = ledgerLicenses.filter(l => l.status === 'active' || l.status === 'used').length;
-        const buyerName = ledgerLicenses.find(l => l.buyer_name)?.buyer_name || '';
+        const buyerName = (ledgerLicenses.find(l => l.buyer_name)?.buyer_name || '').replace(/\s*\(TRIAL\)\s*|\s*\(TEST\)\s*/gi, '').trim();
         const primaryChannel = ledgerLicenses.find(l => l.channel)?.channel || '크몽';
         return {
             totalSpent,
@@ -543,8 +543,13 @@ export const LicenseList = () => {
                                     </div>
                                     <h2 className="text-xl font-black text-white tracking-tight">고객 구매원장 (Order Ledger)</h2>
                                 </div>
-                                <div className="text-xs text-slate-300 font-medium pt-0.5">
+                                <div className="text-xs text-slate-300 font-medium flex items-center gap-3 pt-0.5 flex-wrap">
                                     <span>고객 이메일: <b className="text-white underline">{selectedLedgerContact}</b></span>
+                                    {ledgerStats.buyerName && (
+                                        <span className="bg-white/10 px-2.5 py-0.5 rounded text-[11px] text-indigo-200">
+                                            크몽 ID: <b className="text-white">{ledgerStats.buyerName}</b>
+                                        </span>
+                                    )}
                                 </div>
                             </div>
                             <button 
