@@ -52,8 +52,13 @@
 1. **모달 창 배치**: 최초 작은 모달이나 알림창은 화면 **정중앙(Center)**에 배치한다.
 2. **메인 프로그램 창 배치**: 메인 프로그램 실행 창은 모니터 화면 좌상단 끝에서 **사방 약 1cm(약 35~45px) 떨어진 오프셋 지점**에 맞추어 띄운다.
 
-## 6. 지식의 보존
+## 6. 지식의 보존 및 공식 규정 문서 목록
 - 작업 중 발견된 새로운 기술적 팩트나 DB 스키마 변경 사항은 즉시 관련 명세서에 기록하여, 다음 세션의 AI가 맥락을 잃지 않게 한다.
+- **3M-DOC-001**: [Monster_강령](file:///d:/3Monster/docs/Monster_강령.md) (Hub AI 최상위 지침서)
+- **3M-DOC-002**: [Supabase_DB스키마](file:///d:/3Monster/docs/Supabase_DB스키마.md) (클라우드 전역 DB 구조)
+- **3M-DOC-003**: [Monster_빌드배포강령](file:///d:/3Monster/docs/Monster_빌드배포강령.md) (하위 프로그램 로컬 빌드/패키징/배포 규정)
+- **3M-DOC-004**: [Monster_기능명세서](file:///d:/3Monster/docs/Monster_기능명세서.md) (플랫폼 통합 비즈니스 로직 및 기능 명세서)
 
 ---
-*Updated on 2026-06-04 by Monster*
+*Updated on 2026-09-10 by Monster*
+
