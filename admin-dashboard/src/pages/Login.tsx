@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { OtpInput } from '../components/ui/OtpInput';
-import { Mail, ChevronRight, AlertTriangle, CheckCircle2, KeyRound, Sparkles, ShieldCheck, Eye, EyeOff } from 'lucide-react';
+import { Mail, ChevronRight, AlertTriangle, CheckCircle2, KeyRound, Eye, EyeOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../lib/utils';
 import { useAuth } from '../context/AuthContext';
@@ -498,31 +498,6 @@ export const Login = () => {
                             )}
                         </form>
                     )}
-
-                    {/* PG Reviewer Test Account Quick Box */}
-                    <div className="mt-6 pt-5 border-t border-slate-150 space-y-2.5">
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setLoginMode('password');
-                                setEmail('test@sundreamer.app');
-                                setPassword('test1234!');
-                                setError('');
-                                setInfoMessage('PG 심사용 테스트 계정이 자동 입력되었습니다. [로그인] 버튼을 눌러주세요.');
-                            }}
-                            className="w-full py-2.5 px-3 bg-slate-50 hover:bg-indigo-50/90 border border-slate-200 hover:border-indigo-200 rounded-2xl text-[11px] font-black text-slate-600 hover:text-indigo-600 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
-                        >
-                            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                            <span>PG 심사용 테스트 계정 원클릭 자동완성</span>
-                        </button>
-                        <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 text-[10px] text-slate-500 font-bold space-y-1 text-left">
-                            <p className="text-slate-700 font-black flex items-center gap-1">
-                                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> PG 심사관 전용 계정 정보
-                            </p>
-                            <p className="text-slate-500">• 아이디(이메일): <strong className="text-slate-800 font-black select-all">test@sundreamer.app</strong></p>
-                            <p className="text-slate-500">• 비밀번호: <strong className="text-slate-800 font-black select-all">test1234!</strong> <span className="text-slate-400 font-normal">(OTP 선택 시 123456)</span></p>
-                        </div>
-                    </div>
                 </Card>
                 <p className="text-center mt-6 text-[10px] text-slate-400 font-black tracking-widest uppercase">
                     © 2026 3Monster Platform. All rights reserved.
