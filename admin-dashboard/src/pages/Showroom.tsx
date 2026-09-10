@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { supabase, supabasePublic } from '../lib/supabase';
 import { 
@@ -184,6 +184,8 @@ const productCategories = [
 export const Showroom = () => {
     const { user, email: verifiedEmail, role } = useAuth();
     const location = useLocation();
+    const navigate = useNavigate();
+    const isLoggedIn = Boolean(verifiedEmail || localStorage.getItem('user_email'));
     const isAdmin = role === 'admin';
 
     // Q&A state management
@@ -1370,6 +1372,28 @@ export const Showroom = () => {
                                                             </div>
                                                         )}
 
+                                                        {/* 회원 전용 안내 배너 (비로그인 상태일 때 표시) */}
+                                                        {!isLoggedIn && (
+                                                            <div className="p-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl flex items-center justify-between flex-wrap gap-3 text-xs">
+                                                                <div className="flex items-center gap-2.5 text-amber-950">
+                                                                    <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+                                                                        <Lock className="w-4 h-4 text-amber-700" />
+                                                                    </div>
+                                                                    <div>
+                                                                        <p className="font-extrabold text-amber-900">3Monster 회원 전용 결제 시스템입니다</p>
+                                                                        <p className="text-[11px] text-amber-700 font-medium">안전한 라이선스 키 발급 및 관리를 위해 로그인 또는 회원가입 후 결제가 가능합니다.</p>
+                                                                    </div>
+                                                                </div>
+                                                                <Button
+                                                                    size="sm"
+                                                                    onClick={() => navigate(`/login?redirect=${encodeURIComponent(location.pathname + location.search)}`)}
+                                                                    className="bg-amber-600 hover:bg-amber-700 text-white font-black text-xs shrink-0 rounded-xl px-4 py-2 shadow-xs"
+                                                                >
+                                                                    로그인 / 회원가입하기 →
+                                                                </Button>
+                                                            </div>
+                                                        )}
+
                                                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                                             {/* Standard */}
                                                             <div className="flex flex-col p-4 rounded-2xl border border-slate-200 bg-white hover:border-indigo-300 transition-all shadow-sm">
@@ -1392,6 +1416,11 @@ export const Showroom = () => {
                                                                     )}
                                                                     <Button 
                                                                         onClick={() => {
+                                                                            if (!isLoggedIn) {
+                                                                                alert('라이선스 발급 및 구매는 회원 전용 서비스입니다.\n로그인 또는 회원가입 페이지로 이동합니다.');
+                                                                                navigate(`/login?redirect=${encodeURIComponent(location.pathname + location.search)}`);
+                                                                                return;
+                                                                            }
                                                                             setPaymentProduct({
                                                                                 id: selectedProduct.id,
                                                                                 title: selectedProduct.title,
@@ -1403,7 +1432,7 @@ export const Showroom = () => {
                                                                         }}
                                                                         className="w-full h-9 bg-slate-900 hover:bg-indigo-600 text-white rounded-xl text-xs font-black transition-colors"
                                                                     >
-                                                                        {hasPurchased ? '기간 연장 (4,200원)' : '구매하기'}
+                                                                        {!isLoggedIn ? '로그인 후 구매하기' : (hasPurchased ? '기간 연장 (4,200원)' : '구매하기')}
                                                                     </Button>
                                                                 </div>
                                                             </div>
@@ -1429,6 +1458,11 @@ export const Showroom = () => {
                                                                     )}
                                                                     <Button 
                                                                         onClick={() => {
+                                                                            if (!isLoggedIn) {
+                                                                                alert('라이선스 발급 및 구매는 회원 전용 서비스입니다.\n로그인 또는 회원가입 페이지로 이동합니다.');
+                                                                                navigate(`/login?redirect=${encodeURIComponent(location.pathname + location.search)}`);
+                                                                                return;
+                                                                            }
                                                                             setPaymentProduct({
                                                                                 id: selectedProduct.id,
                                                                                 title: selectedProduct.title,
@@ -1440,7 +1474,7 @@ export const Showroom = () => {
                                                                         }}
                                                                         className={cn("w-full h-9 rounded-xl text-xs font-black transition-colors", isCurrentStandard ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-200" : "bg-slate-900 hover:bg-indigo-600 text-white")}
                                                                     >
-                                                                        {isCurrentStandard ? '🚀 무제한 업그레이드' : (hasPurchased ? '기간 연장 (7,600원)' : '구매하기')}
+                                                                        {!isLoggedIn ? '로그인 후 구매하기' : (isCurrentStandard ? '🚀 무제한 업그레이드' : (hasPurchased ? '기간 연장 (7,600원)' : '구매하기'))}
                                                                     </Button>
                                                                 </div>
                                                             </div>
@@ -1469,6 +1503,11 @@ export const Showroom = () => {
                                                                     )}
                                                                     <Button 
                                                                         onClick={() => {
+                                                                            if (!isLoggedIn) {
+                                                                                alert('라이선스 발급 및 구매는 회원 전용 서비스입니다.\n로그인 또는 회원가입 페이지로 이동합니다.');
+                                                                                navigate(`/login?redirect=${encodeURIComponent(location.pathname + location.search)}`);
+                                                                                return;
+                                                                            }
                                                                             setPaymentProduct({
                                                                                 id: selectedProduct.id,
                                                                                 title: selectedProduct.title,
@@ -1480,7 +1519,7 @@ export const Showroom = () => {
                                                                         }}
                                                                         className="w-full h-9 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black shadow-md shadow-indigo-200 transition-colors"
                                                                     >
-                                                                        {hasPurchased ? '3개월 연장 (17,900원)' : '구매하기'}
+                                                                        {!isLoggedIn ? '로그인 후 구매하기' : (hasPurchased ? '3개월 연장 (17,900원)' : '구매하기')}
                                                                     </Button>
                                                                 </div>
                                                             </div>

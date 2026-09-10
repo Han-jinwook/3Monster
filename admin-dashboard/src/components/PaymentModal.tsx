@@ -88,6 +88,23 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
     const [kcpFormData, setKcpFormData] = useState<any>(null);
 
     useEffect(() => {
+        if (!isOpen) return;
+
+        const currentEmail = localStorage.getItem('user_email') || '';
+        if (!currentEmail) {
+            alert('라이선스 결제는 회원 전용 서비스입니다.\n로그인 또는 회원가입 페이지로 이동합니다.');
+            onClose();
+            window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+            return;
+        }
+
+        setBuyerEmail(currentEmail);
+        supabase.from('users').select('name').eq('email', currentEmail.toLowerCase()).maybeSingle().then(({ data }) => {
+            if (data?.name) {
+                setBuyerName(prev => prev || data.name);
+            }
+        });
+
         if (product?.initialTier) {
             setSelectedTier(product.initialTier);
         }
@@ -448,15 +465,20 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                 <div>
-                                    <label className="text-[11px] font-bold text-slate-600 block mb-1">이메일 (라이선스 키 수신용) *</label>
+                                    <label className="text-[11px] font-bold text-slate-600 block mb-1">
+                                        이메일 (회원 계정 귀속 및 발송용) *
+                                    </label>
                                     <Input 
                                         type="email"
-                                        placeholder="buyer@example.com" 
+                                        placeholder="로그인된 계정 이메일" 
                                         value={buyerEmail}
-                                        onChange={(e) => setBuyerEmail(e.target.value)}
-                                        className="h-10 bg-white text-xs font-bold"
+                                        readOnly
+                                        className="h-10 bg-slate-100 text-xs font-bold text-slate-700 cursor-not-allowed border-slate-300 select-none"
                                         required
                                     />
+                                    <p className="text-[10px] text-slate-400 font-medium mt-1">
+                                        🔒 로그인된 계정({buyerEmail || '회원'})으로 라이선스가 자동 발급됩니다.
+                                    </p>
                                 </div>
                                 <div>
                                     <label className="text-[11px] font-bold text-slate-600 block mb-1">휴대폰 번호</label>
