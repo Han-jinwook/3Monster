@@ -20,7 +20,10 @@ import {
     FileText,
     Image as ImageIcon,
     CheckCircle2,
-    Sparkles
+    Sparkles,
+    Clock,
+    Lock,
+    ShieldCheck
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -50,7 +53,8 @@ const productCategories = [
                 description: "포털 지도 상의 업체 연락처, 이메일, 홈페이지 주소를 포함한 고퀄리티 가망 고객 정보를 실시간 정밀 파싱하여 즉각 영업 가능한 DB로 변환합니다.",
                 icon: MapPin,
                 color: "from-blue-600 to-indigo-700",
-                badge: "26년 7월 출시",
+                badge: "정식 출시",
+                isReleased: true,
                 features: [
                     "실시간 포털 지도 정보 추출",
                     "무료 인스타그램 DM발송",
@@ -65,7 +69,8 @@ const productCategories = [
                 description: "원하는 커뮤니티, 전문 블로그, 타겟 웹페이지의 주요 텍스트와 이미지 데이터를 정확히 긁어와 AI 및 마케팅용 핵심 데이터셋으로 가공해 줍니다.",
                 icon: Layers,
                 color: "from-indigo-500 to-purple-600",
-                badge: "26년 8월 출시예정",
+                badge: "26년 11월 출시예정",
+                isReleased: false,
                 features: ["구조화된 웹 스크래핑 엔진", "게시글 및 댓글 본문 파싱", "CSV / JSON 포맷 저장"]
             },
             {
@@ -75,7 +80,8 @@ const productCategories = [
                 description: "AI 자연어로 회원 성향과 구매 내역을 정밀 검색하고, 필터링된 가망 고객들을 대상으로 SMS/이메일 자동 발송을 무료로 연동해 주는 통합 매니저입니다.",
                 icon: Monitor,
                 color: "from-blue-400 to-cyan-600",
-                badge: "26년 8월 출시예정",
+                badge: "26년 12월 출시예정",
+                isReleased: false,
                 features: ["AI 대화형 고객 검색 필터", "무료 SMS/Email 발송 연동", "가망 고객 타겟 그룹 관리"]
             }
         ]
@@ -93,7 +99,8 @@ const productCategories = [
                 description: "마케터가 타겟으로 삼은 카페의 전체 게시글, 실시간 새글, 작성자의 댓글 활동 내역까지 완벽 분석하여 핵심 유저층의 데이터셋을 빌드합니다.",
                 icon: Smartphone,
                 color: "from-orange-500 to-rose-600",
-                badge: "26년 8월 출시예정",
+                badge: "26년 10월 출시예정",
+                isReleased: false,
                 features: ["전체 히스토리 분석 수집", "진성 회원 식별 및 패턴 추적", "실시간 신규 알림 연동"]
             },
             {
@@ -103,7 +110,8 @@ const productCategories = [
                 description: "작성되는 실시간 댓글을 분석하여 여론의 긍/부정 지수, 주요 키워드 트렌드, 커뮤니티 전반의 상호작용 피드백을 대시보드로 시각화해 줍니다.",
                 icon: FileText,
                 color: "from-pink-500 to-purple-600",
-                badge: "26년 8월 출시예정",
+                badge: "26년 11월 출시예정",
+                isReleased: false,
                 features: ["여론 감정선 시각 분석", "핵심 반응 키워드 분석", "실시간 대시보드 리포팅"]
             },
             {
@@ -113,7 +121,8 @@ const productCategories = [
                 description: "카페 활성화를 위한 이벤트 기여도, 회원별 참여 지수 등 정교한 지표 분석을 제공하여 실질적인 회원 행동량 성장을 유도할 수 있는 솔루션입니다.",
                 icon: BellRing,
                 color: "from-amber-500 to-orange-600",
-                badge: "26년 8월 출시예정",
+                badge: "26년 12월 출시예정",
+                isReleased: false,
                 features: ["활동 활력 지표 진단", "이벤트 참여율 랭킹 산출", "맞춤형 활성화 솔루션 추천"]
             }
         ]
@@ -131,7 +140,8 @@ const productCategories = [
                 description: "스마트폰이나 PC에 쌓인 수천 장의 사진들을 원하는 기준에 따라 자동 분류하고, 중복 및 흔들린 사진을 정리하여 기기 용량을 획기적으로 늘려줍니다.",
                 icon: ImageIcon,
                 color: "from-emerald-500 to-teal-600",
-                badge: "26년 8월 출시예정",
+                badge: "26년 10월 출시예정",
+                isReleased: false,
                 features: ["중복/유사 사진 탐지 및 삭제", "촬영 날짜/위치별 폴더 분류", "원클릭 고효율 이미지 리사이징"]
             },
             {
@@ -141,7 +151,8 @@ const productCategories = [
                 description: "식사 시간마다 찾아오는 결정 장애를 단번에 날려줍니다. 오늘 날씨, 사용자의 기호, 최근 먹은 메뉴 데이터 등을 반영하여 최적의 식사 메뉴를 제안합니다.",
                 icon: MessageCircle,
                 color: "from-teal-500 to-emerald-600",
-                badge: "26년 8월 출시예정",
+                badge: "26년 11월 출시예정",
+                isReleased: false,
                 features: ["빅데이터 기반 룰렛 추천", "사용자 식사 취향 맞춤 학습", "주변 인기 식당 위치 탐색"]
             },
             {
@@ -151,7 +162,8 @@ const productCategories = [
                 description: "조회수만을 유도하는 허위/과장 광고성 썸네일과 스팸성 댓글, 알맹이 없는 영상을 필터링하여 쾌적하고 낭비 없는 유튜브 시청 환경을 구축해 줍니다.",
                 icon: Monitor,
                 color: "from-cyan-500 to-blue-600",
-                badge: "26년 8월 출시예정",
+                badge: "26년 12월 출시예정",
+                isReleased: false,
                 features: ["어그로 키워드 감지 시스템", "스팸/도배성 댓글 완전 필터", "사용자 맞춤형 블랙리스트 지정"]
             },
             {
@@ -161,7 +173,8 @@ const productCategories = [
                 description: "수기 입력의 번거로움 없이, 소비 영수증이나 지출 승인 문자를 캡처해 올리면 AI 비서가 카테고리 분류부터 자산 리포트까지 자동으로 완성해 줍니다.",
                 icon: FileText,
                 color: "from-purple-500 to-indigo-650",
-                badge: "26년 8월 출시예정",
+                badge: "27년 1월 출시예정",
+                isReleased: false,
                 features: ["초정밀 OCR 영수증 파싱", "소비 행태 자동 분류 및 분석", "스마트 예산 경고 비서 알림"]
             }
         ]
@@ -741,7 +754,10 @@ export const Showroom = () => {
                                         key={product.id}
                                         id={product.id}
                                         className={cn(
-                                            "group overflow-hidden border border-slate-200 shadow-[0_15px_45px_rgba(0,0,0,0.05)] hover:shadow-xl hover:border-indigo-400 transition-all duration-500 rounded-[2rem] bg-white flex flex-col cursor-pointer scroll-mt-24",
+                                            "group overflow-hidden border transition-all duration-500 rounded-[2rem] bg-white flex flex-col cursor-pointer scroll-mt-24",
+                                            product.isReleased
+                                                ? "border-slate-200 shadow-[0_15px_45px_rgba(0,0,0,0.05)] hover:shadow-xl hover:border-indigo-400"
+                                                : "border-slate-200/80 shadow-xs bg-slate-50/40 grayscale-[90%] contrast-[0.9] opacity-75 hover:grayscale-0 hover:opacity-100 hover:border-slate-300 transition-all duration-300",
                                             selectedProductIdForDetail === product.id ? "ring-2 ring-indigo-500 shadow-md" : "",
                                             highlightedProductId === product.id ? "ring-4 ring-indigo-500 shadow-2xl scale-[1.01]" : ""
                                         )}
@@ -753,7 +769,12 @@ export const Showroom = () => {
                                             }
                                         }}
                                     >
-                                        <div className={`h-2.5 p-0 w-full bg-gradient-to-r ${product.color}`} />
+                                        <div className={cn(
+                                            "h-2.5 p-0 w-full",
+                                            product.isReleased 
+                                                ? `bg-gradient-to-r ${product.color}` 
+                                                : "bg-gradient-to-r from-slate-400 via-slate-300 to-slate-400"
+                                        )} />
                                         <div className="p-6 space-y-5 flex-1 flex flex-col">
                                             <div className="flex items-start justify-between gap-3">
                                                 <div className="space-y-2 flex-1">
@@ -761,24 +782,31 @@ export const Showroom = () => {
                                                         {product.badge && (
                                                             <span className={cn(
                                                                 "px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider border",
-                                                                product.badge.includes('예정')
-                                                                    ? "bg-amber-55/10 text-amber-600 border-amber-200/50"
-                                                                    : "bg-emerald-55/10 text-emerald-650 border-emerald-200/50"
+                                                                product.isReleased
+                                                                    ? "bg-emerald-55/10 text-emerald-650 border-emerald-200/50"
+                                                                    : "bg-slate-200/60 text-slate-500 border-slate-300/80"
                                                             )}>
                                                                 {product.badge}
                                                             </span>
                                                         )}
                                                     </div>
                                                     <h3 className="text-lg font-black text-slate-900 leading-tight">{product.title}</h3>
-                                                    <p className="text-indigo-650 font-black text-xs">{product.subtitle}</p>
+                                                    <p className={cn("font-black text-xs", product.isReleased ? "text-indigo-650" : "text-slate-500")}>{product.subtitle}</p>
                                                 </div>
                                                 {product.icon && (
-                                                    <div className={cn(
-                                                        "flex items-center gap-1.5 px-2.5 py-2 rounded-xl bg-indigo-100 border border-indigo-200 text-indigo-700 shadow-sm shrink-0 hover:bg-indigo-200 transition-all"
-                                                    )}>
-                                                        <product.icon className="w-3.5 h-3.5" />
-                                                        <span className="text-[10px] font-black tracking-wide">무료체험판 다운로드</span>
-                                                    </div>
+                                                    product.isReleased ? (
+                                                        <div className={cn(
+                                                            "flex items-center gap-1.5 px-2.5 py-2 rounded-xl bg-indigo-100 border border-indigo-200 text-indigo-700 shadow-sm shrink-0 hover:bg-indigo-200 transition-all"
+                                                        )}>
+                                                            <product.icon className="w-3.5 h-3.5" />
+                                                            <span className="text-[10px] font-black tracking-wide">무료체험판 다운로드</span>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl bg-slate-100 border border-slate-200 text-slate-500 shadow-2xs shrink-0">
+                                                            <Clock className="w-3.5 h-3.5 text-slate-400" />
+                                                            <span className="text-[10px] font-bold tracking-wide">출시 준비 중</span>
+                                                        </div>
+                                                    )
                                                 )}
                                             </div>
 
@@ -789,7 +817,7 @@ export const Showroom = () => {
                                             <div className="grid grid-cols-1 gap-1.5 pt-1">
                                                 {product.features.map(f => (
                                                     <div key={f} className="flex items-center gap-2 text-slate-400 text-[11px] font-bold">
-                                                        <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" /> {f}
+                                                        <div className={cn("w-1.5 h-1.5 rounded-full shrink-0", product.isReleased ? "bg-indigo-500" : "bg-slate-300")} /> {f}
                                                     </div>
                                                 ))}
                                             </div>
@@ -806,12 +834,14 @@ export const Showroom = () => {
                                                     }}
                                                     className={cn(
                                                         "w-1/2 h-10 rounded-xl font-bold transition-all flex items-center justify-center gap-1 text-[11px] sm:text-xs px-2.5 border-none",
-                                                        selectedProductIdForDetail === product.id 
-                                                            ? "bg-indigo-600 text-white hover:bg-indigo-700" 
-                                                            : "bg-slate-900 hover:bg-indigo-600 text-white"
+                                                        !product.isReleased
+                                                            ? (selectedProductIdForDetail === product.id ? "bg-slate-700 text-white" : "bg-slate-200 hover:bg-slate-300 text-slate-700")
+                                                            : (selectedProductIdForDetail === product.id 
+                                                                ? "bg-indigo-600 text-white hover:bg-indigo-700" 
+                                                                : "bg-slate-900 hover:bg-indigo-600 text-white")
                                                     )}
                                                 >
-                                                    상세보기
+                                                    {product.isReleased ? "상세보기 및 구매" : "사전 안내 보기"}
                                                 </Button>
                                                 <Button 
                                                     onClick={(e) => {
@@ -1225,34 +1255,69 @@ export const Showroom = () => {
                                         </div>
 
                                         <div className="pt-6 space-y-6">
-                                            <div className="flex flex-col sm:flex-row gap-3">
-                                                <Link 
-                                                    to={`/docs/${selectedProduct.id}`}
-                                                    className="w-full sm:w-1/2 block"
-                                                    onClick={() => setSelectedProductIdForDetail(null)}
-                                                >
-                                                    <Button variant="outline" className="w-full h-12 border-2 border-indigo-200 hover:border-indigo-300 text-indigo-600 hover:bg-indigo-50/50 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 text-xs sm:text-sm">
-                                                        📖 설치 & 사용 가이드
-                                                    </Button>
-                                                </Link>
-                                                <a 
-                                                    href={
-                                                        selectedProduct.id === 'nplace-db'
-                                                            ? `https://github.com/Han-jinwook/n-place-db/releases/latest/download/Map_DB-Trial.zip?t=${Date.now()}`
-                                                            : (selectedProduct.id === 'cafe-crawler' || selectedProduct.id === 'event-activity-stats' || selectedProduct.id === 'comment-stats')
-                                                            ? `https://github.com/Han-jinwook/CafeScraper/releases/latest/download/CafeMonster-Trial.zip?t=${Date.now()}`
-                                                            : `https://github.com/Han-jinwook/${selectedProduct.id}/releases/latest/download/${selectedProduct.id}-Trial.zip?t=${Date.now()}`
-                                                    }
-                                                    className="w-full sm:w-1/2 block"
-                                                >
-                                                    <Button variant="outline" className="w-full h-12 border-2 border-emerald-200 hover:border-emerald-300 text-emerald-650 hover:bg-emerald-50/50 rounded-2xl font-black transition-all flex items-center justify-center gap-2 text-xs sm:text-sm">
-                                                        🎁 100건 무료체험판 다운로드 (.zip)
-                                                    </Button>
-                                                </a>
-                                            </div>
+                                            {selectedProduct.isReleased ? (
+                                                <div className="flex flex-col sm:flex-row gap-3">
+                                                    <Link 
+                                                        to={`/docs/${selectedProduct.id}`}
+                                                        className="w-full sm:w-1/2 block"
+                                                        onClick={() => setSelectedProductIdForDetail(null)}
+                                                    >
+                                                        <Button variant="outline" className="w-full h-12 border-2 border-indigo-200 hover:border-indigo-300 text-indigo-600 hover:bg-indigo-50/50 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 text-xs sm:text-sm">
+                                                            📖 설치 & 사용 가이드
+                                                        </Button>
+                                                    </Link>
+                                                    <a 
+                                                        href={
+                                                            selectedProduct.id === 'nplace-db'
+                                                                ? `https://github.com/Han-jinwook/n-place-db/releases/latest/download/Map_DB-Trial.zip?t=${Date.now()}`
+                                                                : `https://github.com/Han-jinwook/${selectedProduct.id}/releases/latest/download/${selectedProduct.id}-Trial.zip?t=${Date.now()}`
+                                                        }
+                                                        className="w-full sm:w-1/2 block"
+                                                    >
+                                                        <Button variant="outline" className="w-full h-12 border-2 border-emerald-200 hover:border-emerald-300 text-emerald-650 hover:bg-emerald-50/50 rounded-2xl font-black transition-all flex items-center justify-center gap-2 text-xs sm:text-sm">
+                                                            🎁 100건 무료체험판 다운로드 (.zip)
+                                                        </Button>
+                                                    </a>
+                                                </div>
+                                            ) : (
+                                                <div className="p-4 bg-slate-50 border border-slate-200/80 rounded-2xl text-center space-y-1.5 text-slate-500">
+                                                    <div className="flex items-center justify-center gap-1.5 text-xs font-black text-slate-700">
+                                                        <Clock className="w-4 h-4 text-slate-500" />
+                                                        <span>정식 런칭 준비 중인 소프트웨어입니다 ({selectedProduct.badge})</span>
+                                                    </div>
+                                                    <p className="text-[11px] text-slate-400">체험판 다운로드 및 가이드는 정식 출시 일정에 맞추어 순차 공개됩니다.</p>
+                                                </div>
+                                            )}
 
-                                            {/* Pricing Section (기존 회원 재구매/연장 특가 자동 적용) */}
-                                            {(() => {
+                                            {/* Pricing Section (출시된 제품만 실제 결제 활성화, 미출시 제품은 사전 오픈 안내) */}
+                                            {!selectedProduct.isReleased ? (
+                                                <div id="pricing-section" className="space-y-3.5 pt-4 border-t border-slate-100 text-left scroll-mt-28">
+                                                    <div className="p-6 bg-gradient-to-b from-slate-50 to-slate-100/70 border border-slate-200 rounded-3xl text-center space-y-3">
+                                                        <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-white text-slate-500 shadow-2xs border border-slate-200/80 mx-auto">
+                                                            <Lock className="w-6 h-6 text-slate-400" />
+                                                        </div>
+                                                        <div className="space-y-1">
+                                                            <h4 className="text-base font-black text-slate-800">
+                                                                {selectedProduct.badge} 정식 오픈 예정
+                                                            </h4>
+                                                            <p className="text-xs text-slate-500 leading-relaxed max-w-md mx-auto">
+                                                                현재 고도화 개발 및 품질 안정화 테스트가 진행 중인 소프트웨어입니다.<br/>
+                                                                정식 출시일 이후에 실시간 결제 및 라이선스 즉시 발급이 활성화됩니다.
+                                                            </p>
+                                                        </div>
+                                                        <div className="pt-2 flex flex-wrap items-center justify-center gap-2">
+                                                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 shadow-2xs">
+                                                                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                                                                정식 출시 시 크몽 & 자사몰 동시 런칭
+                                                            </span>
+                                                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 shadow-2xs">
+                                                                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                                                                출시 알림 및 사전 혜택 준비 중
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ) : (() => {
                                                 const normalizedTarget = normalizeProdKey(selectedProduct.id);
                                                 const targetLicenses = userLicenses.filter(l => normalizeProdKey(l.product_id) === normalizedTarget);
                                                 const nowTime = Date.now();
