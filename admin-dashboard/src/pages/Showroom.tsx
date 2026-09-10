@@ -99,8 +99,8 @@ const productCategories = [
                 description: "마케터가 타겟으로 삼은 카페의 전체 게시글, 실시간 새글, 작성자의 댓글 활동 내역까지 완벽 분석하여 핵심 유저층의 데이터셋을 빌드합니다.",
                 icon: Smartphone,
                 color: "from-orange-500 to-rose-600",
-                badge: "26년 10월 출시예정",
-                isReleased: false,
+                badge: "정식 출시",
+                isReleased: true,
                 features: ["전체 히스토리 분석 수집", "진성 회원 식별 및 패턴 추적", "실시간 신규 알림 연동"]
             },
             {
@@ -110,8 +110,8 @@ const productCategories = [
                 description: "작성되는 실시간 댓글을 분석하여 여론의 긍/부정 지수, 주요 키워드 트렌드, 커뮤니티 전반의 상호작용 피드백을 대시보드로 시각화해 줍니다.",
                 icon: FileText,
                 color: "from-pink-500 to-purple-600",
-                badge: "26년 11월 출시예정",
-                isReleased: false,
+                badge: "정식 출시",
+                isReleased: true,
                 features: ["여론 감정선 시각 분석", "핵심 반응 키워드 분석", "실시간 대시보드 리포팅"]
             },
             {
@@ -121,8 +121,8 @@ const productCategories = [
                 description: "카페 활성화를 위한 이벤트 기여도, 회원별 참여 지수 등 정교한 지표 분석을 제공하여 실질적인 회원 행동량 성장을 유도할 수 있는 솔루션입니다.",
                 icon: BellRing,
                 color: "from-amber-500 to-orange-600",
-                badge: "26년 12월 출시예정",
-                isReleased: false,
+                badge: "정식 출시",
+                isReleased: true,
                 features: ["활동 활력 지표 진단", "이벤트 참여율 랭킹 산출", "맞춤형 활성화 솔루션 추천"]
             }
         ]

@@ -181,7 +181,14 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
             const { error } = await supabase
                 .from('licenses')
                 .insert([{
-                    product_id: product.id === 'nplace-db' ? 'NPlace-DB' : product.id,
+                    product_id: (() => {
+                        const clean = product.id.toLowerCase().replace(/[-_]/g, '');
+                        if (clean.includes('cafe')) return 'CafeCrawler';
+                        if (clean.includes('event')) return 'EventStats';
+                        if (clean.includes('comment') || clean.includes('stealth')) return 'AutoComment';
+                        if (clean.includes('nplace') || clean.includes('map')) return 'NPlace-DB';
+                        return product.id;
+                    })(),
                     license_type: selectedTier,
                     constraint_type: 'HWID',
                     buyer_name: buyerName.trim() || '3Monster 구매고객',

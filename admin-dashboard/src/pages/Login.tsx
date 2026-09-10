@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { OtpInput } from '../components/ui/OtpInput';
-import { Mail, ChevronRight, AlertTriangle, CheckCircle2, KeyRound, Sparkles, ShieldCheck } from 'lucide-react';
+import { Mail, ChevronRight, AlertTriangle, CheckCircle2, KeyRound, Sparkles, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../lib/utils';
 import { useAuth } from '../context/AuthContext';
@@ -19,6 +19,7 @@ export const Login = () => {
     const [loginMode, setLoginMode] = useState<'password' | 'otp'>('password');
     const [email, setEmail] = useState(() => localStorage.getItem('remember_email') || '');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [otp, setOtp] = useState('');
     const [otpStep, setOtpStep] = useState(1); // 1: Email, 2: OTP
     const [error, setError] = useState('');
@@ -243,16 +244,52 @@ export const Login = () => {
         }
     }, [otp, otpStep, loginMode]);
 
+    // Alt + V 키보드 입력 시 브라우저 메뉴 단축키 간섭 방지 및 클립보드 자동 붙여넣기 지원
+    useEffect(() => {
+        const handleGlobalKeyDown = async (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                navigate(redirectUrl);
+                return;
+            }
+
+            // Alt + V 또는 Alt 키와 V 키 조합 감지
+            if (e.altKey && (e.key === 'v' || e.key === 'V' || e.code === 'KeyV')) {
+                e.preventDefault();
+                e.stopPropagation();
+                try {
+                    const text = await navigator.clipboard.readText();
+                    if (text && document.activeElement instanceof HTMLInputElement) {
+                        const input = document.activeElement;
+                        const start = input.selectionStart || 0;
+                        const end = input.selectionEnd || 0;
+                        const val = input.value;
+                        const newVal = val.substring(0, start) + text + val.substring(end);
+                        
+                        const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+                        nativeInputValueSetter?.call(input, newVal);
+                        input.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                } catch (err) {
+                    console.warn('Clipboard read error:', err);
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleGlobalKeyDown);
+        return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+    }, [navigate, redirectUrl]);
+
     return (
         <div 
-            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/65 backdrop-blur-md p-4"
-            onClick={() => navigate(redirectUrl)}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/65 backdrop-blur-md p-4 overflow-y-auto"
         >
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="w-full max-w-[460px] relative"
                 onClick={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.stopPropagation()}
+                onMouseUp={(e) => e.stopPropagation()}
             >
                 <Card className="p-8 md:p-10 shadow-2xl border border-slate-150 bg-white rounded-[2.5rem] relative">
                     {/* Close Button */}
@@ -325,17 +362,27 @@ export const Login = () => {
 
                             <div className="space-y-1.5">
                                 <label className="text-[11px] font-black text-slate-500 uppercase tracking-wider ml-1">비밀번호</label>
-                                <input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    autoComplete="current-password"
-                                    placeholder="비밀번호를 입력해주세요"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                    className="flex h-12 w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-2 text-sm text-slate-800 transition-all outline-none focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 font-bold placeholder:text-slate-400"
-                                />
+                                <div className="relative">
+                                    <input
+                                        id="password"
+                                        name="password"
+                                        type={showPassword ? "text" : "password"}
+                                        autoComplete="current-password"
+                                        placeholder="비밀번호를 입력해주세요"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        required
+                                        className="flex h-12 w-full rounded-2xl border-2 border-slate-300 bg-white px-4 pr-11 py-2 text-sm text-slate-800 transition-all outline-none focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 font-bold placeholder:text-slate-400"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-slate-600 transition-colors"
+                                        aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
+                                    >
+                                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                    </button>
+                                </div>
                             </div>
 
                             <div className="min-h-[10px] space-y-2 pt-1">
