@@ -434,18 +434,24 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                     </div>
 
                     {/* 라이선스 키 수신 이메일 단일 안내 */}
-                    <div className="p-4 bg-slate-50 border border-slate-200/90 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div className="flex items-center gap-2 text-xs">
-                            <Mail className="w-4 h-4 text-indigo-600 shrink-0" />
-                            <span className="text-slate-500 font-bold">수신 이메일:</span>
-                            <span className="font-black text-slate-900 bg-white px-2.5 py-1 rounded-xl border border-slate-200 shadow-2xs select-all">
+                    <div className="p-3.5 bg-slate-50 border border-slate-200/90 rounded-2xl space-y-2.5">
+                        <div className="flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-2 shrink-0">
+                                <div className="w-6 h-6 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shrink-0">
+                                    <Mail className="w-3.5 h-3.5" />
+                                </div>
+                                <span className="text-xs font-black text-slate-700 whitespace-nowrap">
+                                    수신 이메일
+                                </span>
+                            </div>
+                            <span className="text-xs font-black text-slate-900 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs select-all truncate">
                                 {buyerEmail}
                             </span>
                         </div>
-                        <p className="text-xs font-black text-indigo-600 flex items-center gap-1.5">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                            라이선스 키는 위 이메일로 자동 발송됩니다.
-                        </p>
+                        <div className="flex items-center gap-1.5 pt-2 border-t border-slate-200/70 text-[11px] font-bold text-indigo-600">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                            <span>결제 완료 즉시 위 이메일로 라이선스 키가 자동 발송됩니다.</span>
+                        </div>
                     </div>
 
                     {/* 결제 수단 선택 */}
