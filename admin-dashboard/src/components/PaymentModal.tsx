@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
-import { Input } from './ui/Input';
 import { 
     CreditCard, 
-    ShieldCheck, 
     Zap, 
     CheckCircle2, 
     Copy, 
@@ -12,8 +10,8 @@ import {
     AlertCircle, 
     Loader2, 
     ExternalLink,
-    Tag,
-    Sparkles
+    Sparkles,
+    Mail
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { cn } from '../lib/utils';
@@ -67,9 +65,7 @@ const KCP_SITE_CD = 'ALRJ8'; // (주)썬드림 2호 디지털 PG
 export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, product }) => {
     const [selectedTier, setSelectedTier] = useState<'DELUXE' | '1M' | '3M'>('1M');
     const [isRepurchase, setIsRepurchase] = useState(false);
-    const [buyerName, setBuyerName] = useState('');
     const [buyerEmail, setBuyerEmail] = useState('');
-    const [buyerPhone, setBuyerPhone] = useState('');
     const [payMethod, setPayMethod] = useState<'card' | 'bank' | 'phone'>('card');
     const [processing, setProcessing] = useState(false);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -99,11 +95,6 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
         }
 
         setBuyerEmail(currentEmail);
-        supabase.from('users').select('name').eq('email', currentEmail.toLowerCase()).maybeSingle().then(({ data }) => {
-            if (data?.name) {
-                setBuyerName(prev => prev || data.name);
-            }
-        });
 
         if (product?.initialTier) {
             setSelectedTier(product.initialTier);
@@ -191,8 +182,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                     })(),
                     license_type: selectedTier,
                     constraint_type: 'HWID',
-                    buyer_name: buyerName.trim() || '3Monster 구매고객',
-                    contact: buyerEmail.trim() || buyerPhone.trim() || '온라인결제',
+                    buyer_name: buyerEmail.split('@')[0] || '3Monster 회원',
+                    contact: buyerEmail.trim(),
                     channel: '3Monster (KCP 카드결제)',
                     serial_key: serial,
                     expire_date: expireDate.toISOString(),
@@ -226,12 +217,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
         e.preventDefault();
         setErrorMsg(null);
 
-        if (!buyerName.trim()) {
-            setErrorMsg('구매자 성함(또는 상호명)을 입력해 주세요.');
-            return;
-        }
-        if (!buyerEmail.trim() && !buyerPhone.trim()) {
-            setErrorMsg('라이선스 키를 수신할 이메일 또는 연락처를 입력해 주세요.');
+        if (!buyerEmail.trim()) {
+            setErrorMsg('로그인된 계정 이메일이 확인되지 않습니다.');
             return;
         }
 
@@ -245,14 +232,16 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
             if (payMethod === 'phone') kcpPayMethod = '000010000000';
             if (payMethod === 'bank') kcpPayMethod = '010000000000';
 
+            const defaultBuyerName = buyerEmail.split('@')[0] || '3Monster 회원';
+
             const paymentData = {
                 site_cd: KCP_SITE_CD,
                 ordr_idxx: orderId,
                 good_mny: finalPrice,
                 good_name: goodName,
-                buyr_name: buyerName.trim(),
+                buyr_name: defaultBuyerName,
                 buyr_mail: buyerEmail.trim(),
-                buyr_tel1: buyerPhone.trim(),
+                buyr_tel1: '010-0000-0000',
                 site_name: '3Monster',
                 pay_method: kcpPayMethod,
                 req_tx: 'pay',
@@ -399,19 +388,11 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                     <div className="space-y-2">
                         <div className="flex items-center justify-between">
                             <label className="text-xs font-black text-slate-900 uppercase tracking-wider">이용 플랜 선택</label>
-                            <button
-                                type="button"
-                                onClick={() => setIsRepurchase(!isRepurchase)}
-                                className={cn(
-                                    "text-[11px] font-black px-2.5 py-1 rounded-lg border transition-all flex items-center gap-1",
-                                    isRepurchase 
-                                        ? "bg-amber-100 text-amber-900 border-amber-300 ring-2 ring-amber-300"
-                                        : "bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200"
-                                )}
-                            >
-                                <Tag className="w-3 h-3" />
-                                {isRepurchase ? "🎁 재구매 우대 (15% OFF) 적용 중" : "재구매 15% 할인 적용"}
-                            </button>
+                            {isRepurchase && (
+                                <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    기존 회원 15% 우대할인 적용 중
+                                </span>
+                            )}
                         </div>
 
                         <div className="grid grid-cols-3 gap-2.5">
@@ -452,52 +433,19 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                         </div>
                     </div>
 
-                    {/* 구매자 정보 입력 */}
-                    <div className="space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                        <p className="text-xs font-black text-slate-800 flex items-center gap-1.5">
-                            <ShieldCheck className="w-4 h-4 text-indigo-600" /> 구매자 및 라이선스 키 수신 정보
-                        </p>
-                        
-                        <div className="space-y-2">
-                            <div>
-                                <label className="text-[11px] font-bold text-slate-600 block mb-1">성함 / 상호명 *</label>
-                                <Input 
-                                    placeholder="예: 홍길동 (또는 썬드림마케팅)" 
-                                    value={buyerName}
-                                    onChange={(e) => setBuyerName(e.target.value)}
-                                    className="h-10 bg-white text-xs font-bold"
-                                    required
-                                />
-                            </div>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                <div>
-                                    <label className="text-[11px] font-bold text-slate-600 block mb-1">
-                                        이메일 (회원 계정 귀속 및 발송용) *
-                                    </label>
-                                    <Input 
-                                        type="email"
-                                        placeholder="로그인된 계정 이메일" 
-                                        value={buyerEmail}
-                                        readOnly
-                                        className="h-10 bg-slate-100 text-xs font-bold text-slate-700 cursor-not-allowed border-slate-300 select-none"
-                                        required
-                                    />
-                                    <p className="text-[10px] text-slate-400 font-medium mt-1">
-                                        🔒 로그인된 계정({buyerEmail || '회원'})으로 라이선스가 자동 발급됩니다.
-                                    </p>
-                                </div>
-                                <div>
-                                    <label className="text-[11px] font-bold text-slate-600 block mb-1">휴대폰 번호</label>
-                                    <Input 
-                                        placeholder="010-1234-5678" 
-                                        value={buyerPhone}
-                                        onChange={(e) => setBuyerPhone(e.target.value)}
-                                        className="h-10 bg-white text-xs font-bold"
-                                    />
-                                </div>
-                            </div>
+                    {/* 라이선스 키 수신 이메일 단일 안내 */}
+                    <div className="p-4 bg-slate-50 border border-slate-200/90 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="flex items-center gap-2 text-xs">
+                            <Mail className="w-4 h-4 text-indigo-600 shrink-0" />
+                            <span className="text-slate-500 font-bold">수신 이메일:</span>
+                            <span className="font-black text-slate-900 bg-white px-2.5 py-1 rounded-xl border border-slate-200 shadow-2xs select-all">
+                                {buyerEmail}
+                            </span>
                         </div>
+                        <p className="text-xs font-black text-indigo-600 flex items-center gap-1.5">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                            라이선스 키는 위 이메일로 자동 발송됩니다.
+                        </p>
                     </div>
 
                     {/* 결제 수단 선택 */}
