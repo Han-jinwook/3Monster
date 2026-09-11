@@ -22,7 +22,6 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
     const navigate = useNavigate();
     const location = useLocation();
     const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
-    const [activeSection, setActiveSection] = React.useState<string>('');
     const [notifications, setNotifications] = React.useState<any[]>([]);
     const [bellDropdownOpen, setBellDropdownOpen] = React.useState(false);
     const dropdownRef = React.useRef<HTMLDivElement>(null);
@@ -115,27 +114,33 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
         };
     }, [fetchQnaNotifications]);
 
-    const scrollToSection = (id: string) => {
+    const searchParams = new URLSearchParams(location.search);
+    const activeCategory = searchParams.get('category') || (location.hash ? location.hash.replace('#', '') : '');
+
+    const handleCategoryClick = (catId: string) => {
         setMobileMenuOpen(false);
-        setActiveSection(id);
-        if (location.pathname !== '/') {
-            navigate(`/#${id}`);
+        // If clicking currently active category, toggle off (back to clean Home)
+        if (activeCategory === catId) {
+            navigate('/');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
             return;
         }
-        const element = document.getElementById(id);
-        if (element) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        navigate(`/?category=${catId}`);
+        setTimeout(() => {
+            const element = document.getElementById(catId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 150);
     };
 
     const isFirstRender = React.useRef(true);
 
     React.useEffect(() => {
         const params = new URLSearchParams(location.search);
-        const hasTargetParam = params.get('product') || params.get('target') || params.get('detail_product') || params.get('qna_product');
+        const hasTargetParam = params.get('product') || params.get('target') || params.get('detail_product') || params.get('qna_product') || params.get('category');
 
         if (hasTargetParam) {
-            // 쇼룸 특정 제품 또는 문의 위치로 이동해야 하므로 상단 초기화(0,0) 스크롤 방지
             isFirstRender.current = false;
             return;
         }
@@ -149,55 +154,10 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
             return;
         }
 
-        if (location.hash && (location.pathname === '/' || location.pathname === '/showroom')) {
-            const id = location.hash.replace('#', '');
-            const element = document.getElementById(id);
-            if (element) {
-                setTimeout(() => {
-                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }, 100);
-            }
-        } else if (!location.hash) {
+        if (!location.search && !location.hash) {
             window.scrollTo(0, 0);
         }
     }, [location]);
-
-    React.useEffect(() => {
-        if (location.pathname !== '/') {
-            setActiveSection('');
-            return;
-        }
-
-        const handleScroll = () => {
-            if (window.scrollY < 450) {
-                setActiveSection('');
-                return;
-            }
-
-            const sections = ['marketing-monster', 'cafe-monster', 'app-monster'];
-            let currentSection = '';
-            const triggerPoint = window.scrollY + window.innerHeight * 0.35;
-
-            for (const id of sections) {
-                const el = document.getElementById(id);
-                if (el) {
-                    const top = el.offsetTop;
-                    if (triggerPoint >= top) {
-                        currentSection = id;
-                    }
-                }
-            }
-
-            setActiveSection(currentSection);
-        };
-
-        window.addEventListener('scroll', handleScroll);
-        handleScroll();
-
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-        };
-    }, [location.pathname]);
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-indigo-100/80 via-slate-200/90 to-purple-100/70 flex flex-col font-sans">
@@ -207,11 +167,8 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                     {/* Logo */}
                     <Link 
                         to="/" 
-                        onClick={(e) => {
-                            if (location.pathname === '/') {
-                                e.preventDefault();
-                                window.scrollTo({ top: 0, behavior: 'smooth' });
-                            }
+                        onClick={() => {
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
                         }}
                         className="flex items-center gap-3 group"
                     >
@@ -221,10 +178,10 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                     {/* Desktop Navigation */}
                     <nav className="hidden md:flex items-center gap-12">
                         <button 
-                            onClick={() => scrollToSection('marketing-monster')}
+                            onClick={() => handleCategoryClick('marketing-monster')}
                             className={cn(
-                                "text-lg font-black transition-all duration-300 relative py-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-0.5 after:bg-indigo-600 after:transition-all after:duration-300",
-                                activeSection === 'marketing-monster' 
+                                "text-lg font-black transition-all duration-300 relative py-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-0.5 after:bg-indigo-600 after:transition-all after:duration-300 cursor-pointer",
+                                activeCategory === 'marketing-monster' 
                                     ? "text-indigo-600 after:w-full" 
                                     : "text-slate-600 hover:text-indigo-600 after:w-0 hover:after:w-full"
                             )}
@@ -232,10 +189,10 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                             마케팅 몬스터
                         </button>
                         <button 
-                            onClick={() => scrollToSection('cafe-monster')}
+                            onClick={() => handleCategoryClick('cafe-monster')}
                             className={cn(
-                                "text-lg font-black transition-all duration-300 relative py-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-0.5 after:bg-indigo-600 after:transition-all after:duration-300",
-                                activeSection === 'cafe-monster' 
+                                "text-lg font-black transition-all duration-300 relative py-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-0.5 after:bg-indigo-600 after:transition-all after:duration-300 cursor-pointer",
+                                activeCategory === 'cafe-monster' 
                                     ? "text-indigo-600 after:w-full" 
                                     : "text-slate-600 hover:text-indigo-600 after:w-0 hover:after:w-full"
                             )}
@@ -243,10 +200,10 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                             카페 몬스터
                         </button>
                         <button 
-                            onClick={() => scrollToSection('app-monster')}
+                            onClick={() => handleCategoryClick('app-monster')}
                             className={cn(
-                                "text-lg font-black transition-all duration-300 relative py-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-0.5 after:bg-indigo-600 after:transition-all after:duration-300",
-                                activeSection === 'app-monster' 
+                                "text-lg font-black transition-all duration-300 relative py-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-0.5 after:bg-indigo-600 after:transition-all after:duration-300 cursor-pointer",
+                                activeCategory === 'app-monster' 
                                     ? "text-indigo-600 after:w-full" 
                                     : "text-slate-600 hover:text-indigo-600 after:w-0 hover:after:w-full"
                             )}
@@ -466,20 +423,29 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
                     <div className="md:hidden border-b border-slate-100 bg-white px-6 py-6 space-y-4 animate-in fade-in slide-in-from-top-5 duration-200">
                         <div className="flex flex-col gap-3">
                             <button 
-                                onClick={() => scrollToSection('marketing-monster')}
-                                className="text-left py-2 font-bold text-slate-600 hover:text-slate-950"
+                                onClick={() => handleCategoryClick('marketing-monster')}
+                                className={cn(
+                                    "text-left py-2 font-bold transition-colors cursor-pointer",
+                                    activeCategory === 'marketing-monster' ? "text-indigo-600 font-black" : "text-slate-600 hover:text-slate-950"
+                                )}
                             >
                                 마케팅 몬스터
                             </button>
                             <button 
-                                onClick={() => scrollToSection('cafe-monster')}
-                                className="text-left py-2 font-bold text-slate-600 hover:text-slate-950"
+                                onClick={() => handleCategoryClick('cafe-monster')}
+                                className={cn(
+                                    "text-left py-2 font-bold transition-colors cursor-pointer",
+                                    activeCategory === 'cafe-monster' ? "text-indigo-600 font-black" : "text-slate-600 hover:text-slate-950"
+                                )}
                             >
                                 카페 몬스터
                             </button>
                             <button 
-                                onClick={() => scrollToSection('app-monster')}
-                                className="text-left py-2 font-bold text-slate-600 hover:text-slate-950"
+                                onClick={() => handleCategoryClick('app-monster')}
+                                className={cn(
+                                    "text-left py-2 font-bold transition-colors cursor-pointer",
+                                    activeCategory === 'app-monster' ? "text-indigo-600 font-black" : "text-slate-600 hover:text-slate-950"
+                                )}
                             >
                                 앱 몬스터
                             </button>

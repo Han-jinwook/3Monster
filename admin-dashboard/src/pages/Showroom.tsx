@@ -23,7 +23,8 @@ import {
     Sparkles,
     Clock,
     Lock,
-    ShieldCheck
+    ShieldCheck,
+    X
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -208,6 +209,41 @@ export const Showroom = () => {
         if (clean.includes('comment') || clean.includes('stealth')) return 'AutoComment';
         if (clean.includes('nplace') || clean.includes('map')) return 'NPlace-DB';
         return id;
+    };
+
+    const searchParams = new URLSearchParams(location.search);
+    const categoryParam = searchParams.get('category');
+    const hashParam = location.hash ? location.hash.replace('#', '') : null;
+    const directCategory = categoryParam || (hashParam && ['marketing-monster', 'cafe-monster', 'app-monster'].includes(hashParam) ? hashParam : null);
+
+    const productParam = searchParams.get('product') || searchParams.get('target');
+    const detailProduct = searchParams.get('detail_product');
+    const qnaProduct = searchParams.get('qna_product');
+    const buyProduct = searchParams.get('buy');
+    const targetProductKey = productParam || detailProduct || qnaProduct || buyProduct;
+
+    const inferredCategory = targetProductKey ? (() => {
+        const found = productCategories.find(cat => 
+            cat.products.some(p => 
+                p.id.toLowerCase() === targetProductKey.toLowerCase() ||
+                normalizeProdKey(p.id).toLowerCase() === normalizeProdKey(targetProductKey).toLowerCase()
+            )
+        );
+        return found ? found.id : null;
+    })() : null;
+
+    const activeCategory = directCategory || inferredCategory;
+    const visibleCategories = activeCategory 
+        ? productCategories.filter(cat => cat.id === activeCategory)
+        : [];
+
+    const handleCategoryToggle = (categoryId: string) => {
+        if (activeCategory === categoryId) {
+            navigate('/');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+            navigate(`/?category=${categoryId}`);
+        }
     };
 
     const fetchUserLicenses = async () => {
@@ -406,7 +442,16 @@ export const Showroom = () => {
                 }, 300);
             }
         }
-    }, [location.search]);
+
+        if (activeCategory && !productParam && !detailProduct && !qnaProduct) {
+            setTimeout(() => {
+                const element = document.getElementById(activeCategory);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 150);
+        }
+    }, [location.search, activeCategory]);
 
     useEffect(() => {
         const handleForceJump = (e: Event) => {
@@ -703,25 +748,28 @@ export const Showroom = () => {
                 />
                 {/* Clickable Overlay Regions */}
                 <div className="absolute inset-0 flex">
-                    <a 
-                        href="#marketing-monster" 
-                        className="w-1/3 h-full cursor-pointer hover:bg-white/5 transition-all duration-300"
+                    <button 
+                        type="button"
+                        onClick={() => handleCategoryToggle('marketing-monster')}
+                        className="w-1/3 h-full cursor-pointer hover:bg-white/5 transition-all duration-300 text-left focus:outline-none"
                         title="마케팅 몬스터 바로가기"
                     />
-                    <a 
-                        href="#cafe-monster" 
-                        className="w-1/3 h-full cursor-pointer hover:bg-white/5 transition-all duration-300 border-x border-white/5"
+                    <button 
+                        type="button"
+                        onClick={() => handleCategoryToggle('cafe-monster')}
+                        className="w-1/3 h-full cursor-pointer hover:bg-white/5 transition-all duration-300 border-x border-white/5 text-left focus:outline-none"
                         title="카페 몬스터 바로가기"
                     />
-                    <a 
-                        href="#app-monster" 
-                        className="w-1/3 h-full cursor-pointer hover:bg-white/5 transition-all duration-300"
+                    <button 
+                        type="button"
+                        onClick={() => handleCategoryToggle('app-monster')}
+                        className="w-1/3 h-full cursor-pointer hover:bg-white/5 transition-all duration-300 text-left focus:outline-none"
                         title="앱 몬스터 바로가기"
                     />
                 </div>
             </div>
             {/* Product Category Groups */}
-            {productCategories.map((category) => {
+            {visibleCategories.map((category) => {
                 const selectedProduct = category.products.find(p => p.id === selectedProductIdForDetail);
                 const hasSelectedProductInCategory = !!selectedProduct;
 
@@ -729,18 +777,32 @@ export const Showroom = () => {
                     <section 
                         key={category.id} 
                         id={category.id} 
-                        className="space-y-8 scroll-mt-24"
+                        className="space-y-8 scroll-mt-24 animate-in fade-in slide-in-from-top-4 duration-300"
                     >
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-4 pl-6 border-l-4 border-indigo-600">
-                            <img 
-                                src={`/${category.id}-logo.png`} 
-                                alt={category.name} 
-                                className="h-12 w-auto object-contain shrink-0" 
-                            />
-                            <span className="hidden sm:inline text-slate-300 text-lg">|</span>
-                            <p className="text-slate-500 font-bold text-sm sm:text-base self-start sm:self-center">
-                                {category.subtitle}
-                            </p>
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pl-6 border-l-4 border-indigo-600">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                                <img 
+                                    src={`/${category.id}-logo.png`} 
+                                    alt={category.name} 
+                                    className="h-12 w-auto object-contain shrink-0" 
+                                />
+                                <span className="hidden sm:inline text-slate-300 text-lg">|</span>
+                                <p className="text-slate-500 font-bold text-sm sm:text-base self-start sm:self-center">
+                                    {category.subtitle}
+                                </p>
+                            </div>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                    navigate('/');
+                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                }}
+                                className="self-end sm:self-center text-slate-400 hover:text-slate-700 flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-slate-100 transition-colors cursor-pointer"
+                            >
+                                <X className="w-4 h-4" />
+                                <span className="text-xs font-semibold">카드 닫기</span>
+                            </Button>
                         </div>
 
                         <div className={cn(
