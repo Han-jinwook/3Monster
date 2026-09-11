@@ -243,6 +243,7 @@ export const Showroom = () => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
             navigate(`/?category=${categoryId}`);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     };
 
@@ -444,12 +445,7 @@ export const Showroom = () => {
         }
 
         if (activeCategory && !productParam && !detailProduct && !qnaProduct) {
-            setTimeout(() => {
-                const element = document.getElementById(activeCategory);
-                if (element) {
-                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            }, 150);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     }, [location.search, activeCategory]);
 
@@ -739,35 +735,37 @@ export const Showroom = () => {
 
     return (
         <div className="max-w-7xl mx-auto space-y-20 py-12 px-6">
-            {/* Hero Banner Section */}
-            <div className="relative overflow-hidden rounded-[2.5rem] shadow-2xl bg-slate-950 group">
-                <img 
-                    src="/hero-banner.png" 
-                    alt="3Monster Hero Banner" 
-                    className="w-full h-auto object-cover block" 
-                />
-                {/* Clickable Overlay Regions */}
-                <div className="absolute inset-0 flex">
-                    <button 
-                        type="button"
-                        onClick={() => handleCategoryToggle('marketing-monster')}
-                        className="w-1/3 h-full cursor-pointer hover:bg-white/5 transition-all duration-300 text-left focus:outline-none"
-                        title="마케팅 몬스터 바로가기"
+            {/* Hero Banner Section (홈 화면에서만 표시, 카테고리 진입 시 숨김) */}
+            {!activeCategory && (
+                <div className="relative overflow-hidden rounded-[2.5rem] shadow-2xl bg-slate-950 group animate-in fade-in zoom-in-95 duration-300">
+                    <img 
+                        src="/hero-banner.png" 
+                        alt="3Monster Hero Banner" 
+                        className="w-full h-auto object-cover block" 
                     />
-                    <button 
-                        type="button"
-                        onClick={() => handleCategoryToggle('cafe-monster')}
-                        className="w-1/3 h-full cursor-pointer hover:bg-white/5 transition-all duration-300 border-x border-white/5 text-left focus:outline-none"
-                        title="카페 몬스터 바로가기"
-                    />
-                    <button 
-                        type="button"
-                        onClick={() => handleCategoryToggle('app-monster')}
-                        className="w-1/3 h-full cursor-pointer hover:bg-white/5 transition-all duration-300 text-left focus:outline-none"
-                        title="앱 몬스터 바로가기"
-                    />
+                    {/* Clickable Overlay Regions */}
+                    <div className="absolute inset-0 flex">
+                        <button 
+                            type="button"
+                            onClick={() => handleCategoryToggle('marketing-monster')}
+                            className="w-1/3 h-full cursor-pointer hover:bg-white/5 transition-all duration-300 text-left focus:outline-none"
+                            title="마케팅 몬스터 바로가기"
+                        />
+                        <button 
+                            type="button"
+                            onClick={() => handleCategoryToggle('cafe-monster')}
+                            className="w-1/3 h-full cursor-pointer hover:bg-white/5 transition-all duration-300 border-x border-white/5 text-left focus:outline-none"
+                            title="카페 몬스터 바로가기"
+                        />
+                        <button 
+                            type="button"
+                            onClick={() => handleCategoryToggle('app-monster')}
+                            className="w-1/3 h-full cursor-pointer hover:bg-white/5 transition-all duration-300 text-left focus:outline-none"
+                            title="앱 몬스터 바로가기"
+                        />
+                    </div>
                 </div>
-            </div>
+            )}
             {/* Product Category Groups */}
             {visibleCategories.map((category) => {
                 const selectedProduct = category.products.find(p => p.id === selectedProductIdForDetail);

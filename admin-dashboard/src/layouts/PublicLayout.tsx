@@ -126,12 +126,7 @@ export const PublicLayout: React.FC<{ children?: React.ReactNode }> = ({ childre
             return;
         }
         navigate(`/?category=${catId}`);
-        setTimeout(() => {
-            const element = document.getElementById(catId);
-            if (element) {
-                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }, 150);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const isFirstRender = React.useRef(true);
