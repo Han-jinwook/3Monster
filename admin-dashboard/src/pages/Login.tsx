@@ -47,6 +47,14 @@ export const Login = () => {
         }, 100);
     };
 
+    const normalizeLoginInput = (raw: string): string => {
+        const trimmed = raw.trim().toLowerCase();
+        if (trimmed === 'test' || trimmed === 'test1' || trimmed === 'pgtest') {
+            return 'test@sundreamer.app';
+        }
+        return trimmed;
+    };
+
     const handlePasswordLogin = async (e?: React.FormEvent) => {
         if (e) e.preventDefault();
         if (!email.trim() || !password || loading) return;
@@ -54,7 +62,7 @@ export const Login = () => {
         setError('');
         setInfoMessage('');
         try {
-            const emailKey = email.trim().toLowerCase();
+            const emailKey = normalizeLoginInput(email);
 
             // PG 심사 및 공용 테스트 계정 검증
             const isTestAccount = (
@@ -95,7 +103,7 @@ export const Login = () => {
         setError('');
         setInfoMessage('');
         try {
-            const emailKey = email.trim().toLowerCase();
+            const emailKey = normalizeLoginInput(email);
 
             // 테스트 계정은 이메일 발송 없이 즉시 통과 모드로 전환
             if (emailKey === 'test@sundreamer.app' || emailKey === 'pgtest@3monster.net') {
@@ -202,7 +210,7 @@ export const Login = () => {
         setError('');
         setInfoMessage('');
         try {
-            const emailKey = email.trim().toLowerCase();
+            const emailKey = normalizeLoginInput(email);
 
             // 테스트 계정 전용 고정 인증번호 통과
             const isTestOtp = (emailKey === 'test@sundreamer.app' || emailKey === 'pgtest@3monster.net') && (otp === '123456' || otp === '000000');
@@ -350,9 +358,9 @@ export const Login = () => {
                                 <input
                                     id="email"
                                     name="email"
-                                    type="email"
-                                    autoComplete="email"
-                                    placeholder="이메일 주소 (예: test@sundreamer.app)"
+                                    type="text"
+                                    autoComplete="username"
+                                    placeholder="이메일 또는 아이디 (예: test 또는 test@sundreamer.app)"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     required
@@ -423,13 +431,13 @@ export const Login = () => {
                                     className="space-y-4"
                                 >
                                     <div className="space-y-1.5">
-                                        <label className="text-[11px] font-black text-slate-500 uppercase tracking-wider ml-1">이메일 주소</label>
+                                        <label className="text-[11px] font-black text-slate-500 uppercase tracking-wider ml-1">이메일 또는 아이디</label>
                                         <input
                                             id="otp-email"
                                             name="email"
-                                            type="email"
-                                            autoComplete="email"
-                                            placeholder="이메일을 입력해주세요"
+                                            type="text"
+                                            autoComplete="username"
+                                            placeholder="이메일 또는 아이디 (예: test 또는 test@sundreamer.app)"
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
                                             required
