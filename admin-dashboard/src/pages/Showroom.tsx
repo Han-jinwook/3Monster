@@ -806,6 +806,7 @@ export const Showroom = () => {
             {visibleCategories.map((category) => {
                 const selectedProduct = category.products.find(p => p.id === selectedProductIdForDetail);
                 const hasSelectedProductInCategory = !!selectedProduct;
+                const otherProducts = category.products.filter(p => p.id !== selectedProductIdForDetail);
 
                 return (
                     <section 
@@ -845,9 +846,11 @@ export const Showroom = () => {
                         )}>
                             {/* Cards Column */}
                             <div className={cn(
-                                hasSelectedProductInCategory ? "lg:col-span-4 flex flex-col gap-6" : "contents"
+                                hasSelectedProductInCategory 
+                                    ? "lg:col-span-4 lg:sticky lg:top-24 lg:self-start flex flex-col gap-4 z-20 max-h-[calc(100vh-7rem)] overflow-y-auto pr-1 scrollbar-none" 
+                                    : "contents"
                             )}>
-                                {category.products.map((product) => (
+                                {(hasSelectedProductInCategory && selectedProduct ? [selectedProduct] : category.products).map((product) => (
                                     <Card 
                                         key={product.id}
                                         id={product.id}
@@ -885,6 +888,11 @@ export const Showroom = () => {
                                                                     : "bg-slate-200/60 text-slate-500 border-slate-300/80"
                                                             )}>
                                                                 {product.badge}
+                                                            </span>
+                                                        )}
+                                                        {selectedProductIdForDetail === product.id && (
+                                                            <span className="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-200 shadow-2xs flex items-center gap-1">
+                                                                ✨ 요약 카드
                                                             </span>
                                                         )}
                                                     </div>
@@ -952,7 +960,9 @@ export const Showroom = () => {
                                                                 : "bg-slate-900 hover:bg-indigo-600 text-white")
                                                     )}
                                                 >
-                                                    {product.isReleased ? (product.appUrl ? "상세보기 & 앱 안내" : "상세보기 및 구매") : "사전 안내 보기"}
+                                                    {product.isReleased 
+                                                        ? (selectedProductIdForDetail === product.id ? "요약 접기" : (product.appUrl ? "상세보기 & 앱 안내" : "상세보기 및 구매")) 
+                                                        : (selectedProductIdForDetail === product.id ? "접기" : "사전 안내 보기")}
                                                 </Button>
                                                 <Button 
                                                     onClick={(e) => {
@@ -1221,11 +1231,59 @@ export const Showroom = () => {
                                         </AnimatePresence>
                                     </Card>
                                 ))}
+
+                                {/* Other Products in Category (Compact Switchers when one product is selected) */}
+                                {hasSelectedProductInCategory && otherProducts.length > 0 && (
+                                    <div className="space-y-2 pt-2 border-t border-slate-200/80">
+                                        <div className="flex items-center justify-between px-1">
+                                            <span className="text-[11px] font-black text-slate-500 uppercase tracking-wider">
+                                                {category.name} 다른 제품 둘러보기
+                                            </span>
+                                            <span className="text-[10px] font-bold text-slate-400">
+                                                {otherProducts.length}개
+                                            </span>
+                                        </div>
+                                        <div className="flex flex-col gap-2">
+                                            {otherProducts.map(other => (
+                                                <div
+                                                    key={other.id}
+                                                    onClick={() => {
+                                                        setSelectedProductIdForDetail(other.id);
+                                                        setActiveQnaProductId(null);
+                                                    }}
+                                                    className="p-3 bg-white hover:bg-slate-50 border border-slate-200 hover:border-indigo-300 rounded-2xl cursor-pointer transition-all shadow-2xs hover:shadow-sm flex items-center justify-between gap-3 group"
+                                                >
+                                                    <div className="flex items-center gap-2.5 min-w-0">
+                                                        <div className="w-8 h-8 rounded-xl bg-slate-100 group-hover:bg-indigo-50 text-slate-500 group-hover:text-indigo-600 flex items-center justify-center shrink-0 transition-colors">
+                                                            <other.icon className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="min-w-0">
+                                                            <p className="text-xs font-black text-slate-800 truncate group-hover:text-indigo-600 transition-colors">
+                                                                {other.title}
+                                                            </p>
+                                                            <p className="text-[10px] text-slate-400 font-medium truncate">
+                                                                {other.subtitle}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <span className={cn(
+                                                        "text-[9px] font-black px-2 py-0.5 rounded-md border shrink-0",
+                                                        other.isReleased 
+                                                            ? "bg-emerald-50 text-emerald-600 border-emerald-200/60" 
+                                                            : "bg-slate-100 text-slate-500 border-slate-200"
+                                                    )}>
+                                                        {other.badge}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Detail Panel Column */}
                             {hasSelectedProductInCategory && selectedProduct && (
-                                <div className="lg:col-span-8 bg-white rounded-[2rem] p-8 md:p-10 shadow-sm border border-slate-100 flex flex-col relative h-fit sticky top-28">
+                                <div className="lg:col-span-8 bg-white rounded-[2rem] p-8 md:p-10 shadow-sm border border-slate-100 flex flex-col relative h-fit">
                                     <button 
                                         onClick={() => setSelectedProductIdForDetail(null)}
                                         className="absolute top-6 right-6 p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
