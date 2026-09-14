@@ -11,7 +11,6 @@ import {
     MessageSquare, 
     ArrowRight,
     MapPin,
-    MessageCircle,
     BellRing,
     ChevronDown,
     ChevronUp,
@@ -24,7 +23,8 @@ import {
     Clock,
     Lock,
     ShieldCheck,
-    X
+    X,
+    ExternalLink
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -135,26 +135,38 @@ const productCategories = [
         actionCopy: '조건 없이 100% 무료로 일상의 가려운 곳 긁어보기',
         products: [
             {
-                id: 'photo-organizer',
-                title: "사진 정리",
-                subtitle: "기기 내 흩어진 사진들을 일괄 정리 및 최적화",
-                description: "스마트폰이나 PC에 쌓인 수천 장의 사진들을 원하는 기준에 따라 자동 분류하고, 중복 및 흔들린 사진을 정리하여 기기 용량을 획기적으로 늘려줍니다.",
-                icon: ImageIcon,
-                color: "from-emerald-500 to-teal-600",
-                badge: "26년 10월 출시예정",
-                isReleased: false,
-                features: ["중복/유사 사진 탐지 및 삭제", "촬영 날짜/위치별 폴더 분류", "원클릭 고효율 이미지 리사이징"]
+                id: 'sundreamer',
+                title: "썬드리머 (썬드림 회원앱)",
+                subtitle: "11년 역사의 자외선 조사기 힐링 케어 멤버십 PWA",
+                description: "11년간 5천 명 이상의 실구매 회원과 함께해 온 자외선조사기 케어 전문 웹앱입니다. 1,600시간 램프 수명 자동 계산, 매일의 자외선 조사기 치유 타임라인 기록, 30개 엄선 치유 후기 및 루미노트 CRM 연동 회원 혜택을 100% 무료로 제공합니다.",
+                icon: Smartphone,
+                color: "from-amber-500 to-orange-600",
+                badge: "1호앱 · 정식 오픈",
+                isReleased: true,
+                appUrl: "https://sundreamer.app",
+                features: [
+                    "1,600시간 램프 수명 & 조사시간 계산기",
+                    "매일 자외선 조사 치유 기록 타임라인",
+                    "11년 전문 카페 엄선 치유 후기 30선",
+                    "무설치 초경량 PWA 모바일/PC 완벽 지원"
+                ]
             },
             {
-                id: 'food-picker',
-                title: "오늘 뭐 먹지?",
-                subtitle: "결정 장애 해결을 위한 스마트 메뉴 추천",
-                description: "식사 시간마다 찾아오는 결정 장애를 단번에 날려줍니다. 오늘 날씨, 사용자의 기호, 최근 먹은 메뉴 데이터 등을 반영하여 최적의 식사 메뉴를 제안합니다.",
-                icon: MessageCircle,
-                color: "from-teal-500 to-emerald-600",
-                badge: "26년 11월 출시예정",
-                isReleased: false,
-                features: ["빅데이터 기반 룰렛 추천", "사용자 식사 취향 맞춤 학습", "주변 인기 식당 위치 탐색"]
+                id: 'realpick',
+                title: "리얼픽 (RealPick)",
+                subtitle: "실시간 예능 투표 & 승부 예측 엔터테인먼트 플랫폼",
+                description: "실시간 방송 예능 프로그램 투표 및 승부 예측 게임 플랫폼입니다. 실시간 예능 투표, 티어 랭킹 시스템, 커뮤니티 댓글 및 AI 기반 예능 미션 참여를 통해 포인트와 혜택을 얻는 차세대 인터랙티브 엔터테인먼트 앱입니다.",
+                icon: Monitor,
+                color: "from-purple-600 to-indigo-600",
+                badge: "2호앱 · 정식 오픈",
+                isReleased: true,
+                appUrl: "https://real-pick.com",
+                features: [
+                    "실시간 예능 방송 투표 & 승부 예측 게임",
+                    "유저 티어 시스템 및 랭킹 보상 리워드",
+                    "AI 기반 예능 미션 및 영상 하이라이트",
+                    "참여형 커뮤니티 & 실시간 댓글 소통"
+                ]
             },
             {
                 id: 'youtube-filter',
@@ -208,6 +220,8 @@ export const Showroom = () => {
         if (clean.includes('event')) return 'EventStats';
         if (clean.includes('comment') || clean.includes('stealth')) return 'AutoComment';
         if (clean.includes('nplace') || clean.includes('map')) return 'NPlace-DB';
+        if (clean.includes('sundream')) return 'SunDreamer';
+        if (clean.includes('realpick')) return 'RealPick';
         return id;
     };
 
@@ -857,12 +871,25 @@ export const Showroom = () => {
                                                 </div>
                                                 {product.icon && (
                                                     product.isReleased ? (
-                                                        <div className={cn(
-                                                            "flex items-center gap-1.5 px-2.5 py-2 rounded-xl bg-indigo-100 border border-indigo-200 text-indigo-700 shadow-sm shrink-0 hover:bg-indigo-200 transition-all"
-                                                        )}>
-                                                            <product.icon className="w-3.5 h-3.5" />
-                                                            <span className="text-[10px] font-black tracking-wide">무료체험판 다운로드</span>
-                                                        </div>
+                                                        product.appUrl ? (
+                                                            <a 
+                                                                href={product.appUrl}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                onClick={(e) => e.stopPropagation()}
+                                                                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-sm shrink-0 transition-all cursor-pointer hover:scale-105"
+                                                            >
+                                                                <ExternalLink className="w-3.5 h-3.5" />
+                                                                <span className="text-[10px] font-black tracking-wide">웹앱 바로가기 ↗</span>
+                                                            </a>
+                                                        ) : (
+                                                            <div className={cn(
+                                                                "flex items-center gap-1.5 px-2.5 py-2 rounded-xl bg-indigo-100 border border-indigo-200 text-indigo-700 shadow-sm shrink-0 hover:bg-indigo-200 transition-all"
+                                                            )}>
+                                                                <product.icon className="w-3.5 h-3.5" />
+                                                                <span className="text-[10px] font-black tracking-wide">무료체험판 다운로드</span>
+                                                            </div>
+                                                        )
                                                     ) : (
                                                         <div className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl bg-slate-100 border border-slate-200 text-slate-500 shadow-2xs shrink-0">
                                                             <Clock className="w-3.5 h-3.5 text-slate-400" />
@@ -903,7 +930,7 @@ export const Showroom = () => {
                                                                 : "bg-slate-900 hover:bg-indigo-600 text-white")
                                                     )}
                                                 >
-                                                    {product.isReleased ? "상세보기 및 구매" : "사전 안내 보기"}
+                                                    {product.isReleased ? (product.appUrl ? "상세보기 & 앱 안내" : "상세보기 및 구매") : "사전 안내 보기"}
                                                 </Button>
                                                 <Button 
                                                     onClick={(e) => {
@@ -1220,6 +1247,41 @@ export const Showroom = () => {
                                             </p>
                                         </div>
 
+                                        {selectedProduct.id === 'sundreamer' && (
+                                            <div className="space-y-3 pt-3">
+                                                <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider">웹앱 대표 인터페이스 & 미리보기</h4>
+                                                <div className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-950 shadow-sm max-h-[380px] flex items-center justify-center">
+                                                    <img 
+                                                        src="/showroom/sundreamer-preview.png" 
+                                                        alt="썬드리머 웹앱 미리보기" 
+                                                        className="w-full h-auto max-h-[380px] object-cover"
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {selectedProduct.id === 'realpick' && (
+                                            <div className="space-y-3 pt-3">
+                                                <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider">플랫폼 대표 캐릭터 & 로고</h4>
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                    <div className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-900 flex items-center justify-center p-6 shadow-sm">
+                                                        <img 
+                                                            src="/showroom/realpick-logo.png" 
+                                                            alt="리얼픽 로고" 
+                                                            className="max-h-24 object-contain"
+                                                        />
+                                                    </div>
+                                                    <div className="rounded-2xl overflow-hidden border border-slate-200 bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 flex items-center justify-center p-4 shadow-sm">
+                                                        <img 
+                                                            src="/showroom/realpick-mascot.png" 
+                                                            alt="리얼픽 마스코트" 
+                                                            className="max-h-28 object-contain drop-shadow-lg"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
                                         {selectedProduct.id === 'nplace-db' && (
                                             <>
                                                 <div className="space-y-3 pt-3">
@@ -1318,29 +1380,45 @@ export const Showroom = () => {
 
                                         <div className="pt-6 space-y-6">
                                             {selectedProduct.isReleased ? (
-                                                <div className="flex flex-col sm:flex-row gap-3">
-                                                    <Link 
-                                                        to={`/docs/${selectedProduct.id}`}
-                                                        className="w-full sm:w-1/2 block"
-                                                        onClick={() => setSelectedProductIdForDetail(null)}
-                                                    >
-                                                        <Button variant="outline" className="w-full h-12 border-2 border-indigo-200 hover:border-indigo-300 text-indigo-600 hover:bg-indigo-50/50 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 text-xs sm:text-sm">
-                                                            📖 설치 & 사용 가이드
-                                                        </Button>
-                                                    </Link>
-                                                    <a 
-                                                        href={
-                                                            selectedProduct.id === 'nplace-db'
-                                                                ? `https://github.com/Han-jinwook/n-place-db/releases/latest/download/Map_DB-Trial.zip?t=${Date.now()}`
-                                                                : `https://github.com/Han-jinwook/${selectedProduct.id}/releases/latest/download/${selectedProduct.id}-Trial.zip?t=${Date.now()}`
-                                                        }
-                                                        className="w-full sm:w-1/2 block"
-                                                    >
-                                                        <Button variant="outline" className="w-full h-12 border-2 border-emerald-200 hover:border-emerald-300 text-emerald-650 hover:bg-emerald-50/50 rounded-2xl font-black transition-all flex items-center justify-center gap-2 text-xs sm:text-sm">
-                                                            🎁 100건 무료체험판 다운로드 (.zip)
-                                                        </Button>
-                                                    </a>
-                                                </div>
+                                                selectedProduct.appUrl ? (
+                                                    <div className="space-y-3">
+                                                        <a 
+                                                            href={selectedProduct.appUrl} 
+                                                            target="_blank" 
+                                                            rel="noopener noreferrer" 
+                                                            className="w-full block"
+                                                        >
+                                                            <Button className="w-full h-14 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:opacity-95 text-white rounded-2xl font-black text-sm sm:text-base shadow-lg shadow-indigo-200 flex items-center justify-center gap-2 transition-all cursor-pointer">
+                                                                <ExternalLink className="w-5 h-5" />
+                                                                <span>🚀 {selectedProduct.title} 웹앱 바로 실행하기 ({selectedProduct.appUrl}) ↗</span>
+                                                            </Button>
+                                                        </a>
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex flex-col sm:flex-row gap-3">
+                                                        <Link 
+                                                            to={`/docs/${selectedProduct.id}`}
+                                                            className="w-full sm:w-1/2 block"
+                                                            onClick={() => setSelectedProductIdForDetail(null)}
+                                                        >
+                                                            <Button variant="outline" className="w-full h-12 border-2 border-indigo-200 hover:border-indigo-300 text-indigo-600 hover:bg-indigo-50/50 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 text-xs sm:text-sm">
+                                                                📖 설치 & 사용 가이드
+                                                            </Button>
+                                                        </Link>
+                                                        <a 
+                                                            href={
+                                                                selectedProduct.id === 'nplace-db'
+                                                                    ? `https://github.com/Han-jinwook/n-place-db/releases/latest/download/Map_DB-Trial.zip?t=${Date.now()}`
+                                                                    : `https://github.com/Han-jinwook/${selectedProduct.id}/releases/latest/download/${selectedProduct.id}-Trial.zip?t=${Date.now()}`
+                                                            }
+                                                            className="w-full sm:w-1/2 block"
+                                                        >
+                                                            <Button variant="outline" className="w-full h-12 border-2 border-emerald-200 hover:border-emerald-300 text-emerald-650 hover:bg-emerald-50/50 rounded-2xl font-black transition-all flex items-center justify-center gap-2 text-xs sm:text-sm">
+                                                                🎁 100건 무료체험판 다운로드 (.zip)
+                                                            </Button>
+                                                        </a>
+                                                    </div>
+                                                )
                                             ) : (
                                                 <div className="p-4 bg-slate-50 border border-slate-200/80 rounded-2xl text-center space-y-1.5 text-slate-500">
                                                     <div className="flex items-center justify-center gap-1.5 text-xs font-black text-slate-700">
@@ -1351,8 +1429,42 @@ export const Showroom = () => {
                                                 </div>
                                             )}
 
-                                            {/* Pricing Section (출시된 제품만 실제 결제 활성화, 미출시 제품은 사전 오픈 안내) */}
-                                            {!selectedProduct.isReleased ? (
+                                            {/* Pricing Section (출시된 제품만 실제 결제 활성화, 웹앱은 100% 무료 안내) */}
+                                            {selectedProduct.appUrl ? (
+                                                <div id="pricing-section" className="space-y-3.5 pt-4 border-t border-slate-100 text-left scroll-mt-28">
+                                                    <div className="p-6 bg-gradient-to-br from-indigo-50/80 via-purple-50/60 to-pink-50/40 border border-indigo-100 rounded-3xl space-y-3.5">
+                                                        <div className="flex items-center justify-between flex-wrap gap-2">
+                                                            <div className="flex items-center gap-2.5">
+                                                                <span className="px-3 py-1 bg-indigo-600 text-white text-xs font-black rounded-full shadow-xs">
+                                                                    100% 무료 제공
+                                                                </span>
+                                                                <h4 className="text-base font-black text-slate-900">
+                                                                    {selectedProduct.id === 'sundreamer' ? '썬드림 회원 전용 힐링 케어 서비스' : '참여형 예능 인터랙티브 플랫폼'}
+                                                                </h4>
+                                                            </div>
+                                                            <span className="text-[11px] font-black text-indigo-700 bg-white px-3 py-1 rounded-full border border-indigo-200 shadow-2xs">
+                                                                무설치 웹앱 · 즉시 이용 가능
+                                                            </span>
+                                                        </div>
+                                                        <p className="text-xs text-slate-600 leading-relaxed">
+                                                            {selectedProduct.id === 'sundreamer' 
+                                                                ? '썬드리머는 11년간 5천 명 이상의 실구매 회원과 함께해 온 자외선 조사기 힐링 케어 전용 웹앱입니다. 별도 코인이나 유료 결제 없이 1,600시간 램프 계산기, 치유 타임라인 기록, 30개 엄선 치유 후기 및 루미노트 CRM 연동 회원 혜택을 100% 무료로 이용하실 수 있습니다.'
+                                                                : '리얼픽은 실시간 예능 방송 시청자들을 위한 승부 예측 및 커뮤니티 플랫폼입니다. 별도 과금 없이 누구나 자유롭게 투표에 참여하고 티어 랭킹 보상을 획득하실 수 있습니다.'
+                                                            }
+                                                        </p>
+                                                        <div className="pt-2 flex flex-wrap items-center gap-2">
+                                                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-indigo-200/80 rounded-xl text-xs font-bold text-slate-700 shadow-2xs">
+                                                                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                                                                별도 결제/과금 없는 100% 무료 앱
+                                                            </span>
+                                                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-indigo-200/80 rounded-xl text-xs font-bold text-slate-700 shadow-2xs">
+                                                                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                                                                PWA 모바일 홈 화면 바로가기 추가 지원
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ) : !selectedProduct.isReleased ? (
                                                 <div id="pricing-section" className="space-y-3.5 pt-4 border-t border-slate-100 text-left scroll-mt-28">
                                                     <div className="p-6 bg-gradient-to-b from-slate-50 to-slate-100/70 border border-slate-200 rounded-3xl text-center space-y-3">
                                                         <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-white text-slate-500 shadow-2xs border border-slate-200/80 mx-auto">
