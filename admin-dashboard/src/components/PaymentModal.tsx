@@ -11,7 +11,8 @@ import {
     Loader2, 
     ExternalLink,
     Sparkles,
-    Mail
+    Mail,
+    BookOpen
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { cn } from '../lib/utils';
@@ -76,6 +77,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
         tierLabel: string;
         expireDate: string;
         downloadUrl: string;
+        docsUrl?: string;
     } | null>(null);
     const [copied, setCopied] = useState(false);
 
@@ -168,6 +170,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
         serialKey,
         expireDate,
         downloadUrl,
+        docsUrl,
         orderId,
         price
     }: {
@@ -177,6 +180,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
         serialKey: string;
         expireDate: string;
         downloadUrl: string;
+        docsUrl: string;
         orderId: string;
         price: number;
     }) => {
@@ -224,9 +228,12 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                                         <p style="margin: 4px 0;">2. 프로그램을 실행한 뒤 <strong>[라이선스 키 입력]</strong> 창에 위 시리얼키를 붙여넣기(Ctrl+V) 하세요.</p>
                                         <p style="margin: 4px 0;">3. 입력 즉시 기기(HWID)에 정식 등록되어 모든 기능을 정상 이용하실 수 있습니다.</p>
                                     </div>
-                                    <div style="text-align: center; margin: 28px 0 16px 0;">
-                                        <a href="${downloadUrl}" style="display: inline-block; background: #4f46e5; color: #ffffff; text-decoration: none; padding: 14px 32px; font-size: 14px; font-weight: 800; border-radius: 12px; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);">
-                                            프로그램 다운로드 바로가기 →
+                                    <div style="text-align: center; margin: 24px 0 16px 0;">
+                                        <a href="${downloadUrl}" style="display: inline-block; background: #059669; color: #ffffff; text-decoration: none; padding: 14px 28px; font-size: 14px; font-weight: 800; border-radius: 12px; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3); margin: 6px;">
+                                            🚀 프로그램 다운로드 바로가기
+                                        </a>
+                                        <a href="${docsUrl}" style="display: inline-block; background: #4f46e5; color: #ffffff; text-decoration: none; padding: 14px 28px; font-size: 14px; font-weight: 800; border-radius: 12px; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); margin: 6px;">
+                                            📖 설치 & 사용 가이드 확인하기 →
                                         </a>
                                     </div>
                                     <div style="border-top: 1px solid #f1f5f9; padding-top: 20px; margin-top: 24px; font-size: 11px; color: #94a3b8;">
@@ -261,6 +268,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
             const expireDate = new Date();
             expireDate.setMonth(now.getMonth() + currentTierInfo.months);
             const downloadUrl = getDownloadUrl(product.id);
+            const docsUrl = `https://sundreamer.app/docs/${product.id}`;
             const expireDateStr = expireDate.toISOString().slice(0, 10);
 
             const prodClean = (() => {
@@ -341,6 +349,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                 serialKey: serial,
                 expireDate: expireDateStr,
                 downloadUrl,
+                docsUrl,
                 orderId: ordr_idxx,
                 price: finalPrice
             });
@@ -351,7 +360,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                 productName: product.title,
                 tierLabel: currentTierInfo.label,
                 expireDate: expireDateStr,
-                downloadUrl
+                downloadUrl,
+                docsUrl
             });
             setProcessing(false);
         } catch (err: any) {
@@ -515,16 +525,27 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                         <p>2. 입력 즉시 정식 버전의 모든 기능이 즉시 활성화됩니다.</p>
                     </div>
 
-                    <div className="flex gap-3">
-                        <a href={successData.downloadUrl} className="w-1/2 block">
-                            <Button className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center justify-center gap-2">
-                                <Download className="w-4 h-4" /> 프로그램 다운로드
-                            </Button>
-                        </a>
+                    <div className="space-y-2.5">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            <a href={successData.downloadUrl} className="block">
+                                <Button className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm">
+                                    <Download className="w-4 h-4" /> 프로그램 다운로드
+                                </Button>
+                            </a>
+                            <a href={successData.docsUrl || `/docs/${product.id}`} target="_blank" rel="noreferrer" className="block">
+                                <Button 
+                                    type="button"
+                                    variant="outline"
+                                    className="w-full h-12 rounded-xl font-black text-xs sm:text-sm border-2 border-indigo-200 text-indigo-700 hover:bg-indigo-50 flex items-center justify-center gap-2 shadow-sm"
+                                >
+                                    <BookOpen className="w-4 h-4" /> 📖 설치 & 사용 가이드
+                                </Button>
+                            </a>
+                        </div>
                         <Button 
                             onClick={onClose} 
-                            variant="outline"
-                            className="w-1/2 h-12 rounded-xl font-black text-xs sm:text-sm"
+                            variant="ghost"
+                            className="w-full h-10 rounded-xl font-bold text-xs text-slate-500 hover:text-slate-800"
                         >
                             닫기
                         </Button>
@@ -603,12 +624,12 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                         </div>
                     </div>
 
-                    {/* 결제 수단 단일 안내 (신용/체크카드 및 간편결제 전용) */}
+                    {/* 결제 수단 단일 안내 (신용/체크카드 및 카드사 앱카드) */}
                     <div className="space-y-1.5">
                         <div className="flex items-center justify-between">
                             <label className="text-xs font-black text-slate-900 uppercase tracking-wider">결제 수단</label>
-                            <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-md">
-                                전 카드사 & 간편결제 지원
+                            <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-200/80 px-2 py-0.5 rounded-md">
+                                국내 전 카드사 지원
                             </span>
                         </div>
                         <div className="p-3.5 bg-slate-900 text-white rounded-2xl flex items-center justify-between shadow-xs">
@@ -617,8 +638,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                                     <CreditCard className="w-4 h-4" />
                                 </div>
                                 <div>
-                                    <p className="text-xs font-black text-white">신용 / 체크카드</p>
-                                    <p className="text-[10px] text-slate-400 font-medium">카카오페이 · 네이버페이 · 토스 · 페이코 · 앱카드 포함</p>
+                                    <p className="text-xs font-black text-white">신용 / 체크카드 (앱카드)</p>
+                                    <p className="text-[10px] text-slate-400 font-medium">KB·신한·현대·삼성·롯데·BC·농협·카카오뱅크 등 지원</p>
                                 </div>
                             </div>
                             <span className="text-[10px] font-black text-indigo-400 bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700">
