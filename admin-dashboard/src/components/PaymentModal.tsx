@@ -66,7 +66,6 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
     const [selectedTier, setSelectedTier] = useState<'DELUXE' | '1M' | '3M'>('1M');
     const [isRepurchase, setIsRepurchase] = useState(false);
     const [buyerEmail, setBuyerEmail] = useState('');
-    const [payMethod, setPayMethod] = useState<'card' | 'bank' | 'phone'>('card');
     const [processing, setProcessing] = useState(false);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -377,9 +376,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
             const orderId = `3M_${Date.now()}_${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
             const goodName = `[3Monster] ${product.title} - ${currentTierInfo.label}`;
 
-            let kcpPayMethod = '100000000000';
-            if (payMethod === 'phone') kcpPayMethod = '000010000000';
-            if (payMethod === 'bank') kcpPayMethod = '010000000000';
+            const kcpPayMethod = '100000000000'; // NHN KCP 신용/체크카드 및 간편결제 (카카오페이, 네이버페이, 토스, 앱카드 등)
 
             const defaultBuyerName = buyerEmail.split('@')[0] || '3Monster 회원';
 
@@ -606,46 +603,27 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                         </div>
                     </div>
 
-                    {/* 결제 수단 선택 */}
-                    <div className="space-y-2">
-                        <label className="text-xs font-black text-slate-900 uppercase tracking-wider">결제 수단</label>
-                        <div className="grid grid-cols-3 gap-2">
-                            <button
-                                type="button"
-                                onClick={() => setPayMethod('card')}
-                                className={cn(
-                                    "h-11 rounded-xl text-xs font-black border transition-all flex items-center justify-center gap-1.5",
-                                    payMethod === 'card' 
-                                        ? "bg-slate-900 text-white border-slate-900 shadow-sm" 
-                                        : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
-                                )}
-                            >
-                                <CreditCard className="w-3.5 h-3.5" /> 신용/체크카드
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setPayMethod('bank')}
-                                className={cn(
-                                    "h-11 rounded-xl text-xs font-black border transition-all flex items-center justify-center gap-1.5",
-                                    payMethod === 'bank' 
-                                        ? "bg-slate-900 text-white border-slate-900 shadow-sm" 
-                                        : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
-                                )}
-                            >
-                                🏦 실시간 계좌이체
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setPayMethod('phone')}
-                                className={cn(
-                                    "h-11 rounded-xl text-xs font-black border transition-all flex items-center justify-center gap-1.5",
-                                    payMethod === 'phone' 
-                                        ? "bg-slate-900 text-white border-slate-900 shadow-sm" 
-                                        : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
-                                )}
-                            >
-                                📱 휴대폰 소액결제
-                            </button>
+                    {/* 결제 수단 단일 안내 (신용/체크카드 및 간편결제 전용) */}
+                    <div className="space-y-1.5">
+                        <div className="flex items-center justify-between">
+                            <label className="text-xs font-black text-slate-900 uppercase tracking-wider">결제 수단</label>
+                            <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-md">
+                                전 카드사 & 간편결제 지원
+                            </span>
+                        </div>
+                        <div className="p-3.5 bg-slate-900 text-white rounded-2xl flex items-center justify-between shadow-xs">
+                            <div className="flex items-center gap-2.5">
+                                <div className="w-8 h-8 rounded-xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-400">
+                                    <CreditCard className="w-4 h-4" />
+                                </div>
+                                <div>
+                                    <p className="text-xs font-black text-white">신용 / 체크카드</p>
+                                    <p className="text-[10px] text-slate-400 font-medium">카카오페이 · 네이버페이 · 토스 · 페이코 · 앱카드 포함</p>
+                                </div>
+                            </div>
+                            <span className="text-[10px] font-black text-indigo-400 bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700">
+                                KCP 정식 승인
+                            </span>
                         </div>
                     </div>
 

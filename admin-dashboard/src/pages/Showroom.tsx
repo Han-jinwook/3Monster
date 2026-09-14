@@ -225,6 +225,15 @@ export const Showroom = () => {
         return id;
     };
 
+    const getDownloadUrl = (productId: string) => {
+        const t = Date.now();
+        const clean = productId.toLowerCase().replace(/[-_]/g, '');
+        if (clean.includes('cafe') || clean.includes('comment') || clean.includes('event') || clean.includes('auto')) {
+            return `https://github.com/Han-jinwook/CafeScraper/releases/latest/download/CafeMonster-Trial.zip?t=${t}`;
+        }
+        return `https://github.com/Han-jinwook/n-place-db/releases/latest/download/Map_DB-Trial.zip?t=${t}`;
+    };
+
     const searchParams = new URLSearchParams(location.search);
     const categoryParam = searchParams.get('category');
     const hashParam = location.hash ? location.hash.replace('#', '') : null;
@@ -1410,11 +1419,7 @@ export const Showroom = () => {
                                                             </Button>
                                                         </Link>
                                                         <a 
-                                                            href={
-                                                                selectedProduct.id === 'nplace-db'
-                                                                    ? `https://github.com/Han-jinwook/n-place-db/releases/latest/download/Map_DB-Trial.zip?t=${Date.now()}`
-                                                                    : `https://github.com/Han-jinwook/${selectedProduct.id}/releases/latest/download/${selectedProduct.id}-Trial.zip?t=${Date.now()}`
-                                                            }
+                                                            href={getDownloadUrl(selectedProduct.id)}
                                                             className="w-full sm:w-1/2 block"
                                                         >
                                                             <Button variant="outline" className="w-full h-12 border-2 border-emerald-200 hover:border-emerald-300 text-emerald-650 hover:bg-emerald-50/50 rounded-2xl font-black transition-all flex items-center justify-center gap-2 text-xs sm:text-sm">
