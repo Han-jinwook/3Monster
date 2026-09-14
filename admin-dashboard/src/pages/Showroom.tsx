@@ -153,19 +153,19 @@ const productCategories = [
             },
             {
                 id: 'realpick',
-                title: "리얼픽 (RealPick)",
-                subtitle: "실시간 예능 투표 & 승부 예측 엔터테인먼트 플랫폼",
-                description: "실시간 방송 예능 프로그램 투표 및 승부 예측 게임 플랫폼입니다. 실시간 예능 투표, 티어 랭킹 시스템, 커뮤니티 댓글 및 AI 기반 예능 미션 참여를 통해 포인트와 혜택을 얻는 차세대 인터랙티브 엔터테인먼트 앱입니다.",
+                title: "리얼픽 (시청비서)",
+                subtitle: "출연진 프로필 & 회차별 선택 흐름을 한눈에 보는 심플 시청비서",
+                description: "나는 솔로, 나솔사계 등 인기 연애 리얼리티 프로그램의 복잡한 출연진 프로필(직업, 나이, 인스타)과 회차별 화살표 선택 흐름(러브라인)을 한눈에 직관적으로 보여주는 심플형 시청 비서 웹앱입니다.",
                 icon: Monitor,
-                color: "from-purple-600 to-indigo-600",
-                badge: "2호앱 · 정식 오픈",
+                color: "from-pink-500 to-rose-600",
+                badge: "2호앱 · 시청비서 MVP",
                 isReleased: true,
                 appUrl: "https://real-pick.com",
                 features: [
-                    "실시간 예능 방송 투표 & 승부 예측 게임",
-                    "유저 티어 시스템 및 랭킹 보상 리워드",
-                    "AI 기반 예능 미션 및 영상 하이라이트",
-                    "참여형 커뮤니티 & 실시간 댓글 소통"
+                    "출연진 프로필 상세 (직업·나이·인스타)",
+                    "회차별 화살표 선택 흐름도 (러브라인)",
+                    "나는 솔로 / 나솔사계 실시간 업데이트",
+                    "무설치 원클릭 심플 웹 시청비서 (MVP)"
                 ]
             },
             {
@@ -1262,22 +1262,13 @@ export const Showroom = () => {
 
                                         {selectedProduct.id === 'realpick' && (
                                             <div className="space-y-3 pt-3">
-                                                <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider">플랫폼 대표 캐릭터 & 로고</h4>
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                    <div className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-900 flex items-center justify-center p-6 shadow-sm">
-                                                        <img 
-                                                            src="/showroom/realpick-logo.png" 
-                                                            alt="리얼픽 로고" 
-                                                            className="max-h-24 object-contain"
-                                                        />
-                                                    </div>
-                                                    <div className="rounded-2xl overflow-hidden border border-slate-200 bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 flex items-center justify-center p-4 shadow-sm">
-                                                        <img 
-                                                            src="/showroom/realpick-mascot.png" 
-                                                            alt="리얼픽 마스코트" 
-                                                            className="max-h-28 object-contain drop-shadow-lg"
-                                                        />
-                                                    </div>
+                                                <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider">시청비서 대표 프로그램 & 인터페이스</h4>
+                                                <div className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-950 shadow-sm max-h-[360px] flex items-center justify-center">
+                                                    <img 
+                                                        src="/showroom/realpick-preview.jpg" 
+                                                        alt="리얼픽 나는솔로 시청비서" 
+                                                        className="w-full h-auto max-h-[360px] object-cover"
+                                                    />
                                                 </div>
                                             </div>
                                         )}
@@ -1439,7 +1430,7 @@ export const Showroom = () => {
                                                                     100% 무료 제공
                                                                 </span>
                                                                 <h4 className="text-base font-black text-slate-900">
-                                                                    {selectedProduct.id === 'sundreamer' ? '썬드림 회원 전용 힐링 케어 서비스' : '참여형 예능 인터랙티브 플랫폼'}
+                                                                    {selectedProduct.id === 'sundreamer' ? '썬드림 회원 전용 힐링 케어 서비스' : '연애방송 시청비서 심플 웹앱 (MVP)'}
                                                                 </h4>
                                                             </div>
                                                             <span className="text-[11px] font-black text-indigo-700 bg-white px-3 py-1 rounded-full border border-indigo-200 shadow-2xs">
@@ -1449,17 +1440,17 @@ export const Showroom = () => {
                                                         <p className="text-xs text-slate-600 leading-relaxed">
                                                             {selectedProduct.id === 'sundreamer' 
                                                                 ? '썬드리머는 11년간 5천 명 이상의 실구매 회원과 함께해 온 자외선 조사기 힐링 케어 전용 웹앱입니다. 별도 코인이나 유료 결제 없이 1,600시간 램프 계산기, 치유 타임라인 기록, 30개 엄선 치유 후기 및 루미노트 CRM 연동 회원 혜택을 100% 무료로 이용하실 수 있습니다.'
-                                                                : '리얼픽은 실시간 예능 방송 시청자들을 위한 승부 예측 및 커뮤니티 플랫폼입니다. 별도 과금 없이 누구나 자유롭게 투표에 참여하고 티어 랭킹 보상을 획득하실 수 있습니다.'
+                                                                : '리얼픽은 나는 솔로, 나솔사계 등 연애 리얼리티 시청자들을 위한 심플형 시청비서 웹앱입니다. 방송을 시청하며 복잡한 출연진 프로필(직업·나이·인스타)과 회차별 화살표 러브라인 선택 흐름을 누구나 별도 결제나 가입 없이 100% 무료로 즉시 확인하실 수 있습니다.'
                                                             }
                                                         </p>
                                                         <div className="pt-2 flex flex-wrap items-center gap-2">
                                                             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-indigo-200/80 rounded-xl text-xs font-bold text-slate-700 shadow-2xs">
                                                                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                                                                별도 결제/과금 없는 100% 무료 앱
+                                                                {selectedProduct.id === 'sundreamer' ? '별도 결제/과금 없는 100% 무료 앱' : '가입 없이 즉시 무료 열람'}
                                                             </span>
                                                             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-indigo-200/80 rounded-xl text-xs font-bold text-slate-700 shadow-2xs">
                                                                 <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                                                                PWA 모바일 홈 화면 바로가기 추가 지원
+                                                                {selectedProduct.id === 'sundreamer' ? 'PWA 모바일 홈 화면 바로가기 추가 지원' : '실시간 선택 흐름도 & 인스타 링크 지원'}
                                                             </span>
                                                         </div>
                                                     </div>
