@@ -161,6 +161,99 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
         setTimeout(() => setCopied(false), 2500);
     };
 
+    // 라이선스 키 이메일 자동 발송 (Resend API)
+    const sendLicenseEmail = async ({
+        email,
+        productTitle,
+        tierLabel,
+        serialKey,
+        expireDate,
+        downloadUrl,
+        orderId,
+        price
+    }: {
+        email: string;
+        productTitle: string;
+        tierLabel: string;
+        serialKey: string;
+        expireDate: string;
+        downloadUrl: string;
+        orderId: string;
+        price: number;
+    }) => {
+        try {
+            const apiKey = import.meta.env.VITE_RESEND_API_KEY;
+            if (!apiKey) {
+                console.warn('VITE_RESEND_API_KEY is not configured');
+                return;
+            }
+
+            const res = await fetch('/api/resend/emails', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    from: '3Monster <admin@3monster.net>',
+                    to: [email.trim()],
+                    subject: `[3Monster] ${productTitle} (${tierLabel}) 정식 라이선스 키 발급 안내`,
+                    html: `
+                        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 30px; background-color: #f8fafc; color: #1e293b; line-height: 1.6;">
+                            <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 20px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);">
+                                <div style="background: #0f172a; padding: 32px 24px; text-align: center;">
+                                    <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 900; letter-spacing: -0.03em;">3Monster</h1>
+                                    <p style="color: #94a3b8; font-size: 13px; font-weight: 600; margin: 8px 0 0 0;">소프트웨어 정식 라이선스 발급 완료</p>
+                                </div>
+                                <div style="padding: 32px 28px;">
+                                    <div style="text-align: center; margin-bottom: 24px;">
+                                        <div style="display: inline-block; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 9999px; padding: 6px 16px; color: #059669; font-size: 12px; font-weight: 800; margin-bottom: 12px;">
+                                            ✔ 결제 및 발급 승인 완료
+                                        </div>
+                                        <h2 style="font-size: 20px; font-weight: 800; color: #0f172a; margin: 0 0 6px 0;">${productTitle}</h2>
+                                        <p style="font-size: 13px; color: #64748b; margin: 0;">플랜: <strong>${tierLabel}</strong> · 만료일: <strong>${expireDate}</strong></p>
+                                    </div>
+                                    <div style="background: #0f172a; border-radius: 16px; padding: 24px; margin: 24px 0; text-align: center; border: 1px solid #1e293b;">
+                                        <div style="color: #818cf8; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;">정식 라이선스 키 (Serial Key)</div>
+                                        <div style="font-family: monospace; font-size: 20px; font-weight: 900; color: #fde047; letter-spacing: 0.08em; background: #1e293b; padding: 12px 16px; border-radius: 10px; word-break: break-all; border: 1px dashed #475569;">
+                                            ${serialKey}
+                                        </div>
+                                    </div>
+                                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 20px; margin-bottom: 24px; font-size: 13px; color: #475569;">
+                                        <h4 style="margin: 0 0 10px 0; font-size: 14px; font-weight: 800; color: #0f172a;">⚡ 프로그램 등록 및 실행 안내</h4>
+                                        <p style="margin: 4px 0;">1. 아래 [프로그램 다운로드] 버튼을 눌러 압축 파일을 다운로드 후 압축을 해제합니다.</p>
+                                        <p style="margin: 4px 0;">2. 프로그램을 실행한 뒤 <strong>[라이선스 키 입력]</strong> 창에 위 시리얼키를 붙여넣기(Ctrl+V) 하세요.</p>
+                                        <p style="margin: 4px 0;">3. 입력 즉시 기기(HWID)에 정식 등록되어 모든 기능을 정상 이용하실 수 있습니다.</p>
+                                    </div>
+                                    <div style="text-align: center; margin: 28px 0 16px 0;">
+                                        <a href="${downloadUrl}" style="display: inline-block; background: #4f46e5; color: #ffffff; text-decoration: none; padding: 14px 32px; font-size: 14px; font-weight: 800; border-radius: 12px; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);">
+                                            프로그램 다운로드 바로가기 →
+                                        </a>
+                                    </div>
+                                    <div style="border-top: 1px solid #f1f5f9; padding-top: 20px; margin-top: 24px; font-size: 11px; color: #94a3b8;">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                            <span>주문번호: ${orderId}</span>
+                                            <span>결제금액: ${price.toLocaleString()}원</span>
+                                        </div>
+                                        <p style="margin: 8px 0 0 0;">※ 본 메일은 발신전용입니다. 문의사항은 3Monster 공식 홈페이지 고객센터(Q&A)를 이용해 주시기 바랍니다.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `
+                })
+            });
+
+            if (!res.ok) {
+                console.warn('Resend email response status:', res.status);
+            } else {
+                console.log('✅ License key email sent successfully to:', email);
+            }
+        } catch (emailErr) {
+            console.error('License key email dispatch failed:', emailErr);
+        }
+    };
+
     // 결제 완료 후 라이선스 DB 자동 등록
     const handlePaymentComplete = async (ordr_idxx: string) => {
         try {
@@ -168,22 +261,30 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
             const now = new Date();
             const expireDate = new Date();
             expireDate.setMonth(now.getMonth() + currentTierInfo.months);
+            const downloadUrl = getDownloadUrl(product.id);
+            const expireDateStr = expireDate.toISOString().slice(0, 10);
 
-            const { error } = await supabase
+            const prodClean = (() => {
+                const clean = product.id.toLowerCase().replace(/[-_]/g, '');
+                if (clean.includes('cafe')) return 'CafeCrawler';
+                if (clean.includes('event')) return 'EventStats';
+                if (clean.includes('comment') || clean.includes('stealth')) return 'AutoComment';
+                if (clean.includes('nplace') || clean.includes('map')) return 'NPlace-DB';
+                return product.id;
+            })();
+
+            const buyerClean = buyerEmail.trim().toLowerCase();
+            const buyerNick = buyerClean.split('@')[0] || '3Monster 회원';
+
+            // 1. Supabase licenses 테이블에 정식 라이선스 발급
+            const { error: licError } = await supabase
                 .from('licenses')
                 .insert([{
-                    product_id: (() => {
-                        const clean = product.id.toLowerCase().replace(/[-_]/g, '');
-                        if (clean.includes('cafe')) return 'CafeCrawler';
-                        if (clean.includes('event')) return 'EventStats';
-                        if (clean.includes('comment') || clean.includes('stealth')) return 'AutoComment';
-                        if (clean.includes('nplace') || clean.includes('map')) return 'NPlace-DB';
-                        return product.id;
-                    })(),
+                    product_id: prodClean,
                     license_type: selectedTier,
                     constraint_type: 'HWID',
-                    buyer_name: buyerEmail.split('@')[0] || '3Monster 회원',
-                    contact: buyerEmail.trim(),
+                    buyer_name: buyerNick,
+                    contact: buyerClean,
                     channel: '3Monster (KCP 카드결제)',
                     serial_key: serial,
                     expire_date: expireDate.toISOString(),
@@ -194,21 +295,69 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                     memo: `[KCP 즉시결제] 주문번호: ${ordr_idxx} | 결제금액: ${finalPrice.toLocaleString()}원`
                 }]);
 
-            if (error) {
-                console.error('Supabase license insert error:', error);
+            if (licError) {
+                console.error('Supabase license insert error (Check RLS policy):', licError);
+                // 비상 백업: support_tickets에 구매 이력 자동 기록 (RLS 허용 테이블)
+                try {
+                    await supabase.from('support_tickets').insert([{
+                        uid: '00000000-0000-0000-0000-000000000000',
+                        email: buyerClean,
+                        issue_type: 'kcp_payment_backup',
+                        status: 'open',
+                        title: `[KCP 결제완료 백업] ${product.title} (${currentTierInfo.label})`,
+                        content: JSON.stringify({
+                            ordr_idxx,
+                            serial_key: serial,
+                            product_id: prodClean,
+                            tier: selectedTier,
+                            price: finalPrice,
+                            expire_date: expireDate.toISOString(),
+                            buyer: buyerClean
+                        })
+                    }]);
+                } catch (ticketErr) {
+                    console.error('Order backup ticket creation error:', ticketErr);
+                }
             }
 
+            // 2. 구매 회원 role을 'buyer'로 업데이트
+            try {
+                await supabase
+                    .from('users')
+                    .upsert({
+                        email: buyerClean,
+                        role: 'buyer',
+                        name: buyerNick,
+                        channel: '3Monster'
+                    }, { onConflict: 'email' });
+            } catch (uErr) {
+                console.warn('User buyer role sync warning:', uErr);
+            }
+
+            // 3. 구매자 이메일로 라이선스 키 자동 발송
+            await sendLicenseEmail({
+                email: buyerClean,
+                productTitle: product.title,
+                tierLabel: currentTierInfo.label,
+                serialKey: serial,
+                expireDate: expireDateStr,
+                downloadUrl,
+                orderId: ordr_idxx,
+                price: finalPrice
+            });
+
+            // 4. 화면 발급 완료 상태 반영
             setSuccessData({
                 serialKey: serial,
                 productName: product.title,
                 tierLabel: currentTierInfo.label,
-                expireDate: expireDate.toISOString().slice(0, 10),
-                downloadUrl: getDownloadUrl(product.id)
+                expireDate: expireDateStr,
+                downloadUrl
             });
             setProcessing(false);
         } catch (err: any) {
             console.error('License creation error:', err);
-            setErrorMsg('결제는 완료되었으나 라이선스 발급 중 오류가 발생했습니다. 고객센터로 문의해 주시면 즉시 처리해 드립니다.');
+            setErrorMsg('결제는 완료되었으나 발급 처리 중 지연이 발생했습니다. 발급 키를 확인하시거나 고객센터로 문의해 주시면 즉시 처리해 드립니다.');
             setProcessing(false);
         }
     };
@@ -253,21 +402,22 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
             // KCP 글로벌 인증 콜백 등록
             (window as any).m_Completepayment = (FormOrJson: any, closeEvent: any) => {
                 try {
-                    const res_cd = FormOrJson?.elements?.["res_cd"]?.value || FormOrJson?.res_cd || "0000";
-                    const res_msg = FormOrJson?.elements?.["res_msg"]?.value || FormOrJson?.res_msg || "승인";
+                    const res_cd = FormOrJson?.elements?.["res_cd"]?.value || FormOrJson?.res_cd;
+                    const res_msg = FormOrJson?.elements?.["res_msg"]?.value || FormOrJson?.res_msg || "결제가 취소되었습니다.";
 
-                    if (res_cd === "0000" || res_cd === "") {
-                        if (closeEvent) closeEvent();
+                    if (closeEvent) closeEvent();
+
+                    if (res_cd === "0000") {
                         handlePaymentComplete(orderId);
                     } else {
-                        if (closeEvent) closeEvent();
-                        setErrorMsg(`[결제 실패] ${res_msg} (${res_cd})`);
+                        setErrorMsg(`[결제 취소/실패] ${res_msg} (${res_cd || 'CANCEL'})`);
                         setProcessing(false);
                     }
                 } catch (err: any) {
                     console.error('[KCP Callback Error]', err);
                     if (closeEvent) closeEvent();
-                    handlePaymentComplete(orderId);
+                    setErrorMsg('결제 처리 중 오류가 발생했습니다. 고객센터로 문의해 주세요.');
+                    setProcessing(false);
                 }
             };
 
@@ -283,11 +433,13 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                             kcpFunc(formRef.current);
                         } catch (kcpErr: any) {
                             console.error('KCP execute error:', kcpErr);
-                            handlePaymentComplete(orderId);
+                            setErrorMsg('결제창 호출 중 오류가 발생했습니다: ' + (kcpErr?.message || '다시 시도해 주세요.'));
+                            setProcessing(false);
                         }
                     } else if (attempts >= 40) {
                         clearInterval(checkKcp);
-                        handlePaymentComplete(orderId);
+                        setErrorMsg('KCP 결제 모듈을 불러오지 못했습니다. 페이지를 새로고침하거나 브라우저 광고 차단(AdBlock)을 해제한 후 다시 시도해 주세요.');
+                        setProcessing(false);
                     }
                 }, 100);
             }, 100);

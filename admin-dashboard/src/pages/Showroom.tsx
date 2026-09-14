@@ -153,7 +153,7 @@ const productCategories = [
             },
             {
                 id: 'realpick',
-                title: "리얼픽 (시청비서)",
+                title: "리얼픽 (리얼연애방송 시청비서)",
                 subtitle: "출연진 프로필 & 회차별 선택 흐름을 한눈에 보는 심플 시청비서",
                 description: "나는 솔로, 나솔사계 등 인기 연애 리얼리티 프로그램의 복잡한 출연진 프로필(직업, 나이, 인스타)과 회차별 화살표 선택 흐름(러브라인)을 한눈에 직관적으로 보여주는 심플형 시청 비서 웹앱입니다.",
                 icon: Monitor,
@@ -429,6 +429,19 @@ export const Showroom = () => {
             );
             const targetId = matched ? matched.id : detailProduct;
             setSelectedProductIdForDetail(targetId);
+
+            const buyParam = params.get('buy');
+            const tierParam = (params.get('tier') as 'DELUXE' | '1M' | '3M') || '1M';
+            if (buyParam && matched && isLoggedIn) {
+                setPaymentProduct({
+                    id: matched.id,
+                    title: matched.title,
+                    subtitle: matched.subtitle,
+                    initialTier: tierParam,
+                    isRepurchase: false
+                });
+                setIsPaymentModalOpen(true);
+            }
 
             setTimeout(() => {
                 const pricingEl = document.getElementById('pricing-section') || document.getElementById(targetId);
@@ -1549,7 +1562,7 @@ export const Showroom = () => {
                                                                 </div>
                                                                 <Button
                                                                     size="sm"
-                                                                    onClick={() => navigate(`/login?redirect=${encodeURIComponent(location.pathname + location.search)}`)}
+                                                                    onClick={() => navigate(`/login?redirect=${encodeURIComponent(`/?category=${activeCategory || 'marketing-monster'}&detail_product=${selectedProduct.id}`)}`)}
                                                                     className="bg-amber-600 hover:bg-amber-700 text-white font-black text-xs shrink-0 rounded-xl px-4 py-2 shadow-xs"
                                                                 >
                                                                     로그인 / 회원가입하기 →
@@ -1581,7 +1594,7 @@ export const Showroom = () => {
                                                                         onClick={() => {
                                                                             if (!isLoggedIn) {
                                                                                 alert('라이선스 발급 및 구매는 회원 전용 서비스입니다.\n로그인 또는 회원가입 페이지로 이동합니다.');
-                                                                                navigate(`/login?redirect=${encodeURIComponent(location.pathname + location.search)}`);
+                                                                                navigate(`/login?redirect=${encodeURIComponent(`/?category=${activeCategory || 'marketing-monster'}&detail_product=${selectedProduct.id}&tier=DELUXE&buy=1`)}`);
                                                                                 return;
                                                                             }
                                                                             setPaymentProduct({
@@ -1623,7 +1636,7 @@ export const Showroom = () => {
                                                                         onClick={() => {
                                                                             if (!isLoggedIn) {
                                                                                 alert('라이선스 발급 및 구매는 회원 전용 서비스입니다.\n로그인 또는 회원가입 페이지로 이동합니다.');
-                                                                                navigate(`/login?redirect=${encodeURIComponent(location.pathname + location.search)}`);
+                                                                                navigate(`/login?redirect=${encodeURIComponent(`/?category=${activeCategory || 'marketing-monster'}&detail_product=${selectedProduct.id}&tier=1M&buy=1`)}`);
                                                                                 return;
                                                                             }
                                                                             setPaymentProduct({
@@ -1668,7 +1681,7 @@ export const Showroom = () => {
                                                                         onClick={() => {
                                                                             if (!isLoggedIn) {
                                                                                 alert('라이선스 발급 및 구매는 회원 전용 서비스입니다.\n로그인 또는 회원가입 페이지로 이동합니다.');
-                                                                                navigate(`/login?redirect=${encodeURIComponent(location.pathname + location.search)}`);
+                                                                                navigate(`/login?redirect=${encodeURIComponent(`/?category=${activeCategory || 'marketing-monster'}&detail_product=${selectedProduct.id}&tier=3M&buy=1`)}`);
                                                                                 return;
                                                                             }
                                                                             setPaymentProduct({
