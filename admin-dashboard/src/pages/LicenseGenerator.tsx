@@ -235,7 +235,7 @@ export const LicenseGenerator = () => {
         cafe: [
             { id: 'CafeCrawler', name: '☕ 카페 수집기 Pro', desc: '카페 게시글/댓글 수집기' },
             { id: 'EventStats', name: '📊 이벤트 활동 분석기', desc: '회원 활동지수 집계·이벤트 추첨' },
-            { id: 'AutoComment', name: '🤖 자동댓글러', desc: '자동 댓글 등록 자동화' },
+            { id: 'AutoComment', name: '🤖 카페 댓글 관리기', desc: '스탭 맞춤 템플릿 신속 응대' },
         ]
     };
 
@@ -440,7 +440,7 @@ export const LicenseGenerator = () => {
                                             <optgroup label="카페몬스터 제품군">
                                                 <option value="CafeCrawler">☕ CafeCrawler (카페 수집기 Pro)</option>
                                                 <option value="EventStats">📊 EventStats (이벤트 활동 분석기)</option>
-                                                <option value="AutoComment">🤖 AutoComment (자동댓글러)</option>
+                                                <option value="AutoComment">🤖 AutoComment (카페 댓글 관리기)</option>
                                             </optgroup>
                                         </select>
                                         <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">

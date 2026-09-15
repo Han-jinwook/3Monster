@@ -131,7 +131,7 @@ export const MerlinTrial = () => {
                                 trials.map((trial) => (
                                     <tr key={trial.id} className="hover:bg-slate-50 transition-colors">
                                         <td className="px-4 py-3 font-medium text-slate-700">
-                                            {trial.product_id === 'AutoComment' ? '자동댓글러' :
+                                            {trial.product_id === 'AutoComment' ? '카페 댓글 관리기' :
                                              trial.product_id === 'CafeCrawler' ? '카페 수집기' :
                                              trial.product_id === 'EventStats' ? '이벤트 활동 분석기' :
                                              trial.product_id || 'N-Place-DB'}

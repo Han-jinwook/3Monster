@@ -837,9 +837,6 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                                     <p className="text-[10px] text-slate-400 font-medium">KB·신한·현대·삼성·롯데·BC·농협·카카오뱅크 등 지원</p>
                                 </div>
                             </div>
-                            <span className="text-[10px] font-black text-indigo-400 bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700">
-                                KCP 정식 승인
-                            </span>
                         </div>
                     </div>
 

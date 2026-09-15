@@ -90,41 +90,41 @@ const productCategories = [
     {
         id: 'cafe-monster',
         name: '카페 몬스터',
-        subtitle: '11년의 세월이 담긴 카페 데이터를 완벽한 매출 무기로 전환합니다.',
-        actionCopy: '원하는 타겟 카페의 게시글·댓글·활동 지표 완벽 분석',
+        subtitle: '11년 커뮤니티 운영 노하우가 담긴 내 카페 매니저·스탭 전용 관리 유틸리티',
+        actionCopy: '내 카페의 글·댓글·이벤트 관리를 원클릭으로 자동화하기',
         products: [
             {
                 id: 'cafe-crawler',
-                title: "카페 게시글/댓글 크롤러",
-                subtitle: "카페 내 숨어있는 진성 회원 서사 수집",
-                description: "마케터가 타겟으로 삼은 카페의 전체 게시글, 실시간 새글, 작성자의 댓글 활동 내역까지 완벽 분석하여 핵심 유저층의 데이터셋을 빌드합니다.",
+                title: "카페 게시글/댓글 수집기",
+                subtitle: "내 카페의 소중한 콘텐츠 및 회원 활동 히스토리 아카이빙",
+                description: "운영 중인 내 카페의 전체 게시글, 신규글, 회원들의 댓글 활동 내역을 정밀하게 수집하여 데이터 유실을 방지하고 커뮤니티 성장 흐름을 체계적으로 백업합니다.",
                 icon: Smartphone,
                 color: "from-orange-500 to-rose-600",
                 badge: "정식 출시",
                 isReleased: true,
-                features: ["전체 히스토리 분석 수집", "진성 회원 식별 및 패턴 추적", "실시간 신규 알림 연동"]
+                features: ["게시판별 전체/신규글 정밀 수집", "회원별 활동 히스토리 아카이빙", "CSV / 엑셀 원클릭 백업"]
             },
             {
                 id: 'comment-stats',
-                title: "카페 댓글 수집 통계",
-                subtitle: "여론 흐름과 회원들의 실시간 반응 집계",
-                description: "작성되는 실시간 댓글을 분석하여 여론의 긍/부정 지수, 주요 키워드 트렌드, 커뮤니티 전반의 상호작용 피드백을 대시보드로 시각화해 줍니다.",
+                title: "카페 댓글 관리기",
+                subtitle: "스탭 업무 경감 & 신규 질문·환영 댓글 신속 응대 비서",
+                description: "내 카페에 올라오는 신규 문의글, 가입 인사글, 공지사항에 스탭이 일일이 대응하기 어려운 반복 댓글 업무를 맞춤 템플릿으로 신속하고 친절하게 자동 응대해 줍니다.",
                 icon: FileText,
                 color: "from-pink-500 to-purple-600",
                 badge: "정식 출시",
                 isReleased: true,
-                features: ["여론 감정선 시각 분석", "핵심 반응 키워드 분석", "실시간 대시보드 리포팅"]
+                features: ["스탭 맞춤형 응대 템플릿 등록", "신규 문의/가입인사 신속 응대", "카페 운영·관리 시간 90% 절감"]
             },
             {
                 id: 'event-activity-stats',
-                title: "이벤트 활동 통계 집계",
-                subtitle: "활동 지수 펌핑 및 카페 정밀 지표 분석",
-                description: "카페 활성화를 위한 이벤트 기여도, 회원별 참여 지수 등 정교한 지표 분석을 제공하여 실질적인 회원 행동량 성장을 유도할 수 있는 솔루션입니다.",
+                title: "이벤트 활동 분석기",
+                subtitle: "회원 활동지수 집계 & 공정한 이벤트 자동 추첨",
+                description: "카페 내 정기 이벤트 기간 동안 회원들이 작성한 댓글, 게시글, 출석 등 활동 기여도를 정밀 통계로 집계하고, 조작 없는 공정한 확률 추첨 및 랭킹을 산출합니다.",
                 icon: BellRing,
                 color: "from-amber-500 to-orange-600",
                 badge: "정식 출시",
                 isReleased: true,
-                features: ["활동 활력 지표 진단", "이벤트 참여율 랭킹 산출", "맞춤형 활성화 솔루션 추천"]
+                features: ["회원별 활동지수 정밀 통계", "댓글/게시글/출석 가중치 집계", "공정한 다중 당첨자 자동 추첨"]
             }
         ]
     },
@@ -1587,6 +1587,17 @@ export const Showroom = () => {
                                                 }
 
                                                 const isCafe = selectedProduct.id.includes('cafe') || selectedProduct.id.includes('comment') || selectedProduct.id.includes('event') || selectedProduct.id.includes('auto');
+                                                const isCrawler = selectedProduct.id.includes('cafe');
+                                                const isComment = selectedProduct.id.includes('comment') || selectedProduct.id.includes('auto');
+                                                const isEvent = selectedProduct.id.includes('event');
+
+                                                const cafeSubBadge = isComment 
+                                                    ? '스탭 전용 신속 댓글 관리 & 자동 응대'
+                                                    : (isEvent ? '회원 활동지수 정밀 집계 & 공정 추첨' : '내 카페 게시글·댓글 정밀 수집 & 백업');
+
+                                                const cafeBannerText = isComment 
+                                                    ? '⚡ 스탭 업무 경감 & 신규글 맞춤 템플릿 자동 응대 완벽 지원'
+                                                    : (isEvent ? '⚡ 이벤트 활동지수 집계 & 공정한 자동 추첨 완벽 지원' : '⚡ 내 카페 데이터 아카이빙 & 엑셀 원클릭 백업 완벽 지원');
 
                                                 return (
                                                     <div id="pricing-section" className="space-y-4 pt-4 border-t border-slate-100 text-left scroll-mt-28">
@@ -1597,7 +1608,7 @@ export const Showroom = () => {
                                                                     <span>정식 구독 멤버십</span>
                                                                     <span className="text-[10px] font-black text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-full flex items-center gap-1">
                                                                         <Sparkles className="w-3 h-3 text-indigo-600" />
-                                                                        {isCafe ? '타겟 카페 게시글·댓글 정밀 수집 및 분석' : '전 플랜 이메일 & DM 무제한 발송'}
+                                                                        {isCafe ? cafeSubBadge : '전 플랜 이메일 & DM 무제한 발송'}
                                                                     </span>
                                                                 </h4>
                                                             </div>
@@ -1637,18 +1648,18 @@ export const Showroom = () => {
                                                             </div>
                                                         </div>
 
-                                                        {/* 안전 가이드 & 무제한 발송 안내 배너 */}
+                                                        {/* 안전 가이드 & 안내 배너 */}
                                                         <div className="p-3 bg-gradient-to-r from-blue-50/90 via-indigo-50/80 to-purple-50/90 border border-indigo-100 rounded-2xl flex items-center justify-between flex-wrap gap-2 text-xs">
                                                             <div className="flex items-center gap-2 font-bold text-slate-800">
                                                                 <ShieldCheck className="w-4 h-4 text-indigo-600 shrink-0" />
                                                                 {isCafe ? (
-                                                                    <span>네이버 계정 보호 안전 가이드: <strong>지능형 딜레이 봇 탐지 방지 알고리즘</strong>으로 안전한 수집 환경을 지원합니다.</span>
+                                                                    <span>내 카페 보호 안전 가이드: <strong>지능형 딜레이 알고리즘</strong> 탑재로 안전한 카페 운영 관리를 지원합니다.</span>
                                                                 ) : (
                                                                     <span>네이버 계정 보호 안전 가이드: <strong>하루 권장 300건, 최대 500건 추출</strong>을 준수합니다.</span>
                                                                 )}
                                                             </div>
                                                             <span className="text-[11px] font-extrabold text-indigo-700 bg-white border border-indigo-200 px-3 py-1 rounded-xl shadow-2xs">
-                                                                {isCafe ? '⚡ 카페 데이터 정밀 수집 & 엑셀 원클릭 내보내기 완벽 지원' : '⚡ 구독 기간 내 이메일 & 인스타DM 무제한 발송 지원'}
+                                                                {isCafe ? cafeBannerText : '⚡ 구독 기간 내 이메일 & 인스타DM 무제한 발송 지원'}
                                                             </span>
                                                         </div>
 
@@ -1705,21 +1716,31 @@ export const Showroom = () => {
                                                                 </div>
                                                                 <h5 className="font-black text-slate-900 text-base mb-1">스타트 {billingCycle === 'annual' ? '연간구독' : '월구독'}</h5>
                                                                 <p className="text-[11px] font-extrabold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md w-fit mb-3">
-                                                                    {billingCycle === 'annual' ? '연 12,000건 추출 한도' : '월 1,000건 추출 한도'}
+                                                                    {billingCycle === 'annual' 
+                                                                        ? (isComment ? '연 12,000건 응대 한도' : isEvent ? '연 12,000건 집계 한도' : '연 12,000건 수집 한도') 
+                                                                        : (isComment ? '월 1,000건 응대 한도' : isEvent ? '월 1,000건 집계 한도' : '월 1,000건 수집 한도')}
                                                                 </p>
 
                                                                 <ul className="text-xs text-slate-600 space-y-1.5 mb-5">
                                                                     <li className="flex items-center gap-1.5">
                                                                         <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                                                                        <span>{billingCycle === 'annual' ? '연 12,000건 연간 총량 자유 소진' : '월 1,000건 추출 크레딧'}</span>
+                                                                        <span>
+                                                                            {billingCycle === 'annual'
+                                                                                ? (isComment ? '연 12,000건 자유 소진 (일 30건 안전 응대)' : isEvent ? '연 12,000건 활동 데이터 자유 집계' : '연 12,000건 연간 총량 자유 소진')
+                                                                                : (isComment ? '월 1,000건 크레딧 (일 30건 안전 응대)' : isEvent ? '월 1,000건 활동 데이터 집계' : '월 1,000건 추출 크레딧')}
+                                                                        </span>
                                                                     </li>
                                                                     <li className="flex items-center gap-1.5 font-bold text-slate-800">
                                                                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                                                                        <span>{isCafe ? '카페 게시글 & 댓글 실시간 수집' : '이메일 & 인스타DM 무제한 발송'}</span>
+                                                                        <span>
+                                                                            {isComment ? '신규 문의·환영글 맞춤 템플릿 자동 응대' : isEvent ? '이벤트 기간 내 회원 활동 데이터 집계' : isCrawler ? '내 카페 게시글 & 댓글 데이터 정밀 수집' : '이메일 & 인스타DM 무제한 발송'}
+                                                                        </span>
                                                                     </li>
                                                                     <li className="flex items-center gap-1.5">
                                                                         <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                                                                        <span>{isCafe ? 'CSV / 엑셀 원클릭 데이터 내보내기' : '저장 엑셀 파일 불러와서 재발송'}</span>
+                                                                        <span>
+                                                                            {isComment ? '스탭 응대 시간 단축 및 기본 템플릿 관리' : isEvent ? '활동지수 기반 공정 랜덤 추첨' : isCrawler ? 'CSV / 엑셀 원클릭 데이터 백업' : '저장 엑셀 파일 불러와서 재발송'}
+                                                                        </span>
                                                                     </li>
                                                                     <li className="flex items-center gap-1.5">
                                                                         <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
@@ -1786,25 +1807,35 @@ export const Showroom = () => {
                                                             >
                                                                 <div className="flex justify-between items-start mb-1.5">
                                                                     <span className="text-[11px] font-black text-indigo-600 uppercase tracking-wider">Plus</span>
-                                                                    <span className="text-[10px] font-bold bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">실전 마케터</span>
+                                                                    <span className="text-[10px] font-bold bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">실전 운영 매니저</span>
                                                                 </div>
                                                                 <h5 className="font-black text-slate-900 text-base mb-1">플러스 {billingCycle === 'annual' ? '연간구독' : '월구독'}</h5>
                                                                 <p className="text-[11px] font-extrabold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md w-fit mb-3">
-                                                                    {billingCycle === 'annual' ? '연 36,000건 추출 한도' : '월 3,000건 추출 한도'}
+                                                                    {billingCycle === 'annual' 
+                                                                        ? (isComment ? '연 36,000건 응대 한도' : isEvent ? '연 36,000건 집계 한도' : '연 36,000건 수집 한도') 
+                                                                        : (isComment ? '월 3,000건 응대 한도' : isEvent ? '월 3,000건 집계 한도' : '월 3,000건 수집 한도')}
                                                                 </p>
 
                                                                 <ul className="text-xs text-slate-600 space-y-1.5 mb-5">
                                                                     <li className="flex items-center gap-1.5 font-bold text-indigo-950">
                                                                         <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                                                                        <span>{billingCycle === 'annual' ? '연 36,000건 연간 총량 자유 소진' : '월 3,000건 추출 크레딧'}</span>
+                                                                        <span>
+                                                                            {billingCycle === 'annual'
+                                                                                ? (isComment ? '연 36,000건 자유 소진 (일 100건 안전 응대)' : isEvent ? '연 36,000건 정기 이벤트 총량 집계' : '연 36,000건 연간 총량 자유 소진')
+                                                                                : (isComment ? '월 3,000건 크레딧 (일 100건 안전 응대)' : isEvent ? '월 3,000건 정기 이벤트 집계' : '월 3,000건 추출 크레딧')}
+                                                                        </span>
                                                                     </li>
                                                                     <li className="flex items-center gap-1.5 font-black text-slate-900">
                                                                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                                                                        <span>{isCafe ? '카페 게시글 & 댓글 실시간 수집' : '이메일 & 인스타DM 무제한 발송'}</span>
+                                                                        <span>
+                                                                            {isComment ? '신규 문의·환영글 맞춤 템플릿 자동 응대' : isEvent ? '회원별 활동지수 정밀 가중치 집계' : isCrawler ? '내 카페 게시글 & 댓글 데이터 정밀 수집' : '이메일 & 인스타DM 무제한 발송'}
+                                                                        </span>
                                                                     </li>
                                                                     <li className="flex items-center gap-1.5">
                                                                         <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                                                                        <span>{isCafe ? '진성 회원 식별 및 패턴 추적 분석' : '저장 엑셀 파일 불러와서 재발송'}</span>
+                                                                        <span>
+                                                                            {isComment ? '다중 템플릿 순환 및 제외 닉네임 필터링' : isEvent ? '글자수·출석 가중치 및 회원 랭킹 산출' : isCrawler ? '회원별 활동 히스토리 정밀 아카이빙' : '저장 엑셀 파일 불러와서 재발송'}
+                                                                        </span>
                                                                     </li>
                                                                     <li className="flex items-center gap-1.5">
                                                                         <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
@@ -1871,29 +1902,41 @@ export const Showroom = () => {
                                                             >
                                                                 <div className="flex justify-between items-start mb-1.5">
                                                                     <span className="text-[11px] font-black text-slate-400 uppercase tracking-wider">Pro</span>
-                                                                    <span className="text-[10px] font-bold bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full">대행사 / 팀</span>
+                                                                    <span className="text-[10px] font-bold bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full">대형 카페 / 팀</span>
                                                                 </div>
                                                                 <h5 className="font-black text-slate-900 text-base mb-1">프로 {billingCycle === 'annual' ? '연간구독' : '월구독'}</h5>
                                                                 <p className="text-[11px] font-extrabold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md w-fit mb-3">
-                                                                    {billingCycle === 'annual' ? '연 108,000건 추출 한도' : '월 9,000건 대량 추출 한도'}
+                                                                    {billingCycle === 'annual' 
+                                                                        ? (isComment ? '연 108,000건 대량 응대' : isEvent ? '연 108,000건 대량 집계' : '연 108,000건 대량 수집') 
+                                                                        : (isComment ? '월 9,000건 대량 응대' : isEvent ? '월 9,000건 대량 집계' : '월 9,000건 대량 수집')}
                                                                 </p>
 
                                                                 <ul className="text-xs text-slate-600 space-y-1.5 mb-5">
                                                                     <li className="flex items-center gap-1.5 font-bold text-slate-900">
                                                                         <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                                                                        <span>{billingCycle === 'annual' ? '연 108,000건 대량 총량 자유 소진' : '월 9,000건 대량 추출 크레딧'}</span>
+                                                                        <span>
+                                                                            {billingCycle === 'annual'
+                                                                                ? (isComment ? '연 108,000건 자유 소진 (일 300건 고속 응대)' : isEvent ? '연 108,000건 대형 이벤트 무제한 집계' : '연 108,000건 대량 총량 자유 소진')
+                                                                                : (isComment ? '월 9,000건 대량 크레딧 (일 300건 고속 응대)' : isEvent ? '월 9,000건 대형 이벤트 집계' : '월 9,000건 대량 추출 크레딧')}
+                                                                        </span>
                                                                     </li>
                                                                     <li className="flex items-center gap-1.5 font-bold text-slate-800">
                                                                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                                                                        <span>{isCafe ? '다중 카페 대량 수집 및 종합 통계' : '이메일 & 인스타DM 무제한 발송'}</span>
+                                                                        <span>
+                                                                            {isComment ? '다중 게시판 순회 및 고속 자동 응대 비서' : isEvent ? '다중 이벤트 복합 연산 & 다중 당첨자 추첨' : isCrawler ? '전체 게시판 대량 수집 및 종합 아카이빙' : '이메일 & 인스타DM 무제한 발송'}
+                                                                        </span>
                                                                     </li>
                                                                     <li className="flex items-center gap-1.5">
                                                                         <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                                                                        <span>{isCafe ? '여론 감정선 & 참여 통계 대시보드' : '저장 엑셀 파일 불러와서 재발송'}</span>
+                                                                        <span>
+                                                                            {isComment ? '스탭 전용 무제한 템플릿 및 자동화 지원' : isEvent ? '공정한 조작 방지 추첨 및 엑셀 상세 리포트' : isCrawler ? '대형 커뮤니티 전문 고속 아카이빙' : '저장 엑셀 파일 불러와서 재발송'}
+                                                                        </span>
                                                                     </li>
                                                                     <li className="flex items-center gap-1.5">
                                                                         <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                                                                        <span>대행사·전문 운영팀 전용 고속 처리</span>
+                                                                        <span>
+                                                                            {isCafe ? '전문 운영팀·스탭 전용 고속 처리' : '대행사·영업팀 전용 고속 처리'}
+                                                                        </span>
                                                                     </li>
                                                                 </ul>
 
@@ -1956,9 +1999,6 @@ export const Showroom = () => {
                                                                         정보통신망법 제50조에 따른 (광고) 표기 및 수신거부 가이드를 철저히 준수하여 안전한 비즈니스 1:1 고객 소통을 지원합니다.
                                                                     </p>
                                                                 </div>
-                                                            </div>
-                                                            <div className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-[11px] font-bold text-slate-700 shadow-2xs">
-                                                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> KCP 정식 승인 PG 안전 결제
                                                             </div>
                                                         </div>
                                                     </div>
