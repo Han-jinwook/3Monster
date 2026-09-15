@@ -233,7 +233,7 @@ export const Showroom = () => {
         if (clean.includes('cafe') || clean.includes('comment') || clean.includes('event') || clean.includes('auto')) {
             return `https://github.com/Han-jinwook/CafeScraper/releases/latest/download/CafeMonster-Trial.zip?t=${t}`;
         }
-        return `https://github.com/Han-jinwook/n-place-db/releases/latest/download/Map_DB-Trial.zip?t=${t}`;
+        return `https://github.com/Han-jinwook/n-place-db/releases/latest/download/NPlace-DB-Trial.zip?t=${t}`;
     };
 
     const searchParams = new URLSearchParams(location.search);

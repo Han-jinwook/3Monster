@@ -228,7 +228,7 @@ export const LicenseGenerator = () => {
 
     const pricingProducts = {
         marketing: [
-            { id: 'NPlace-DB', name: '🏢 NPLace_DB', desc: '포털 지도 DB 추출기' },
+            { id: 'NPlace-DB', name: '🏢 NPlace-DB', desc: '네이버 플레이스 DB & 대량발송기' },
             { id: 'ContentCrawler', name: '💻 사이트 컨텐츠 추출기', desc: '웹 데이터 분석 엔진' },
             { id: 'UserManager', name: '👥 회원관리프로그램 확장팩', desc: 'AI 검색 및 메시지 전송' },
         ],

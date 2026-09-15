@@ -55,7 +55,7 @@ export function Docs() {
         if (selectedGroup === 'cafe-monster') {
             return `https://github.com/Han-jinwook/CafeScraper/releases/latest/download/CafeMonster-Trial.zip?t=${t}`;
         }
-        return `https://github.com/Han-jinwook/n-place-db/releases/latest/download/Map_DB-Trial.zip?t=${t}`;
+        return `https://github.com/Han-jinwook/n-place-db/releases/latest/download/NPlace-DB-Trial.zip?t=${t}`;
     };
 
     return (
@@ -326,7 +326,7 @@ export function Docs() {
                                                 <span>프로그램 압축 파일 다운로드</span>
                                             </div>
                                             <p className="pl-8 text-slate-600">
-                                                상단의 <strong>[무료체험판 (.zip) 받기]</strong> 버튼을 눌러 최신 배포본(<code className="bg-slate-200/80 px-1.5 py-0.5 rounded text-indigo-700 font-mono text-xs">Map_DB-Trial.zip</code>)을 다운로드합니다.
+                                                상단의 <strong>[무료체험판 (.zip) 받기]</strong> 버튼을 눌러 최신 배포본(<code className="bg-slate-200/80 px-1.5 py-0.5 rounded text-indigo-700 font-mono text-xs">NPlace-DB-Trial.zip</code>)을 다운로드합니다.
                                             </p>
                                         </div>
 
