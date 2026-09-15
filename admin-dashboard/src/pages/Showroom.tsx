@@ -212,7 +212,7 @@ export const Showroom = () => {
     const [previewImageIndex, setPreviewImageIndex] = useState<number | null>(null);
     const [paymentProduct, setPaymentProduct] = useState<PaymentProduct | null>(null);
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-    const [userLicenses, setUserLicenses] = useState<any[]>([]);
+    const [_userLicenses, setUserLicenses] = useState<any[]>([]);
     const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
     const [selectedCardTier, setSelectedCardTier] = useState<'START' | 'PLUS' | 'PRO'>('START');
 
@@ -1561,31 +1561,6 @@ export const Showroom = () => {
                                                     </div>
                                                 </div>
                                             ) : (() => {
-                                                const normalizedTarget = normalizeProdKey(selectedProduct.id);
-                                                const targetLicenses = userLicenses.filter(l => normalizeProdKey(l.product_id) === normalizedTarget);
-                                                const nowTime = Date.now();
-                                                const activeLic = targetLicenses.find(l => 
-                                                    (l.status === 'active' || l.status === 'used') && 
-                                                    (!l.expire_date || new Date(l.expire_date).getTime() >= nowTime)
-                                                );
-                                                const hasPurchased = targetLicenses.length > 0;
-                                                const isCurrentStandard = activeLic && activeLic.collection_limit && activeLic.collection_limit > 0;
-
-                                                let statusBadgeText = '';
-                                                let daysLeft: number | null = null;
-                                                let expDateStr = '';
-                                                if (activeLic) {
-                                                    const expDt = new Date(activeLic.expire_date);
-                                                    expDateStr = `${expDt.getFullYear()}.${expDt.getMonth() + 1}.${expDt.getDate()}`;
-                                                    daysLeft = Math.ceil((expDt.getTime() - nowTime) / (1000 * 60 * 60 * 24));
-                                                    const planName = isCurrentStandard 
-                                                        ? '스타트 (1,000건 한도)' 
-                                                        : (activeLic.license_type === 'PRO_1M' || activeLic.license_type === 'PRO_1Y' || activeLic.license_type === 'PREMIUM' || activeLic.license_type === '3M' ? '프로' : '플러스');
-                                                    statusBadgeText = `회원님은 현재 [${planName}] 이용 중입니다. (만료일: ${expDateStr} / D-${daysLeft}일)`;
-                                                } else if (hasPurchased) {
-                                                    statusBadgeText = '이전 라이선스 이용 이력이 확인되었습니다.';
-                                                }
-
                                                 const isCafe = selectedProduct.id.includes('cafe') || selectedProduct.id.includes('comment') || selectedProduct.id.includes('event') || selectedProduct.id.includes('auto');
                                                 const isCrawler = selectedProduct.id.includes('cafe');
                                                 const isComment = selectedProduct.id.includes('comment') || selectedProduct.id.includes('auto');
@@ -1662,19 +1637,6 @@ export const Showroom = () => {
                                                                 {isCafe ? cafeBannerText : '⚡ 구독 기간 내 이메일 & 인스타DM 무제한 발송 지원'}
                                                             </span>
                                                         </div>
-
-                                                        {/* 보유 현황 배너 */}
-                                                        {hasPurchased && (
-                                                            <div className="p-3 bg-gradient-to-r from-indigo-50/80 via-emerald-50/70 to-indigo-50/80 border border-indigo-200/80 rounded-2xl flex items-center justify-between flex-wrap gap-2 text-xs">
-                                                                <div className="flex items-center gap-2 font-bold text-slate-800">
-                                                                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                                                                    <span>{statusBadgeText}</span>
-                                                                </div>
-                                                                <span className="text-[11px] font-extrabold text-emerald-700 bg-white border border-emerald-200 px-2.5 py-0.5 rounded-lg shadow-2xs">
-                                                                    ⚡ 이용 기간 연장 가능
-                                                                </span>
-                                                            </div>
-                                                        )}
 
                                                         {/* 회원 전용 안내 배너 (비로그인 상태일 때 표시) */}
                                                         {!isLoggedIn && (
