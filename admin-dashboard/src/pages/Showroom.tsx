@@ -213,6 +213,7 @@ export const Showroom = () => {
     const [paymentProduct, setPaymentProduct] = useState<PaymentProduct | null>(null);
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
     const [userLicenses, setUserLicenses] = useState<any[]>([]);
+    const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
 
     const normalizeProdKey = (id: string): string => {
         const clean = id.toLowerCase().replace(/[-_]/g, '');
@@ -1585,17 +1586,62 @@ export const Showroom = () => {
                                                 }
 
                                                 return (
-                                                    <div id="pricing-section" className="space-y-3.5 pt-3 border-t border-slate-100 text-left scroll-mt-28">
-                                                        <div className="flex items-center justify-between flex-wrap gap-2">
-                                                            <h4 className="text-sm font-black text-slate-800 flex items-center gap-2">
-                                                                <span>크몽 & 3Monster 정식 라이선스</span>
-                                                                {hasPurchased && (
-                                                                    <span className="text-[10px] font-black text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
-                                                                        <Sparkles className="w-3 h-3 text-indigo-600" /> 기존 회원 15% 재구매 특가 적용
+                                                    <div id="pricing-section" className="space-y-4 pt-4 border-t border-slate-100 text-left scroll-mt-28">
+                                                        {/* 상단 타이틀 및 월간/연간 30% 할인 토글 */}
+                                                        <div className="flex items-center justify-between flex-wrap gap-3">
+                                                            <div className="flex items-center gap-2">
+                                                                <h4 className="text-base font-black text-slate-900 flex items-center gap-2">
+                                                                    <span>정식 구독 멤버십</span>
+                                                                    <span className="text-[10px] font-black text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                                                                        <Sparkles className="w-3 h-3 text-indigo-600" /> 전 플랜 이메일 & DM 무제한 발송
                                                                     </span>
-                                                                )}
-                                                            </h4>
-                                                            <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">안전 결제</span>
+                                                                </h4>
+                                                            </div>
+
+                                                            {/* 월간 / 연간 30% 할인 토글 */}
+                                                            <div className="inline-flex items-center bg-slate-100 p-1 rounded-2xl border border-slate-200 shadow-inner">
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => setBillingCycle('monthly')}
+                                                                    className={cn(
+                                                                        "px-3.5 py-1.5 rounded-xl text-xs font-black transition-all",
+                                                                        billingCycle === 'monthly'
+                                                                            ? "bg-white text-slate-900 shadow-xs"
+                                                                            : "text-slate-500 hover:text-slate-800"
+                                                                    )}
+                                                                >
+                                                                    월간 구독
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => setBillingCycle('annual')}
+                                                                    className={cn(
+                                                                        "px-3.5 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5",
+                                                                        billingCycle === 'annual'
+                                                                            ? "bg-indigo-600 text-white shadow-xs"
+                                                                            : "text-indigo-600 hover:text-indigo-700 font-bold"
+                                                                    )}
+                                                                >
+                                                                    <span>연간 구독</span>
+                                                                    <span className={cn(
+                                                                        "text-[9px] px-2 py-0.5 rounded-full font-black",
+                                                                        billingCycle === 'annual' ? "bg-white text-indigo-700" : "bg-indigo-100 text-indigo-700"
+                                                                    )}>
+                                                                        30% 할인 🎁
+                                                                    </span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* 안전 가이드 & 무제한 발송 안내 배너 */}
+                                                        <div className="p-3 bg-gradient-to-r from-blue-50/90 via-indigo-50/80 to-purple-50/90 border border-indigo-100 rounded-2xl flex items-center justify-between flex-wrap gap-2 text-xs">
+                                                            <div className="flex items-center gap-2 font-bold text-slate-800">
+                                                                <ShieldCheck className="w-4 h-4 text-indigo-600 shrink-0" />
+                                                                <span>네이버 계정 보호 안전 가이드: <strong>하루 권장 300건, 최대 500건 추출</strong>을 준수합니다.</span>
+                                                            </div>
+                                                            <span className="text-[11px] font-extrabold text-indigo-700 bg-white border border-indigo-200 px-3 py-1 rounded-xl shadow-2xs">
+                                                                ⚡ 구독 기간 내 이메일 & 인스타DM 무제한 발송 지원
+                                                            </span>
                                                         </div>
 
                                                         {/* 보유 현황 배너 */}
@@ -1606,7 +1652,7 @@ export const Showroom = () => {
                                                                     <span>{statusBadgeText}</span>
                                                                 </div>
                                                                 <span className="text-[11px] font-extrabold text-emerald-700 bg-white border border-emerald-200 px-2.5 py-0.5 rounded-lg shadow-2xs">
-                                                                    ⚡ 재구매/연장 할인가 적용 중
+                                                                    ⚡ 이용 기간 연장 가능
                                                                 </span>
                                                             </div>
                                                         )}
@@ -1619,7 +1665,7 @@ export const Showroom = () => {
                                                                         <Lock className="w-4 h-4 text-amber-700" />
                                                                     </div>
                                                                     <div>
-                                                                        <p className="font-extrabold text-amber-900">3Monster 회원 전용 결제 시스템입니다</p>
+                                                                        <p className="font-extrabold text-amber-900">3Monster 회원 전용 구독 결제 시스템입니다</p>
                                                                         <p className="text-[11px] text-amber-700 font-medium">안전한 라이선스 키 발급 및 관리를 위해 로그인 또는 회원가입 후 결제가 가능합니다.</p>
                                                                     </div>
                                                                 </div>
@@ -1633,132 +1679,228 @@ export const Showroom = () => {
                                                             </div>
                                                         )}
 
-                                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                                            {/* Standard */}
-                                                            <div className="flex flex-col p-4 rounded-2xl border border-slate-200 bg-white hover:border-indigo-300 transition-all shadow-sm">
-                                                                <div className="flex justify-between items-start mb-1">
-                                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Standard</span>
-                                                                    {hasPurchased && (
-                                                                        <span className="text-[9px] font-black bg-indigo-50 text-indigo-600 border border-indigo-100 px-1.5 py-0.2 rounded">16% 할인</span>
-                                                                    )}
+                                                        {/* 신규 3단계 구독 카드 (스타트 / 플러스 / 프로) */}
+                                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                                                            {/* 1. Start 플랜 */}
+                                                            <div className="flex flex-col p-5 rounded-3xl border border-slate-200 bg-white hover:border-indigo-300 transition-all shadow-sm">
+                                                                <div className="flex justify-between items-start mb-1.5">
+                                                                    <span className="text-[11px] font-black text-slate-400 uppercase tracking-wider">Start</span>
+                                                                    <span className="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">1인 / 초보</span>
                                                                 </div>
-                                                                <h5 className="font-black text-slate-800 text-sm mb-1">스탠다드 1개월</h5>
-                                                                <p className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded w-fit mb-3">1,000건 추출 한도</p>
-                                                                <div className="mt-auto">
-                                                                    {hasPurchased ? (
+                                                                <h5 className="font-black text-slate-900 text-base mb-1">스타트 {billingCycle === 'annual' ? '연간구독' : '월구독'}</h5>
+                                                                <p className="text-[11px] font-extrabold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md w-fit mb-3">
+                                                                    {billingCycle === 'annual' ? '연 12,000건 추출 한도' : '월 1,000건 추출 한도'}
+                                                                </p>
+
+                                                                <ul className="text-xs text-slate-600 space-y-1.5 mb-5">
+                                                                    <li className="flex items-center gap-1.5">
+                                                                        <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                                                                        <span>{billingCycle === 'annual' ? '연 12,000건 연간 총량 자유 소진' : '월 1,000건 추출 크레딧'}</span>
+                                                                    </li>
+                                                                    <li className="flex items-center gap-1.5 font-bold text-slate-800">
+                                                                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                                                                        <span>이메일 & 인스타DM 무제한 발송</span>
+                                                                    </li>
+                                                                    <li className="flex items-center gap-1.5">
+                                                                        <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                                                                        <span>저장 엑셀 파일 불러와서 재발송</span>
+                                                                    </li>
+                                                                    <li className="flex items-center gap-1.5">
+                                                                        <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                                                                        <span>실시간 로직 무상 업데이트</span>
+                                                                    </li>
+                                                                </ul>
+
+                                                                <div className="mt-auto pt-3 border-t border-slate-100">
+                                                                    {billingCycle === 'annual' ? (
                                                                         <div className="mb-3">
-                                                                            <span className="text-xs text-slate-400 line-through font-bold">5,000원</span>
-                                                                            <p className="text-lg font-black text-indigo-700">4,200<span className="text-xs text-slate-500 font-bold ml-0.5">원</span></p>
+                                                                            <div className="flex items-baseline gap-1">
+                                                                                <span className="text-xl font-black text-slate-900">82,800</span>
+                                                                                <span className="text-xs font-bold text-slate-500">원 / 1년</span>
+                                                                                <span className="text-[10px] font-extrabold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded ml-auto">30% 할인</span>
+                                                                            </div>
+                                                                            <p className="text-[11px] text-slate-400 font-bold mt-0.5">월 6,900원꼴 (일시납)</p>
                                                                         </div>
                                                                     ) : (
-                                                                        <p className="text-lg font-black text-slate-900 mb-3">5,000<span className="text-xs text-slate-500 font-bold ml-0.5">원</span></p>
+                                                                        <div className="mb-3">
+                                                                            <div className="flex items-baseline gap-1">
+                                                                                <span className="text-xl font-black text-slate-900">9,900</span>
+                                                                                <span className="text-xs font-bold text-slate-500">원 / 월</span>
+                                                                            </div>
+                                                                            <p className="text-[11px] text-slate-400 font-bold mt-0.5">월 커피 2잔 가격</p>
+                                                                        </div>
                                                                     )}
                                                                     <Button 
                                                                         onClick={() => {
                                                                             if (!isLoggedIn) {
-                                                                                alert('라이선스 발급 및 구매는 회원 전용 서비스입니다.\n로그인 또는 회원가입 페이지로 이동합니다.');
-                                                                                navigate(`/login?redirect=${encodeURIComponent(`/?category=${activeCategory || 'marketing-monster'}&detail_product=${selectedProduct.id}&tier=DELUXE&buy=1`)}`);
+                                                                                alert('구독 결제는 회원 전용 서비스입니다.\n로그인 또는 회원가입 페이지로 이동합니다.');
+                                                                                navigate(`/login?redirect=${encodeURIComponent(`/?category=${activeCategory || 'marketing-monster'}&detail_product=${selectedProduct.id}&tier=${billingCycle === 'annual' ? 'START_1Y' : 'START_1M'}&buy=1`)}`);
                                                                                 return;
                                                                             }
                                                                             setPaymentProduct({
                                                                                 id: selectedProduct.id,
                                                                                 title: selectedProduct.title,
                                                                                 subtitle: selectedProduct.subtitle,
-                                                                                initialTier: 'DELUXE',
+                                                                                initialTier: billingCycle === 'annual' ? 'START_1Y' : 'START_1M',
+                                                                                billingCycle: billingCycle,
                                                                                 isRepurchase: hasPurchased
                                                                             });
                                                                             setIsPaymentModalOpen(true);
                                                                         }}
-                                                                        className="w-full h-9 bg-slate-900 hover:bg-indigo-600 text-white rounded-xl text-xs font-black transition-colors"
+                                                                        className="w-full h-10 bg-slate-900 hover:bg-indigo-600 text-white rounded-xl text-xs font-black transition-colors shadow-xs"
                                                                     >
-                                                                        {!isLoggedIn ? '로그인 후 구매하기' : (hasPurchased ? '기간 연장 (4,200원)' : '구매하기')}
+                                                                        {!isLoggedIn ? '로그인 후 구독하기' : (hasPurchased ? '스타트 연장하기' : '스타트 시작하기')}
                                                                     </Button>
                                                                 </div>
                                                             </div>
 
-                                                            {/* Deluxe */}
-                                                            <div className={cn("flex flex-col p-4 rounded-2xl border transition-all shadow-sm bg-white", isCurrentStandard ? "border-2 border-emerald-500 bg-emerald-50/20" : "border-slate-200 hover:border-indigo-300")}>
-                                                                <div className="flex justify-between items-start mb-1">
-                                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Deluxe</span>
-                                                                    {hasPurchased && (
-                                                                        <span className="text-[9px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.2 rounded">15% 할인</span>
-                                                                    )}
+                                                            {/* 2. Plus 플랜 (Best 👑) */}
+                                                            <div className="flex flex-col p-5 rounded-3xl border-2 border-indigo-600 bg-gradient-to-b from-indigo-50/40 via-white to-indigo-50/20 shadow-md shadow-indigo-100 relative">
+                                                                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-[10px] font-black px-3 py-0.5 rounded-full uppercase tracking-wider shadow-sm flex items-center gap-1">
+                                                                    <Sparkles className="w-3 h-3" /> Best 추천 1위
                                                                 </div>
-                                                                <h5 className="font-black text-slate-800 text-sm mb-1">디럭스 1개월</h5>
-                                                                <p className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded w-fit mb-3">무제한 추출</p>
-                                                                <div className="mt-auto">
-                                                                    {hasPurchased ? (
+
+                                                                <div className="flex justify-between items-start mb-1.5 mt-1">
+                                                                    <span className="text-[11px] font-black text-indigo-600 uppercase tracking-wider">Plus</span>
+                                                                    <span className="text-[10px] font-bold bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">실전 영업맨</span>
+                                                                </div>
+                                                                <h5 className="font-black text-slate-900 text-base mb-1">플러스 {billingCycle === 'annual' ? '연간구독' : '월구독'}</h5>
+                                                                <p className="text-[11px] font-extrabold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md w-fit mb-3">
+                                                                    {billingCycle === 'annual' ? '연 36,000건 추출 한도' : '월 3,000건 추출 한도'}
+                                                                </p>
+
+                                                                <ul className="text-xs text-slate-600 space-y-1.5 mb-5">
+                                                                    <li className="flex items-center gap-1.5 font-bold text-indigo-950">
+                                                                        <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                                                                        <span>{billingCycle === 'annual' ? '연 36,000건 연간 총량 자유 소진' : '월 3,000건 추출 크레딧'}</span>
+                                                                    </li>
+                                                                    <li className="flex items-center gap-1.5 font-black text-slate-900">
+                                                                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                                                                        <span>이메일 & 인스타DM 무제한 발송</span>
+                                                                    </li>
+                                                                    <li className="flex items-center gap-1.5">
+                                                                        <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                                                                        <span>저장 엑셀 파일 불러와서 재발송</span>
+                                                                    </li>
+                                                                    <li className="flex items-center gap-1.5">
+                                                                        <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                                                                        <span>실시간 로직 무상 업데이트</span>
+                                                                    </li>
+                                                                </ul>
+
+                                                                <div className="mt-auto pt-3 border-t border-indigo-100">
+                                                                    {billingCycle === 'annual' ? (
                                                                         <div className="mb-3">
-                                                                            <span className="text-xs text-slate-400 line-through font-bold">9,000원</span>
-                                                                            <p className="text-lg font-black text-emerald-700">7,600<span className="text-xs text-slate-500 font-bold ml-0.5">원</span></p>
+                                                                            <div className="flex items-baseline gap-1">
+                                                                                <span className="text-xl font-black text-indigo-700">156,000</span>
+                                                                                <span className="text-xs font-bold text-slate-500">원 / 1년</span>
+                                                                                <span className="text-[10px] font-extrabold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded ml-auto">31% 할인</span>
+                                                                            </div>
+                                                                            <p className="text-[11px] text-indigo-600 font-bold mt-0.5">월 13,000원꼴 (가장 인기)</p>
                                                                         </div>
                                                                     ) : (
-                                                                        <p className="text-lg font-black text-slate-900 mb-3">9,000<span className="text-xs text-slate-500 font-bold ml-0.5">원</span></p>
+                                                                        <div className="mb-3">
+                                                                            <div className="flex items-baseline gap-1">
+                                                                                <span className="text-xl font-black text-slate-900">19,000</span>
+                                                                                <span className="text-xs font-bold text-slate-500">원 / 월</span>
+                                                                                <span className="text-[10px] font-bold text-slate-400 line-through ml-auto">타사 60,000원</span>
+                                                                            </div>
+                                                                            <p className="text-[11px] text-slate-400 font-bold mt-0.5">타사 대비 1/3 이하 파격가</p>
+                                                                        </div>
                                                                     )}
                                                                     <Button 
                                                                         onClick={() => {
                                                                             if (!isLoggedIn) {
-                                                                                alert('라이선스 발급 및 구매는 회원 전용 서비스입니다.\n로그인 또는 회원가입 페이지로 이동합니다.');
-                                                                                navigate(`/login?redirect=${encodeURIComponent(`/?category=${activeCategory || 'marketing-monster'}&detail_product=${selectedProduct.id}&tier=1M&buy=1`)}`);
+                                                                                alert('구독 결제는 회원 전용 서비스입니다.\n로그인 또는 회원가입 페이지로 이동합니다.');
+                                                                                navigate(`/login?redirect=${encodeURIComponent(`/?category=${activeCategory || 'marketing-monster'}&detail_product=${selectedProduct.id}&tier=${billingCycle === 'annual' ? 'PLUS_1Y' : 'PLUS_1M'}&buy=1`)}`);
                                                                                 return;
                                                                             }
                                                                             setPaymentProduct({
                                                                                 id: selectedProduct.id,
                                                                                 title: selectedProduct.title,
                                                                                 subtitle: selectedProduct.subtitle,
-                                                                                initialTier: '1M',
+                                                                                initialTier: billingCycle === 'annual' ? 'PLUS_1Y' : 'PLUS_1M',
+                                                                                billingCycle: billingCycle,
                                                                                 isRepurchase: hasPurchased
                                                                             });
                                                                             setIsPaymentModalOpen(true);
                                                                         }}
-                                                                        className={cn("w-full h-9 rounded-xl text-xs font-black transition-colors", isCurrentStandard ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-200" : "bg-slate-900 hover:bg-indigo-600 text-white")}
+                                                                        className="w-full h-10 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black shadow-md shadow-indigo-200 transition-colors"
                                                                     >
-                                                                        {!isLoggedIn ? '로그인 후 구매하기' : (isCurrentStandard ? '🚀 무제한 업그레이드' : (hasPurchased ? '기간 연장 (7,600원)' : '구매하기'))}
+                                                                        {!isLoggedIn ? '로그인 후 구독하기' : (hasPurchased ? '플러스 연장하기' : '플러스 시작하기')}
                                                                     </Button>
                                                                 </div>
                                                             </div>
 
-                                                            {/* Premium */}
-                                                            <div className="flex flex-col p-4 rounded-2xl border-2 border-indigo-500 bg-indigo-50/20 shadow-md relative">
-                                                                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-indigo-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest shadow-sm">
-                                                                    {hasPurchased ? '월 5,900원 특가' : 'Best (월 7,000원)'}
+                                                            {/* 3. Pro 플랜 */}
+                                                            <div className="flex flex-col p-5 rounded-3xl border border-slate-200 bg-white hover:border-indigo-300 transition-all shadow-sm">
+                                                                <div className="flex justify-between items-start mb-1.5">
+                                                                    <span className="text-[11px] font-black text-slate-400 uppercase tracking-wider">Pro</span>
+                                                                    <span className="text-[10px] font-bold bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full">대행사 / 팀</span>
                                                                 </div>
-                                                                <div className="flex justify-between items-start mb-1">
-                                                                    <span className="text-[10px] font-black text-indigo-500 uppercase tracking-wider">Premium</span>
-                                                                    {hasPurchased && (
-                                                                        <span className="text-[9px] font-black bg-purple-50 text-purple-700 border border-purple-200 px-1.5 py-0.2 rounded">15% 할인</span>
-                                                                    )}
-                                                                </div>
-                                                                <h5 className="font-black text-slate-800 text-sm mb-1">프리미엄 3개월</h5>
-                                                                <p className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded w-fit mb-3">무제한 추출 (파격특가)</p>
-                                                                <div className="mt-auto">
-                                                                    {hasPurchased ? (
+                                                                <h5 className="font-black text-slate-900 text-base mb-1">프로 {billingCycle === 'annual' ? '연간구독' : '월구독'}</h5>
+                                                                <p className="text-[11px] font-extrabold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md w-fit mb-3">
+                                                                    {billingCycle === 'annual' ? '연 108,000건 추출 한도' : '월 9,000건 대량 추출 한도'}
+                                                                </p>
+
+                                                                <ul className="text-xs text-slate-600 space-y-1.5 mb-5">
+                                                                    <li className="flex items-center gap-1.5 font-bold text-slate-900">
+                                                                        <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                                                                        <span>{billingCycle === 'annual' ? '연 108,000건 대량 총량 자유 소진' : '월 9,000건 대량 추출 크레딧'}</span>
+                                                                    </li>
+                                                                    <li className="flex items-center gap-1.5 font-bold text-slate-800">
+                                                                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                                                                        <span>이메일 & 인스타DM 무제한 발송</span>
+                                                                    </li>
+                                                                    <li className="flex items-center gap-1.5">
+                                                                        <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                                                                        <span>저장 엑셀 파일 불러와서 재발송</span>
+                                                                    </li>
+                                                                    <li className="flex items-center gap-1.5">
+                                                                        <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                                                                        <span>대행사·영업팀 전용 고속 처리</span>
+                                                                    </li>
+                                                                </ul>
+
+                                                                <div className="mt-auto pt-3 border-t border-slate-100">
+                                                                    {billingCycle === 'annual' ? (
                                                                         <div className="mb-3">
-                                                                            <span className="text-xs text-slate-400 line-through font-bold">21,000원</span>
-                                                                            <p className="text-lg font-black text-indigo-700">17,900<span className="text-xs text-slate-500 font-bold ml-0.5">원</span></p>
+                                                                            <div className="flex items-baseline gap-1">
+                                                                                <span className="text-xl font-black text-slate-900">324,000</span>
+                                                                                <span className="text-xs font-bold text-slate-500">원 / 1년</span>
+                                                                                <span className="text-[10px] font-extrabold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded ml-auto">30% 할인</span>
+                                                                            </div>
+                                                                            <p className="text-[11px] text-slate-400 font-bold mt-0.5">월 27,000원꼴 (일시납)</p>
                                                                         </div>
                                                                     ) : (
-                                                                        <p className="text-lg font-black text-slate-900 mb-3">21,000<span className="text-xs text-slate-500 font-bold ml-0.5">원</span></p>
+                                                                        <div className="mb-3">
+                                                                            <div className="flex items-baseline gap-1">
+                                                                                <span className="text-xl font-black text-slate-900">39,000</span>
+                                                                                <span className="text-xs font-bold text-slate-500">원 / 월</span>
+                                                                            </div>
+                                                                            <p className="text-[11px] text-slate-400 font-bold mt-0.5">팀 단위 실전 영업 최적</p>
+                                                                        </div>
                                                                     )}
                                                                     <Button 
                                                                         onClick={() => {
                                                                             if (!isLoggedIn) {
-                                                                                alert('라이선스 발급 및 구매는 회원 전용 서비스입니다.\n로그인 또는 회원가입 페이지로 이동합니다.');
-                                                                                navigate(`/login?redirect=${encodeURIComponent(`/?category=${activeCategory || 'marketing-monster'}&detail_product=${selectedProduct.id}&tier=3M&buy=1`)}`);
+                                                                                alert('구독 결제는 회원 전용 서비스입니다.\n로그인 또는 회원가입 페이지로 이동합니다.');
+                                                                                navigate(`/login?redirect=${encodeURIComponent(`/?category=${activeCategory || 'marketing-monster'}&detail_product=${selectedProduct.id}&tier=${billingCycle === 'annual' ? 'PRO_1Y' : 'PRO_1M'}&buy=1`)}`);
                                                                                 return;
                                                                             }
                                                                             setPaymentProduct({
                                                                                 id: selectedProduct.id,
                                                                                 title: selectedProduct.title,
                                                                                 subtitle: selectedProduct.subtitle,
-                                                                                initialTier: '3M',
+                                                                                initialTier: billingCycle === 'annual' ? 'PRO_1Y' : 'PRO_1M',
+                                                                                billingCycle: billingCycle,
                                                                                 isRepurchase: hasPurchased
                                                                             });
                                                                             setIsPaymentModalOpen(true);
                                                                         }}
-                                                                        className="w-full h-9 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black shadow-md shadow-indigo-200 transition-colors"
+                                                                        className="w-full h-10 bg-slate-900 hover:bg-indigo-600 text-white rounded-xl text-xs font-black transition-colors shadow-xs"
                                                                     >
-                                                                        {!isLoggedIn ? '로그인 후 구매하기' : (hasPurchased ? '3개월 연장 (17,900원)' : '구매하기')}
+                                                                        {!isLoggedIn ? '로그인 후 구독하기' : (hasPurchased ? '프로 연장하기' : '프로 시작하기')}
                                                                     </Button>
                                                                 </div>
                                                             </div>

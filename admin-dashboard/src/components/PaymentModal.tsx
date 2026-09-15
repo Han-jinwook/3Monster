@@ -17,11 +17,18 @@ import {
 import { supabase } from '../lib/supabase';
 import { cn } from '../lib/utils';
 
+export type SubscriptionTierKey = 
+    | 'START_1M' | 'START_1Y'
+    | 'PLUS_1M' | 'PLUS_1Y'
+    | 'PRO_1M' | 'PRO_1Y'
+    | 'DELUXE' | '1M' | '3M';
+
 export interface PaymentProduct {
     id: string;
     title: string;
     subtitle: string;
-    initialTier?: 'DELUXE' | '1M' | '3M';
+    initialTier?: SubscriptionTierKey;
+    billingCycle?: 'monthly' | 'annual';
     isRepurchase?: boolean;
 }
 
@@ -31,40 +38,154 @@ interface PaymentModalProps {
     product: PaymentProduct | null;
 }
 
-const TIER_PRICES: Record<string, { label: string; name: string; normalPrice: number; discountPrice: number; limitText: string; months: number; limit: number | null }> = {
-    'DELUXE': {
-        name: 'Standard',
-        label: '스탠다드 1개월',
-        normalPrice: 5000,
-        discountPrice: 4200,
-        limitText: '1,000건 추출 한도',
+export interface TierInfo {
+    label: string;
+    name: string;
+    tier: 'START' | 'PLUS' | 'PRO';
+    cycle: '1M' | '1Y';
+    normalPrice: number;
+    discountPrice: number;
+    monthlyEquivalent: number;
+    limitText: string;
+    months: number;
+    limit: number;
+    badge?: string;
+    features: string[];
+}
+
+export const TIER_PRICES: Record<SubscriptionTierKey, TierInfo> = {
+    'START_1M': {
+        name: 'Start',
+        label: '스타트 1개월 구독',
+        tier: 'START',
+        cycle: '1M',
+        normalPrice: 9900,
+        discountPrice: 8900,
+        monthlyEquivalent: 9900,
+        limitText: '월 1,000건 추출',
         months: 1,
-        limit: 1000
+        limit: 1000,
+        features: ['월 1,000건 추출 한도', '구독 기간 내 이메일 무제한 발송', '구독 기간 내 인스타DM 무제한 발송']
+    },
+    'START_1Y': {
+        name: 'Start',
+        label: '스타트 1년 연간구독',
+        tier: 'START',
+        cycle: '1Y',
+        normalPrice: 82800,
+        discountPrice: 79000,
+        monthlyEquivalent: 6900,
+        limitText: '연 12,000건 추출 (월 6,900원꼴)',
+        months: 12,
+        limit: 12000,
+        badge: '30% 할인',
+        features: ['연 12,000건 연간 총량 자유 소진', '구독 기간 내 이메일 무제한 발송', '구독 기간 내 인스타DM 무제한 발송']
+    },
+    'PLUS_1M': {
+        name: 'Plus',
+        label: '플러스 1개월 구독',
+        tier: 'PLUS',
+        cycle: '1M',
+        normalPrice: 19000,
+        discountPrice: 16900,
+        monthlyEquivalent: 19000,
+        limitText: '월 3,000건 추출',
+        months: 1,
+        limit: 3000,
+        badge: 'Best 추천',
+        features: ['월 3,000건 추출 한도', '구독 기간 내 이메일 무제한 발송', '구독 기간 내 인스타DM 무제한 발송']
+    },
+    'PLUS_1Y': {
+        name: 'Plus',
+        label: '플러스 1년 연간구독',
+        tier: 'PLUS',
+        cycle: '1Y',
+        normalPrice: 156000,
+        discountPrice: 149000,
+        monthlyEquivalent: 13000,
+        limitText: '연 36,000건 추출 (월 13,000원꼴)',
+        months: 12,
+        limit: 36000,
+        badge: '👑 최고인기 (31% 할인)',
+        features: ['연 36,000건 연간 총량 자유 소진', '구독 기간 내 이메일 무제한 발송', '구독 기간 내 인스타DM 무제한 발송']
+    },
+    'PRO_1M': {
+        name: 'Pro',
+        label: '프로 1개월 구독',
+        tier: 'PRO',
+        cycle: '1M',
+        normalPrice: 39000,
+        discountPrice: 35000,
+        monthlyEquivalent: 39000,
+        limitText: '월 9,000건 대량 추출',
+        months: 1,
+        limit: 9000,
+        badge: '대행사/팀 추천',
+        features: ['월 9,000건 대량 추출 한도', '구독 기간 내 이메일 무제한 발송', '구독 기간 내 인스타DM 무제한 발송']
+    },
+    'PRO_1Y': {
+        name: 'Pro',
+        label: '프로 1년 연간구독',
+        tier: 'PRO',
+        cycle: '1Y',
+        normalPrice: 324000,
+        discountPrice: 299000,
+        monthlyEquivalent: 27000,
+        limitText: '연 108,000건 추출 (월 27,000원꼴)',
+        months: 12,
+        limit: 108000,
+        badge: '30% 할인',
+        features: ['연 108,000건 연간 총량 자유 소진', '구독 기간 내 이메일 무제한 발송', '구독 기간 내 인스타DM 무제한 발송']
+    },
+    // 기존 호환성 유지 매핑
+    'DELUXE': {
+        name: 'Start',
+        label: '스타트 1개월 구독',
+        tier: 'START',
+        cycle: '1M',
+        normalPrice: 9900,
+        discountPrice: 8900,
+        monthlyEquivalent: 9900,
+        limitText: '월 1,000건 추출',
+        months: 1,
+        limit: 1000,
+        features: ['월 1,000건 추출 한도', '구독 기간 내 이메일 무제한 발송', '구독 기간 내 인스타DM 무제한 발송']
     },
     '1M': {
-        name: 'Deluxe',
-        label: '디럭스 1개월',
-        normalPrice: 9000,
-        discountPrice: 7600,
-        limitText: '무제한 추출',
+        name: 'Plus',
+        label: '플러스 1개월 구독',
+        tier: 'PLUS',
+        cycle: '1M',
+        normalPrice: 19000,
+        discountPrice: 16900,
+        monthlyEquivalent: 19000,
+        limitText: '월 3,000건 추출',
         months: 1,
-        limit: null
+        limit: 3000,
+        badge: 'Best 추천',
+        features: ['월 3,000건 추출 한도', '구독 기간 내 이메일 무제한 발송', '구독 기간 내 인스타DM 무제한 발송']
     },
     '3M': {
-        name: 'Premium',
-        label: '프리미엄 3개월',
-        normalPrice: 21000,
-        discountPrice: 17900,
-        limitText: '무제한 추출 (월 7,000원 특가)',
-        months: 3,
-        limit: null
+        name: 'Pro',
+        label: '프로 1개월 구독',
+        tier: 'PRO',
+        cycle: '1M',
+        normalPrice: 39000,
+        discountPrice: 35000,
+        monthlyEquivalent: 39000,
+        limitText: '월 9,000건 대량 추출',
+        months: 1,
+        limit: 9000,
+        badge: '대행사/팀 추천',
+        features: ['월 9,000건 대량 추출 한도', '구독 기간 내 이메일 무제한 발송', '구독 기간 내 인스타DM 무제한 발송']
     }
 };
 
 const KCP_SITE_CD = 'ALRJ8'; // (주)썬드림 2호 디지털 PG
 
 export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, product }) => {
-    const [selectedTier, setSelectedTier] = useState<'DELUXE' | '1M' | '3M'>('1M');
+    const [selectedTier, setSelectedTier] = useState<SubscriptionTierKey>('PLUS_1M');
+    const [modalBillingCycle, setModalBillingCycle] = useState<'monthly' | 'annual'>('monthly');
     const [isRepurchase, setIsRepurchase] = useState(false);
     const [buyerEmail, setBuyerEmail] = useState('');
     const [processing, setProcessing] = useState(false);
@@ -98,8 +219,22 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
         setBuyerEmail(currentEmail);
 
         if (product?.initialTier) {
-            setSelectedTier(product.initialTier);
+            let targetTier = product.initialTier;
+            if (targetTier === 'DELUXE') targetTier = 'START_1M';
+            else if (targetTier === '1M') targetTier = 'PLUS_1M';
+            else if (targetTier === '3M') targetTier = 'PRO_1M';
+
+            setSelectedTier(targetTier);
+            if (targetTier.endsWith('_1Y')) {
+                setModalBillingCycle('annual');
+            } else {
+                setModalBillingCycle('monthly');
+            }
+        } else if (product?.billingCycle) {
+            setModalBillingCycle(product.billingCycle);
+            setSelectedTier(product.billingCycle === 'annual' ? 'PLUS_1Y' : 'PLUS_1M');
         }
+
         if (product?.isRepurchase !== undefined) {
             setIsRepurchase(product.isRepurchase);
         }
@@ -555,51 +690,115 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                 /* 결제 입력 폼 */
                 <form onSubmit={handleKcpSubmit} className="space-y-6 text-left">
                     {/* 플랜 선택 */}
-                    <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                            <label className="text-xs font-black text-slate-900 uppercase tracking-wider">이용 플랜 선택</label>
-                            {isRepurchase && (
-                                <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                    기존 회원 15% 우대할인 적용 중
-                                </span>
-                            )}
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between flex-wrap gap-2">
+                            <label className="text-xs font-black text-slate-900 uppercase tracking-wider">구독 플랜 선택</label>
+                            
+                            {/* 월간 / 연간 30% 할인 토글 */}
+                            <div className="inline-flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setModalBillingCycle('monthly');
+                                        const currentBase = selectedTier.startsWith('START') ? 'START_1M' : selectedTier.startsWith('PRO') ? 'PRO_1M' : 'PLUS_1M';
+                                        setSelectedTier(currentBase as SubscriptionTierKey);
+                                    }}
+                                    className={cn(
+                                        "px-2.5 py-1 rounded-lg text-xs font-black transition-all",
+                                        modalBillingCycle === 'monthly'
+                                            ? "bg-white text-slate-900 shadow-xs"
+                                            : "text-slate-500 hover:text-slate-800"
+                                    )}
+                                >
+                                    월간 구독
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setModalBillingCycle('annual');
+                                        const currentBase = selectedTier.startsWith('START') ? 'START_1Y' : selectedTier.startsWith('PRO') ? 'PRO_1Y' : 'PLUS_1Y';
+                                        setSelectedTier(currentBase as SubscriptionTierKey);
+                                    }}
+                                    className={cn(
+                                        "px-2.5 py-1 rounded-lg text-xs font-black transition-all flex items-center gap-1",
+                                        modalBillingCycle === 'annual'
+                                            ? "bg-indigo-600 text-white shadow-xs"
+                                            : "text-indigo-600 hover:text-indigo-700 font-bold"
+                                    )}
+                                >
+                                    <span>연간 구독</span>
+                                    <span className={cn(
+                                        "text-[9px] px-1.5 py-0.2 rounded-full font-black",
+                                        modalBillingCycle === 'annual' ? "bg-white text-indigo-700" : "bg-indigo-100 text-indigo-700"
+                                    )}>
+                                        30% 할인
+                                    </span>
+                                </button>
+                            </div>
                         </div>
 
+                        {/* 플랜 3종 카드 */}
                         <div className="grid grid-cols-3 gap-2.5">
-                            {(['DELUXE', '1M', '3M'] as const).map((tierKey) => {
+                            {((modalBillingCycle === 'annual' 
+                                ? ['START_1Y', 'PLUS_1Y', 'PRO_1Y'] 
+                                : ['START_1M', 'PLUS_1M', 'PRO_1M']) as SubscriptionTierKey[]).map((tierKey) => {
                                 const info = TIER_PRICES[tierKey];
                                 const price = isRepurchase ? info.discountPrice : info.normalPrice;
                                 const isSelected = selectedTier === tierKey;
+                                const isPlus = tierKey.startsWith('PLUS');
 
                                 return (
                                     <div
                                         key={tierKey}
                                         onClick={() => setSelectedTier(tierKey)}
                                         className={cn(
-                                            "cursor-pointer p-3 rounded-2xl border-2 transition-all flex flex-col justify-between relative",
+                                            "cursor-pointer p-3 rounded-2xl border-2 transition-all flex flex-col justify-between relative text-left",
                                             isSelected 
-                                                ? "border-indigo-600 bg-indigo-50/50 shadow-sm" 
-                                                : "border-slate-200 hover:border-slate-300 bg-white"
+                                                ? "border-indigo-600 bg-indigo-50/60 shadow-sm" 
+                                                : isPlus
+                                                    ? "border-indigo-200 bg-indigo-50/20 hover:border-indigo-300"
+                                                    : "border-slate-200 hover:border-slate-300 bg-white"
                                         )}
                                     >
-                                        {tierKey === '3M' && (
-                                            <span className="absolute -top-2 right-2 bg-indigo-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase">
-                                                Best
+                                        {info.badge && (
+                                            <span className={cn(
+                                                "absolute -top-2.5 right-2 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider shadow-2xs",
+                                                isPlus ? "bg-indigo-600" : "bg-slate-800"
+                                            )}>
+                                                {info.badge}
                                             </span>
                                         )}
                                         <div>
-                                            <p className="text-[10px] font-black text-slate-400 uppercase">{info.name}</p>
-                                            <p className="text-xs font-black text-slate-900 leading-tight">{info.label}</p>
-                                            <p className="text-[9px] text-indigo-600 font-bold mt-1">{info.limitText}</p>
+                                            <div className="flex items-center justify-between">
+                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">{info.name}</p>
+                                            </div>
+                                            <p className="text-xs font-black text-slate-900 leading-tight mt-0.5">{info.name === 'Start' ? '스타트' : info.name === 'Plus' ? '플러스' : '프로'}</p>
+                                            <p className="text-[10px] text-indigo-700 font-extrabold mt-1 bg-indigo-50/80 px-1.5 py-0.5 rounded w-fit">
+                                                {info.limitText}
+                                            </p>
                                         </div>
-                                        <div className="mt-2 pt-2 border-t border-slate-100">
+                                        <div className="mt-2.5 pt-2 border-t border-slate-100">
                                             <p className="text-sm font-black text-slate-900">
                                                 {price.toLocaleString()}<span className="text-[10px] font-normal text-slate-500 ml-0.5">원</span>
                                             </p>
+                                            {info.cycle === '1Y' && (
+                                                <p className="text-[9px] text-emerald-600 font-bold">
+                                                    월 {info.monthlyEquivalent.toLocaleString()}원꼴
+                                                </p>
+                                            )}
                                         </div>
                                     </div>
                                 );
                             })}
+                        </div>
+
+                        {/* 무제한 발송 강조 배너 */}
+                        <div className="p-2.5 bg-gradient-to-r from-indigo-50 via-purple-50 to-indigo-50 border border-indigo-200/80 rounded-xl flex items-center justify-between text-[11px] font-bold text-indigo-900">
+                            <span className="flex items-center gap-1.5">
+                                <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                                <span>전 플랜 공통: <strong>구독 기간 내 이메일 & 인스타DM 무제한 발송</strong></span>
+                            </span>
+                            <span className="text-[10px] text-slate-500">일 권장 300~500건</span>
                         </div>
                     </div>
 
