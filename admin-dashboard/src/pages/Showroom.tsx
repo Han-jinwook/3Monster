@@ -49,18 +49,18 @@ const productCategories = [
         products: [
             {
                 id: 'nplace-db',
-                title: "포털 지도 DB 추출기",
-                subtitle: "원하는 지역/업종별 실시간 타겟 DB 수집",
-                description: "포털 지도 상의 업체 연락처, 이메일, 홈페이지 주소를 포함한 고퀄리티 가망 고객 정보를 실시간 정밀 파싱하여 즉각 영업 가능한 DB로 변환합니다.",
+                title: "N플레이스 DB & 대량발송기",
+                subtitle: "원하는 지역/업종별 실시간 타겟 DB 수집 + 이메일·인스타DM 무제한 발송 올인원",
+                description: "포털 지도 상의 업체 연락처, 이메일, 홈페이지 주소를 포함한 고퀄리티 가망 고객 정보를 실시간 정밀 파싱하여 즉각 영업 가능한 DB로 변환하고, 내장된 이메일 및 인스타그램 DM 무제한 발송 엔진으로 즉각적인 비즈니스 소통을 지원합니다.",
                 icon: MapPin,
                 color: "from-blue-600 to-indigo-700",
                 badge: "정식 출시",
                 isReleased: true,
                 features: [
-                    "실시간 포털 지도 정보 추출",
-                    "무료 인스타그램 DM발송",
-                    "무료 이메일 발송 (포털/구글 개인계정 연동)",
-                    "원클릭 Excel 내보내기"
+                    "실시간 포털 지도 DB 정밀 추출",
+                    "구독 기간 내 이메일 무제한 발송 (구글/네이버 개인계정 연동)",
+                    "구독 기간 내 인스타그램 DM 무제한 자동 발송",
+                    "기존 저장 엑셀 불러오기 및 원클릭 내보내기"
                 ]
             },
             {
@@ -1742,14 +1742,13 @@ export const Showroom = () => {
                                                                                 title: selectedProduct.title,
                                                                                 subtitle: selectedProduct.subtitle,
                                                                                 initialTier: billingCycle === 'annual' ? 'START_1Y' : 'START_1M',
-                                                                                billingCycle: billingCycle,
-                                                                                isRepurchase: hasPurchased
+                                                                                billingCycle: billingCycle
                                                                             });
                                                                             setIsPaymentModalOpen(true);
                                                                         }}
                                                                         className="w-full h-10 bg-slate-900 hover:bg-indigo-600 text-white rounded-xl text-xs font-black transition-colors shadow-xs"
                                                                     >
-                                                                        {!isLoggedIn ? '로그인 후 구독하기' : (hasPurchased ? '스타트 연장하기' : '스타트 시작하기')}
+                                                                        {!isLoggedIn ? '로그인 후 구독하기' : '스타트 시작하기'}
                                                                     </Button>
                                                                 </div>
                                                             </div>
@@ -1820,14 +1819,13 @@ export const Showroom = () => {
                                                                                 title: selectedProduct.title,
                                                                                 subtitle: selectedProduct.subtitle,
                                                                                 initialTier: billingCycle === 'annual' ? 'PLUS_1Y' : 'PLUS_1M',
-                                                                                billingCycle: billingCycle,
-                                                                                isRepurchase: hasPurchased
+                                                                                billingCycle: billingCycle
                                                                             });
                                                                             setIsPaymentModalOpen(true);
                                                                         }}
                                                                         className="w-full h-10 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black shadow-md shadow-indigo-200 transition-colors"
                                                                     >
-                                                                        {!isLoggedIn ? '로그인 후 구독하기' : (hasPurchased ? '플러스 연장하기' : '플러스 시작하기')}
+                                                                        {!isLoggedIn ? '로그인 후 구독하기' : '플러스 시작하기'}
                                                                     </Button>
                                                                 </div>
                                                             </div>
@@ -1893,16 +1891,32 @@ export const Showroom = () => {
                                                                                 title: selectedProduct.title,
                                                                                 subtitle: selectedProduct.subtitle,
                                                                                 initialTier: billingCycle === 'annual' ? 'PRO_1Y' : 'PRO_1M',
-                                                                                billingCycle: billingCycle,
-                                                                                isRepurchase: hasPurchased
+                                                                                billingCycle: billingCycle
                                                                             });
                                                                             setIsPaymentModalOpen(true);
                                                                         }}
                                                                         className="w-full h-10 bg-slate-900 hover:bg-indigo-600 text-white rounded-xl text-xs font-black transition-colors shadow-xs"
                                                                     >
-                                                                        {!isLoggedIn ? '로그인 후 구독하기' : (hasPurchased ? '프로 연장하기' : '프로 시작하기')}
+                                                                        {!isLoggedIn ? '로그인 후 구독하기' : '프로 시작하기'}
                                                                     </Button>
                                                                 </div>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* KCP 심사 및 법적 준수 공식 안내 배너 */}
+                                                        <div className="mt-4 p-4 bg-slate-50 border border-slate-200/80 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs text-slate-500">
+                                                            <div className="flex items-start gap-2.5">
+                                                                <ShieldCheck className="w-5 h-5 text-indigo-600 shrink-0 mt-0.5" />
+                                                                <div className="space-y-0.5">
+                                                                    <p className="font-bold text-slate-800 text-[13px]">데이터 합법성 및 정보통신망법 컴플라이언스 준수</p>
+                                                                    <p className="text-[11px] text-slate-500 leading-relaxed">
+                                                                        본 솔루션은 포털 지도에 사업자가 스스로 공개 등록한 공개 상권 정보만을 정기 분석·정리하며, 개인 식별 정보는 일체 취급하지 않습니다. <br className="hidden md:inline"/>
+                                                                        정보통신망법 제50조에 따른 (광고) 표기 및 수신거부 가이드를 철저히 준수하여 안전한 비즈니스 1:1 고객 소통을 지원합니다.
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                            <div className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-[11px] font-bold text-slate-700 shadow-2xs">
+                                                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> KCP 정식 승인 PG 안전 결제
                                                             </div>
                                                         </div>
                                                     </div>

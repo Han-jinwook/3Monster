@@ -9,7 +9,7 @@ import {
     Download, 
     AlertCircle, 
     Loader2, 
-    ExternalLink,
+    ShieldCheck,
     Sparkles,
     Mail,
     BookOpen
@@ -29,7 +29,7 @@ export interface PaymentProduct {
     subtitle: string;
     initialTier?: SubscriptionTierKey;
     billingCycle?: 'monthly' | 'annual';
-    isRepurchase?: boolean;
+    isRepurchase?: boolean; // 레거시 호환용 (사용 안함)
 }
 
 interface PaymentModalProps {
@@ -60,7 +60,7 @@ export const TIER_PRICES: Record<SubscriptionTierKey, TierInfo> = {
         tier: 'START',
         cycle: '1M',
         normalPrice: 9900,
-        discountPrice: 8900,
+        discountPrice: 9900,
         monthlyEquivalent: 9900,
         limitText: '월 1,000건 추출',
         months: 1,
@@ -73,7 +73,7 @@ export const TIER_PRICES: Record<SubscriptionTierKey, TierInfo> = {
         tier: 'START',
         cycle: '1Y',
         normalPrice: 82800,
-        discountPrice: 79000,
+        discountPrice: 82800,
         monthlyEquivalent: 6900,
         limitText: '연 12,000건 추출 (월 6,900원꼴)',
         months: 12,
@@ -87,7 +87,7 @@ export const TIER_PRICES: Record<SubscriptionTierKey, TierInfo> = {
         tier: 'PLUS',
         cycle: '1M',
         normalPrice: 19000,
-        discountPrice: 16900,
+        discountPrice: 19000,
         monthlyEquivalent: 19000,
         limitText: '월 3,000건 추출',
         months: 1,
@@ -101,7 +101,7 @@ export const TIER_PRICES: Record<SubscriptionTierKey, TierInfo> = {
         tier: 'PLUS',
         cycle: '1Y',
         normalPrice: 156000,
-        discountPrice: 149000,
+        discountPrice: 156000,
         monthlyEquivalent: 13000,
         limitText: '연 36,000건 추출 (월 13,000원꼴)',
         months: 12,
@@ -115,7 +115,7 @@ export const TIER_PRICES: Record<SubscriptionTierKey, TierInfo> = {
         tier: 'PRO',
         cycle: '1M',
         normalPrice: 39000,
-        discountPrice: 35000,
+        discountPrice: 39000,
         monthlyEquivalent: 39000,
         limitText: '월 9,000건 대량 추출',
         months: 1,
@@ -129,7 +129,7 @@ export const TIER_PRICES: Record<SubscriptionTierKey, TierInfo> = {
         tier: 'PRO',
         cycle: '1Y',
         normalPrice: 324000,
-        discountPrice: 299000,
+        discountPrice: 324000,
         monthlyEquivalent: 27000,
         limitText: '연 108,000건 추출 (월 27,000원꼴)',
         months: 12,
@@ -144,7 +144,7 @@ export const TIER_PRICES: Record<SubscriptionTierKey, TierInfo> = {
         tier: 'START',
         cycle: '1M',
         normalPrice: 9900,
-        discountPrice: 8900,
+        discountPrice: 9900,
         monthlyEquivalent: 9900,
         limitText: '월 1,000건 추출',
         months: 1,
@@ -157,7 +157,7 @@ export const TIER_PRICES: Record<SubscriptionTierKey, TierInfo> = {
         tier: 'PLUS',
         cycle: '1M',
         normalPrice: 19000,
-        discountPrice: 16900,
+        discountPrice: 19000,
         monthlyEquivalent: 19000,
         limitText: '월 3,000건 추출',
         months: 1,
@@ -171,7 +171,7 @@ export const TIER_PRICES: Record<SubscriptionTierKey, TierInfo> = {
         tier: 'PRO',
         cycle: '1M',
         normalPrice: 39000,
-        discountPrice: 35000,
+        discountPrice: 39000,
         monthlyEquivalent: 39000,
         limitText: '월 9,000건 대량 추출',
         months: 1,
@@ -186,7 +186,6 @@ const KCP_SITE_CD = 'ALRJ8'; // (주)썬드림 2호 디지털 PG
 export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, product }) => {
     const [selectedTier, setSelectedTier] = useState<SubscriptionTierKey>('PLUS_1M');
     const [modalBillingCycle, setModalBillingCycle] = useState<'monthly' | 'annual'>('monthly');
-    const [isRepurchase, setIsRepurchase] = useState(false);
     const [buyerEmail, setBuyerEmail] = useState('');
     const [processing, setProcessing] = useState(false);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -235,9 +234,6 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
             setSelectedTier(product.billingCycle === 'annual' ? 'PLUS_1Y' : 'PLUS_1M');
         }
 
-        if (product?.isRepurchase !== undefined) {
-            setIsRepurchase(product.isRepurchase);
-        }
         setSuccessData(null);
         setErrorMsg(null);
         setCopied(false);
@@ -260,7 +256,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
     if (!product) return null;
 
     const currentTierInfo = TIER_PRICES[selectedTier];
-    const finalPrice = isRepurchase ? currentTierInfo.discountPrice : currentTierInfo.normalPrice;
+    const finalPrice = currentTierInfo.normalPrice;
 
     const generateSerial = () => {
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -519,7 +515,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
 
         try {
             const orderId = `3M_${Date.now()}_${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
-            const goodName = `[3Monster] ${product.title} - ${currentTierInfo.label}`;
+            const goodName = `[3Monster] 비즈니스 소프트웨어 - ${currentTierInfo.label}`;
 
             const kcpPayMethod = '100000000000'; // NHN KCP 신용/체크카드 및 간편결제 (카카오페이, 네이버페이, 토스, 앱카드 등)
 
@@ -743,7 +739,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                                 ? ['START_1Y', 'PLUS_1Y', 'PRO_1Y'] 
                                 : ['START_1M', 'PLUS_1M', 'PRO_1M']) as SubscriptionTierKey[]).map((tierKey) => {
                                 const info = TIER_PRICES[tierKey];
-                                const price = isRepurchase ? info.discountPrice : info.normalPrice;
+                                const price = info.normalPrice;
                                 const isSelected = selectedTier === tierKey;
                                 const isPlus = tierKey.startsWith('PLUS');
 
@@ -847,6 +843,20 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                         </div>
                     </div>
 
+                    {/* 데이터 합법성 및 컴플라이언스 준수 공식 안내 */}
+                    <div className="p-3 bg-slate-100/90 border border-slate-200/80 rounded-2xl text-[11px] text-slate-500 space-y-1">
+                        <p className="font-black text-slate-700 flex items-center gap-1.5">
+                            <ShieldCheck className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                            데이터 합법성 및 정보통신망법 준수 안내
+                        </p>
+                        <p className="text-[10px] text-slate-500 leading-relaxed">
+                            • 본 소프트웨어는 포털 지도 등에 사업자가 직접 공개한 합법적 사업장 정보만을 상권 분석 및 비즈니스 1:1 소통 목적으로 수집·정리합니다.
+                        </p>
+                        <p className="text-[10px] text-slate-500 leading-relaxed">
+                            • 불법 스팸 전송을 엄격히 금지하며, 메시지 발송 시 정보통신망법 제50조에 따른 (광고) 표기 및 수신거부 의무를 철저히 준수합니다.
+                        </p>
+                    </div>
+
                     {errorMsg && (
                         <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-xs font-bold flex items-center gap-2">
                             <AlertCircle className="w-4 h-4 shrink-0" />
@@ -854,7 +864,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                         </div>
                     )}
 
-                    {/* 결제 버튼 및 크몽 안내 */}
+                    {/* 결제 버튼 */}
                     <div className="space-y-3 pt-2">
                         <Button 
                             type="submit" 
@@ -868,21 +878,16 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                             ) : (
                                 <>
                                     <Zap className="w-5 h-5 text-amber-300" />
-                                    <span>{finalPrice.toLocaleString()}원 즉시 결제 및 라이선스 키 발급</span>
+                                    <span>{finalPrice.toLocaleString()}원 결제 및 라이선스 키 즉시 발급</span>
                                 </>
                             )}
                         </Button>
 
                         <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold px-1">
-                            <span>NHN KCP 2호 디지털 PG 안전 결제</span>
-                            <a 
-                                href="https://kmong.com" 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="text-indigo-600 hover:underline flex items-center gap-1"
-                            >
-                                크몽에서 에스크로 결제하기 <ExternalLink className="w-3 h-3" />
-                            </a>
+                            <span className="flex items-center gap-1">
+                                <ShieldCheck className="w-3.5 h-3.5 text-indigo-600 shrink-0" /> NHN KCP 정식 전자결제 (안심 암호화)
+                            </span>
+                            <span>전자상거래 소비자보호법 준수</span>
                         </div>
                     </div>
                 </form>

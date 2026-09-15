@@ -55,10 +55,10 @@ export const LicenseList = () => {
 
     // 연장 / 신규 이력 발급 모달 상태
     const [extendModalLic, setExtendModalLic] = useState<License | null>(null);
-    const [extendPlan, setExtendPlan] = useState<'DELUXE' | 'PREMIUM' | 'STANDARD'>('DELUXE');
+    const [extendPlan, setExtendPlan] = useState<string>('PLUS_1M');
     const [extendMonths, setExtendMonths] = useState<number>(1);
-    const [extendPrice, setExtendPrice] = useState<number>(7600);
-    const [extendChannel, setExtendChannel] = useState<string>('크몽 재결제');
+    const [extendPrice, setExtendPrice] = useState<number>(19000);
+    const [extendChannel, setExtendChannel] = useState<string>('3Monster 재구독');
     const [extendMemo, setExtendMemo] = useState<string>('');
     const [extending, setExtending] = useState(false);
 
@@ -229,38 +229,44 @@ export const LicenseList = () => {
     };
 
     const getProductLabel = (productId: string, licenseType?: string, collectionLimit?: number) => {
-        if (collectionLimit && collectionLimit > 0) {
-            return `${productId} (STANDARD / ${collectionLimit.toLocaleString()}건)`;
-        }
         const mapping: Record<string, string> = {
-            'DELUXE':   'DELUXE (무제한)',
+            'START_1M': '스타트 1M (1,000건/무제한발송)',
+            'START_1Y': '스타트 1Y (12,000건/무제한발송)',
+            'PLUS_1M':  '플러스 1M (3,000건/무제한발송)',
+            'PLUS_1Y':  '플러스 1Y (36,000건/무제한발송)',
+            'PRO_1M':   '프로 1M (9,000건/무제한발송)',
+            'PRO_1Y':   '프로 1Y (108,000건/무제한발송)',
+            'DELUXE':   '스타트 (레거시)',
             'TRIAL':    '체험판',
             'TEST':     '테스트',
-            '1M':       'DELUXE (무제한)',
-            '3M':       'PREMIUM (무제한)',
+            '1M':       '플러스 (레거시)',
+            '3M':       '프로 (레거시)',
             '6M':       '6개월 (무제한)',
             'LIFETIME': '영구 (무제한)',
-            'PREMIUM':  'PREMIUM (무제한)',
-            'STANDARD': 'DELUXE (무제한)'
+            'PREMIUM':  '프로 (레거시)',
+            'STANDARD': '스타트 (레거시)'
         };
         const typeLabel = licenseType ? (mapping[licenseType] || licenseType) : '';
+        if (collectionLimit && collectionLimit > 0 && !typeLabel) {
+            return `${productId} (${collectionLimit.toLocaleString()}건 한도)`;
+        }
         return typeLabel ? `${productId} (${typeLabel})` : productId;
     };
 
     const openExtendModal = (lic: License) => {
         setExtendModalLic(lic);
-        setExtendPlan(lic.license_type === 'PREMIUM' || lic.license_type === '3M' ? 'PREMIUM' : 'DELUXE');
-        setExtendMonths(lic.license_type === 'PREMIUM' || lic.license_type === '3M' ? 3 : 1);
-        setExtendPrice(lic.license_type === 'PREMIUM' || lic.license_type === '3M' ? 17900 : 7600);
-        setExtendChannel('크몽 재결제');
-        setExtendMemo(`[연장] ${lic.product_id} 재결제 이력 추가`);
+        setExtendPlan('PLUS_1M');
+        setExtendMonths(1);
+        setExtendPrice(19000);
+        setExtendChannel('3Monster 재구독');
+        setExtendMemo(`[연장] ${lic.product_id} 신규 구독 이력 추가`);
     };
 
     const generateSerialKey = (plan: string) => {
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         const segment = (len = 4) => Array(len).fill(0).map(() => chars.charAt(Math.floor(Math.random() * chars.length))).join('');
-        const prefix = plan === 'PREMIUM' ? 'PM' : (plan === 'STANDARD' ? 'STD' : 'DLX');
-        return `${prefix}-${segment()}-${segment()}-${segment()}`;
+        const prefix = plan.startsWith('PRO') ? 'PRO' : (plan.startsWith('START') ? 'START' : 'PLUS');
+        return `CM-${prefix}-${segment()}-${segment()}`;
     };
 
     const handleExecuteExtension = async () => {
@@ -279,7 +285,15 @@ export const LicenseList = () => {
 
             const newExpireDate = addMonths(baseDate, extendMonths);
             const newSerialKey = generateSerialKey(extendPlan);
-            const newLimit = extendPlan === 'STANDARD' ? 1000 : 0;
+            const planLimitMap: Record<string, number> = {
+                'START_1M': 1000,
+                'START_1Y': 12000,
+                'PLUS_1M': 3000,
+                'PLUS_1Y': 36000,
+                'PRO_1M': 9000,
+                'PRO_1Y': 108000
+            };
+            const newLimit = planLimitMap[extendPlan] || (extendPlan === 'STANDARD' ? 1000 : 0);
 
             // 1. 새 연장 라이선스 INSERT (신규 이력 레코드 생성)
             const newRow = {
@@ -763,30 +777,33 @@ export const LicenseList = () => {
                         <div className="space-y-4 text-xs font-bold">
                             {/* 1. 플랜 선택 */}
                             <div>
-                                <label className="block text-slate-600 mb-1.5 font-extrabold">적용 플랜</label>
+                                <label className="block text-slate-600 mb-1.5 font-extrabold">적용 플랜 (3단계 정기구독 규격)</label>
                                 <div className="grid grid-cols-3 gap-2">
                                     {[
-                                        { id: 'DELUXE', label: 'DELUXE (무제한)', months: 1, price: 7600 },
-                                        { id: 'PREMIUM', label: 'PREMIUM (무제한)', months: 3, price: 17900 },
-                                        { id: 'STANDARD', label: 'STANDARD (1,000건)', months: 1, price: 4200 },
+                                        { id: 'PLUS_1M', label: '플러스 1M (3,000건)', months: 1, price: 19000 },
+                                        { id: 'START_1M', label: '스타트 1M (1,000건)', months: 1, price: 9900 },
+                                        { id: 'PRO_1M', label: '프로 1M (9,000건)', months: 1, price: 39000 },
+                                        { id: 'PLUS_1Y', label: '플러스 1Y (36,000건)', months: 12, price: 156000 },
+                                        { id: 'START_1Y', label: '스타트 1Y (12,000건)', months: 12, price: 82800 },
+                                        { id: 'PRO_1Y', label: '프로 1Y (108,000건)', months: 12, price: 324000 },
                                     ].map(p => (
                                         <button
                                             key={p.id}
                                             type="button"
                                             onClick={() => {
-                                                setExtendPlan(p.id as any);
+                                                setExtendPlan(p.id);
                                                 setExtendMonths(p.months);
                                                 setExtendPrice(p.price);
                                             }}
                                             className={cn(
-                                                "p-3 rounded-xl border text-center transition-all cursor-pointer",
+                                                "p-2.5 rounded-xl border text-center transition-all cursor-pointer",
                                                 extendPlan === p.id 
                                                     ? "bg-indigo-600 text-white border-indigo-700 shadow-sm" 
                                                     : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
                                             )}
                                         >
-                                            <span className="block font-black">{p.id}</span>
-                                            <span className="text-[10px] opacity-80 block mt-0.5">{p.months}개월 ({p.price.toLocaleString()}원)</span>
+                                            <span className="block font-black text-xs">{p.label}</span>
+                                            <span className="text-[10px] opacity-80 block mt-0.5">{p.price.toLocaleString()}원</span>
                                         </button>
                                     ))}
                                 </div>
