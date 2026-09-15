@@ -1566,38 +1566,46 @@ export const Showroom = () => {
                                                 const isComment = selectedProduct.id.includes('comment') || selectedProduct.id.includes('auto');
                                                 const isEvent = selectedProduct.id.includes('event');
 
-                                                const cafeSubBadge = isComment 
-                                                    ? '스탭 전용 신속 댓글 관리 & 자동 응대'
+                                                const cafeUnifiedBadge = isComment 
+                                                    ? '스탭 전용 신속 댓글 관리 & 맞춤 자동 응대'
                                                     : (isEvent ? '회원 활동지수 정밀 집계 & 공정 추첨' : '내 카페 게시글·댓글 정밀 수집 & 백업');
-
-                                                const cafeBannerText = isComment 
-                                                    ? '⚡ 스탭 업무 경감 & 신규글 맞춤 템플릿 자동 응대 완벽 지원'
-                                                    : (isEvent ? '⚡ 이벤트 활동지수 집계 & 공정한 자동 추첨 완벽 지원' : '⚡ 내 카페 데이터 아카이빙 & 엑셀 원클릭 백업 완벽 지원');
 
                                                 return (
                                                     <div id="pricing-section" className="space-y-4 pt-4 border-t border-slate-100 text-left scroll-mt-28">
-                                                        {/* 상단 타이틀 및 월간/연간 30% 할인 토글 */}
+                                                        {/* 상단 타이틀 및 통합 혜택 배지 */}
                                                         <div className="flex items-center justify-between flex-wrap gap-3">
-                                                            <div className="flex items-center gap-2">
-                                                                <h4 className="text-base font-black text-slate-900 flex items-center gap-2">
+                                                            <div className="flex items-center gap-2.5 flex-wrap">
+                                                                <h4 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
                                                                     <span>정식 구독 멤버십</span>
-                                                                    <span className="text-[10px] font-black text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                                                                        <Sparkles className="w-3 h-3 text-indigo-600" />
-                                                                        {isCafe ? cafeSubBadge : '전 플랜 이메일 & DM 무제한 발송'}
-                                                                    </span>
                                                                 </h4>
+                                                                <span className="text-[11px] sm:text-xs font-black text-indigo-700 bg-indigo-50 border border-indigo-200 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-2xs">
+                                                                    <Sparkles className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                                                                    {isCafe ? cafeUnifiedBadge : '전 플랜 이메일 & 인스타DM 무제한 발송'}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* 안전 가이드 & [중요 하이라이팅된 월간/연간 30% 할인 토글] */}
+                                                        <div className="p-3 sm:p-3.5 bg-gradient-to-r from-blue-50/90 via-indigo-50/80 to-purple-50/90 border border-indigo-150 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs">
+                                                            <div className="flex items-center gap-2 font-bold text-slate-800 text-xs sm:text-[13px]">
+                                                                <ShieldCheck className="w-4 h-4 text-indigo-600 shrink-0" />
+                                                                {isCafe ? (
+                                                                    <span>내 카페 보호 안전 가이드: <strong>지능형 딜레이 알고리즘</strong> 탑재로 안전한 카페 운영 관리를 지원합니다.</span>
+                                                                ) : (
+                                                                    <span>네이버 계정 보호 안전 가이드: <strong>하루 권장 300건, 최대 500건 추출</strong>을 준수합니다.</span>
+                                                                )}
                                                             </div>
 
-                                                            {/* 월간 / 연간 30% 할인 토글 */}
-                                                            <div className="inline-flex items-center bg-slate-100 p-1 rounded-2xl border border-slate-200 shadow-inner">
+                                                            {/* 중요 하이라이팅 및 뚜렷한 테두리의 월간 / 연간 30% 할인 토글 */}
+                                                            <div className="shrink-0 inline-flex items-center bg-white p-1 rounded-2xl border-2 border-indigo-600 shadow-md shadow-indigo-100">
                                                                 <button
                                                                     type="button"
                                                                     onClick={() => setBillingCycle('monthly')}
                                                                     className={cn(
-                                                                        "px-3.5 py-1.5 rounded-xl text-xs font-black transition-all",
+                                                                        "px-4 py-2 rounded-xl text-xs sm:text-sm font-black transition-all",
                                                                         billingCycle === 'monthly'
-                                                                            ? "bg-white text-slate-900 shadow-xs"
-                                                                            : "text-slate-500 hover:text-slate-800"
+                                                                            ? "bg-slate-900 text-white shadow-sm"
+                                                                            : "text-slate-600 hover:text-slate-900"
                                                                     )}
                                                                 >
                                                                     월간 구독
@@ -1606,36 +1614,23 @@ export const Showroom = () => {
                                                                     type="button"
                                                                     onClick={() => setBillingCycle('annual')}
                                                                     className={cn(
-                                                                        "px-3.5 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5",
+                                                                        "px-4 py-2 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center gap-1.5",
                                                                         billingCycle === 'annual'
-                                                                            ? "bg-indigo-600 text-white shadow-xs"
-                                                                            : "text-indigo-600 hover:text-indigo-700 font-bold"
+                                                                            ? "bg-indigo-600 text-white shadow-md shadow-indigo-300"
+                                                                            : "text-indigo-600 hover:text-indigo-700 font-extrabold"
                                                                     )}
                                                                 >
                                                                     <span>연간 구독</span>
                                                                     <span className={cn(
-                                                                        "text-[9px] px-2 py-0.5 rounded-full font-black",
-                                                                        billingCycle === 'annual' ? "bg-white text-indigo-700" : "bg-indigo-100 text-indigo-700"
+                                                                        "text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full font-black transition-transform",
+                                                                        billingCycle === 'annual' 
+                                                                            ? "bg-amber-300 text-slate-950 shadow-xs scale-105" 
+                                                                            : "bg-indigo-100 text-indigo-700"
                                                                     )}>
                                                                         30% 할인 🎁
                                                                     </span>
                                                                 </button>
                                                             </div>
-                                                        </div>
-
-                                                        {/* 안전 가이드 & 안내 배너 */}
-                                                        <div className="p-3 bg-gradient-to-r from-blue-50/90 via-indigo-50/80 to-purple-50/90 border border-indigo-100 rounded-2xl flex items-center justify-between flex-wrap gap-2 text-xs">
-                                                            <div className="flex items-center gap-2 font-bold text-slate-800">
-                                                                <ShieldCheck className="w-4 h-4 text-indigo-600 shrink-0" />
-                                                                {isCafe ? (
-                                                                    <span>내 카페 보호 안전 가이드: <strong>지능형 딜레이 알고리즘</strong> 탑재로 안전한 카페 운영 관리를 지원합니다.</span>
-                                                                ) : (
-                                                                    <span>네이버 계정 보호 안전 가이드: <strong>하루 권장 300건, 최대 500건 추출</strong>을 준수합니다.</span>
-                                                                )}
-                                                            </div>
-                                                            <span className="text-[11px] font-extrabold text-indigo-700 bg-white border border-indigo-200 px-3 py-1 rounded-xl shadow-2xs">
-                                                                {isCafe ? cafeBannerText : '⚡ 구독 기간 내 이메일 & 인스타DM 무제한 발송 지원'}
-                                                            </span>
                                                         </div>
 
                                                         {/* 회원 전용 안내 배너 (비로그인 상태일 때 표시) */}
