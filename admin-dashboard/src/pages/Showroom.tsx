@@ -91,7 +91,7 @@ const productCategories = [
         id: 'cafe-monster',
         name: '카페 몬스터',
         subtitle: '11년의 세월이 담긴 카페 데이터를 완벽한 매출 무기로 전환합니다.',
-        actionCopy: '1,000원으로 내 카페의 진짜 활력지수 검증하기',
+        actionCopy: '원하는 타겟 카페의 게시글·댓글·활동 지표 완벽 분석',
         products: [
             {
                 id: 'cafe-crawler',
@@ -214,6 +214,7 @@ export const Showroom = () => {
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
     const [userLicenses, setUserLicenses] = useState<any[]>([]);
     const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
+    const [selectedCardTier, setSelectedCardTier] = useState<'START' | 'PLUS' | 'PRO'>('START');
 
     const normalizeProdKey = (id: string): string => {
         const clean = id.toLowerCase().replace(/[-_]/g, '');
@@ -1578,12 +1579,14 @@ export const Showroom = () => {
                                                     expDateStr = `${expDt.getFullYear()}.${expDt.getMonth() + 1}.${expDt.getDate()}`;
                                                     daysLeft = Math.ceil((expDt.getTime() - nowTime) / (1000 * 60 * 60 * 24));
                                                     const planName = isCurrentStandard 
-                                                        ? '스탠다드 (1,000건 한도)' 
-                                                        : (activeLic.license_type === 'PREMIUM' || activeLic.license_type === '3M' ? '프리미엄 (3개월 무제한)' : '디럭스 (1개월 무제한)');
+                                                        ? '스타트 (1,000건 한도)' 
+                                                        : (activeLic.license_type === 'PRO_1M' || activeLic.license_type === 'PRO_1Y' || activeLic.license_type === 'PREMIUM' || activeLic.license_type === '3M' ? '프로' : '플러스');
                                                     statusBadgeText = `회원님은 현재 [${planName}] 이용 중입니다. (만료일: ${expDateStr} / D-${daysLeft}일)`;
                                                 } else if (hasPurchased) {
                                                     statusBadgeText = '이전 라이선스 이용 이력이 확인되었습니다.';
                                                 }
+
+                                                const isCafe = selectedProduct.id.includes('cafe') || selectedProduct.id.includes('comment') || selectedProduct.id.includes('event') || selectedProduct.id.includes('auto');
 
                                                 return (
                                                     <div id="pricing-section" className="space-y-4 pt-4 border-t border-slate-100 text-left scroll-mt-28">
@@ -1593,7 +1596,8 @@ export const Showroom = () => {
                                                                 <h4 className="text-base font-black text-slate-900 flex items-center gap-2">
                                                                     <span>정식 구독 멤버십</span>
                                                                     <span className="text-[10px] font-black text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                                                                        <Sparkles className="w-3 h-3 text-indigo-600" /> 전 플랜 이메일 & DM 무제한 발송
+                                                                        <Sparkles className="w-3 h-3 text-indigo-600" />
+                                                                        {isCafe ? '타겟 카페 게시글·댓글 정밀 수집 및 분석' : '전 플랜 이메일 & DM 무제한 발송'}
                                                                     </span>
                                                                 </h4>
                                                             </div>
@@ -1637,10 +1641,14 @@ export const Showroom = () => {
                                                         <div className="p-3 bg-gradient-to-r from-blue-50/90 via-indigo-50/80 to-purple-50/90 border border-indigo-100 rounded-2xl flex items-center justify-between flex-wrap gap-2 text-xs">
                                                             <div className="flex items-center gap-2 font-bold text-slate-800">
                                                                 <ShieldCheck className="w-4 h-4 text-indigo-600 shrink-0" />
-                                                                <span>네이버 계정 보호 안전 가이드: <strong>하루 권장 300건, 최대 500건 추출</strong>을 준수합니다.</span>
+                                                                {isCafe ? (
+                                                                    <span>네이버 계정 보호 안전 가이드: <strong>지능형 딜레이 봇 탐지 방지 알고리즘</strong>으로 안전한 수집 환경을 지원합니다.</span>
+                                                                ) : (
+                                                                    <span>네이버 계정 보호 안전 가이드: <strong>하루 권장 300건, 최대 500건 추출</strong>을 준수합니다.</span>
+                                                                )}
                                                             </div>
                                                             <span className="text-[11px] font-extrabold text-indigo-700 bg-white border border-indigo-200 px-3 py-1 rounded-xl shadow-2xs">
-                                                                ⚡ 구독 기간 내 이메일 & 인스타DM 무제한 발송 지원
+                                                                {isCafe ? '⚡ 카페 데이터 정밀 수집 & 엑셀 원클릭 내보내기 완벽 지원' : '⚡ 구독 기간 내 이메일 & 인스타DM 무제한 발송 지원'}
                                                             </span>
                                                         </div>
 
@@ -1682,7 +1690,15 @@ export const Showroom = () => {
                                                         {/* 신규 3단계 구독 카드 (스타트 / 플러스 / 프로) */}
                                                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                                                             {/* 1. Start 플랜 */}
-                                                            <div className="flex flex-col p-5 rounded-3xl border border-slate-200 bg-white hover:border-indigo-300 transition-all shadow-sm">
+                                                            <div 
+                                                                onClick={() => setSelectedCardTier('START')}
+                                                                className={cn(
+                                                                    "flex flex-col p-5 rounded-3xl transition-all cursor-pointer relative",
+                                                                    selectedCardTier === 'START'
+                                                                        ? "border-2 border-indigo-600 bg-indigo-50/30 shadow-md shadow-indigo-100"
+                                                                        : "border border-slate-200 bg-white hover:border-slate-300 shadow-sm"
+                                                                )}
+                                                            >
                                                                 <div className="flex justify-between items-start mb-1.5">
                                                                     <span className="text-[11px] font-black text-slate-400 uppercase tracking-wider">Start</span>
                                                                     <span className="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">1인 / 초보</span>
@@ -1699,11 +1715,11 @@ export const Showroom = () => {
                                                                     </li>
                                                                     <li className="flex items-center gap-1.5 font-bold text-slate-800">
                                                                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                                                                        <span>이메일 & 인스타DM 무제한 발송</span>
+                                                                        <span>{isCafe ? '카페 게시글 & 댓글 실시간 수집' : '이메일 & 인스타DM 무제한 발송'}</span>
                                                                     </li>
                                                                     <li className="flex items-center gap-1.5">
                                                                         <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                                                                        <span>저장 엑셀 파일 불러와서 재발송</span>
+                                                                        <span>{isCafe ? 'CSV / 엑셀 원클릭 데이터 내보내기' : '저장 엑셀 파일 불러와서 재발송'}</span>
                                                                     </li>
                                                                     <li className="flex items-center gap-1.5">
                                                                         <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
@@ -1727,11 +1743,11 @@ export const Showroom = () => {
                                                                                 <span className="text-xl font-black text-slate-900">9,900</span>
                                                                                 <span className="text-xs font-bold text-slate-500">원 / 월</span>
                                                                             </div>
-                                                                            <p className="text-[11px] text-slate-400 font-bold mt-0.5">월 커피 2잔 가격</p>
                                                                         </div>
                                                                     )}
                                                                     <Button 
-                                                                        onClick={() => {
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
                                                                             if (!isLoggedIn) {
                                                                                 alert('구독 결제는 회원 전용 서비스입니다.\n로그인 또는 회원가입 페이지로 이동합니다.');
                                                                                 navigate(`/login?redirect=${encodeURIComponent(`/?category=${activeCategory || 'marketing-monster'}&detail_product=${selectedProduct.id}&tier=${billingCycle === 'annual' ? 'START_1Y' : 'START_1M'}&buy=1`)}`);
@@ -1746,22 +1762,31 @@ export const Showroom = () => {
                                                                             });
                                                                             setIsPaymentModalOpen(true);
                                                                         }}
-                                                                        className="w-full h-10 bg-slate-900 hover:bg-indigo-600 text-white rounded-xl text-xs font-black transition-colors shadow-xs"
+                                                                        className={cn(
+                                                                            "w-full h-10 rounded-xl text-xs font-black transition-colors shadow-xs",
+                                                                            selectedCardTier === 'START'
+                                                                                ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-200"
+                                                                                : "bg-slate-900 hover:bg-slate-800 text-white"
+                                                                        )}
                                                                     >
                                                                         {!isLoggedIn ? '로그인 후 구독하기' : '스타트 시작하기'}
                                                                     </Button>
                                                                 </div>
                                                             </div>
 
-                                                            {/* 2. Plus 플랜 (Best 👑) */}
-                                                            <div className="flex flex-col p-5 rounded-3xl border-2 border-indigo-600 bg-gradient-to-b from-indigo-50/40 via-white to-indigo-50/20 shadow-md shadow-indigo-100 relative">
-                                                                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-[10px] font-black px-3 py-0.5 rounded-full uppercase tracking-wider shadow-sm flex items-center gap-1">
-                                                                    <Sparkles className="w-3 h-3" /> Best 추천 1위
-                                                                </div>
-
-                                                                <div className="flex justify-between items-start mb-1.5 mt-1">
+                                                            {/* 2. Plus 플랜 */}
+                                                            <div 
+                                                                onClick={() => setSelectedCardTier('PLUS')}
+                                                                className={cn(
+                                                                    "flex flex-col p-5 rounded-3xl transition-all cursor-pointer relative",
+                                                                    selectedCardTier === 'PLUS'
+                                                                        ? "border-2 border-indigo-600 bg-indigo-50/30 shadow-md shadow-indigo-100"
+                                                                        : "border border-slate-200 bg-white hover:border-slate-300 shadow-sm"
+                                                                )}
+                                                            >
+                                                                <div className="flex justify-between items-start mb-1.5">
                                                                     <span className="text-[11px] font-black text-indigo-600 uppercase tracking-wider">Plus</span>
-                                                                    <span className="text-[10px] font-bold bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">실전 영업맨</span>
+                                                                    <span className="text-[10px] font-bold bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">실전 마케터</span>
                                                                 </div>
                                                                 <h5 className="font-black text-slate-900 text-base mb-1">플러스 {billingCycle === 'annual' ? '연간구독' : '월구독'}</h5>
                                                                 <p className="text-[11px] font-extrabold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md w-fit mb-3">
@@ -1775,11 +1800,11 @@ export const Showroom = () => {
                                                                     </li>
                                                                     <li className="flex items-center gap-1.5 font-black text-slate-900">
                                                                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                                                                        <span>이메일 & 인스타DM 무제한 발송</span>
+                                                                        <span>{isCafe ? '카페 게시글 & 댓글 실시간 수집' : '이메일 & 인스타DM 무제한 발송'}</span>
                                                                     </li>
                                                                     <li className="flex items-center gap-1.5">
                                                                         <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                                                                        <span>저장 엑셀 파일 불러와서 재발송</span>
+                                                                        <span>{isCafe ? '진성 회원 식별 및 패턴 추적 분석' : '저장 엑셀 파일 불러와서 재발송'}</span>
                                                                     </li>
                                                                     <li className="flex items-center gap-1.5">
                                                                         <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
@@ -1787,7 +1812,7 @@ export const Showroom = () => {
                                                                     </li>
                                                                 </ul>
 
-                                                                <div className="mt-auto pt-3 border-t border-indigo-100">
+                                                                <div className="mt-auto pt-3 border-t border-slate-100">
                                                                     {billingCycle === 'annual' ? (
                                                                         <div className="mb-3">
                                                                             <div className="flex items-baseline gap-1">
@@ -1795,20 +1820,19 @@ export const Showroom = () => {
                                                                                 <span className="text-xs font-bold text-slate-500">원 / 1년</span>
                                                                                 <span className="text-[10px] font-extrabold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded ml-auto">31% 할인</span>
                                                                             </div>
-                                                                            <p className="text-[11px] text-indigo-600 font-bold mt-0.5">월 13,000원꼴 (가장 인기)</p>
+                                                                            <p className="text-[11px] text-indigo-600 font-bold mt-0.5">월 13,000원꼴 (일시납)</p>
                                                                         </div>
                                                                     ) : (
                                                                         <div className="mb-3">
                                                                             <div className="flex items-baseline gap-1">
                                                                                 <span className="text-xl font-black text-slate-900">19,000</span>
                                                                                 <span className="text-xs font-bold text-slate-500">원 / 월</span>
-                                                                                <span className="text-[10px] font-bold text-slate-400 line-through ml-auto">타사 60,000원</span>
                                                                             </div>
-                                                                            <p className="text-[11px] text-slate-400 font-bold mt-0.5">타사 대비 1/3 이하 파격가</p>
                                                                         </div>
                                                                     )}
                                                                     <Button 
-                                                                        onClick={() => {
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
                                                                             if (!isLoggedIn) {
                                                                                 alert('구독 결제는 회원 전용 서비스입니다.\n로그인 또는 회원가입 페이지로 이동합니다.');
                                                                                 navigate(`/login?redirect=${encodeURIComponent(`/?category=${activeCategory || 'marketing-monster'}&detail_product=${selectedProduct.id}&tier=${billingCycle === 'annual' ? 'PLUS_1Y' : 'PLUS_1M'}&buy=1`)}`);
@@ -1823,7 +1847,12 @@ export const Showroom = () => {
                                                                             });
                                                                             setIsPaymentModalOpen(true);
                                                                         }}
-                                                                        className="w-full h-10 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black shadow-md shadow-indigo-200 transition-colors"
+                                                                        className={cn(
+                                                                            "w-full h-10 rounded-xl text-xs font-black transition-colors shadow-xs",
+                                                                            selectedCardTier === 'PLUS'
+                                                                                ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-200"
+                                                                                : "bg-slate-900 hover:bg-slate-800 text-white"
+                                                                        )}
                                                                     >
                                                                         {!isLoggedIn ? '로그인 후 구독하기' : '플러스 시작하기'}
                                                                     </Button>
@@ -1831,7 +1860,15 @@ export const Showroom = () => {
                                                             </div>
 
                                                             {/* 3. Pro 플랜 */}
-                                                            <div className="flex flex-col p-5 rounded-3xl border border-slate-200 bg-white hover:border-indigo-300 transition-all shadow-sm">
+                                                            <div 
+                                                                onClick={() => setSelectedCardTier('PRO')}
+                                                                className={cn(
+                                                                    "flex flex-col p-5 rounded-3xl transition-all cursor-pointer relative",
+                                                                    selectedCardTier === 'PRO'
+                                                                        ? "border-2 border-indigo-600 bg-indigo-50/30 shadow-md shadow-indigo-100"
+                                                                        : "border border-slate-200 bg-white hover:border-slate-300 shadow-sm"
+                                                                )}
+                                                            >
                                                                 <div className="flex justify-between items-start mb-1.5">
                                                                     <span className="text-[11px] font-black text-slate-400 uppercase tracking-wider">Pro</span>
                                                                     <span className="text-[10px] font-bold bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full">대행사 / 팀</span>
@@ -1848,15 +1885,15 @@ export const Showroom = () => {
                                                                     </li>
                                                                     <li className="flex items-center gap-1.5 font-bold text-slate-800">
                                                                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                                                                        <span>이메일 & 인스타DM 무제한 발송</span>
+                                                                        <span>{isCafe ? '다중 카페 대량 수집 및 종합 통계' : '이메일 & 인스타DM 무제한 발송'}</span>
                                                                     </li>
                                                                     <li className="flex items-center gap-1.5">
                                                                         <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                                                                        <span>저장 엑셀 파일 불러와서 재발송</span>
+                                                                        <span>{isCafe ? '여론 감정선 & 참여 통계 대시보드' : '저장 엑셀 파일 불러와서 재발송'}</span>
                                                                     </li>
                                                                     <li className="flex items-center gap-1.5">
                                                                         <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                                                                        <span>대행사·영업팀 전용 고속 처리</span>
+                                                                        <span>대행사·전문 운영팀 전용 고속 처리</span>
                                                                     </li>
                                                                 </ul>
 
@@ -1876,11 +1913,11 @@ export const Showroom = () => {
                                                                                 <span className="text-xl font-black text-slate-900">39,000</span>
                                                                                 <span className="text-xs font-bold text-slate-500">원 / 월</span>
                                                                             </div>
-                                                                            <p className="text-[11px] text-slate-400 font-bold mt-0.5">팀 단위 실전 영업 최적</p>
                                                                         </div>
                                                                     )}
                                                                     <Button 
-                                                                        onClick={() => {
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
                                                                             if (!isLoggedIn) {
                                                                                 alert('구독 결제는 회원 전용 서비스입니다.\n로그인 또는 회원가입 페이지로 이동합니다.');
                                                                                 navigate(`/login?redirect=${encodeURIComponent(`/?category=${activeCategory || 'marketing-monster'}&detail_product=${selectedProduct.id}&tier=${billingCycle === 'annual' ? 'PRO_1Y' : 'PRO_1M'}&buy=1`)}`);
@@ -1895,7 +1932,12 @@ export const Showroom = () => {
                                                                             });
                                                                             setIsPaymentModalOpen(true);
                                                                         }}
-                                                                        className="w-full h-10 bg-slate-900 hover:bg-indigo-600 text-white rounded-xl text-xs font-black transition-colors shadow-xs"
+                                                                        className={cn(
+                                                                            "w-full h-10 rounded-xl text-xs font-black transition-colors shadow-xs",
+                                                                            selectedCardTier === 'PRO'
+                                                                                ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-200"
+                                                                                : "bg-slate-900 hover:bg-slate-800 text-white"
+                                                                        )}
                                                                     >
                                                                         {!isLoggedIn ? '로그인 후 구독하기' : '프로 시작하기'}
                                                                     </Button>

@@ -236,21 +236,27 @@ export const LicenseList = () => {
             'PLUS_1Y':  '플러스 1Y (36,000건/무제한발송)',
             'PRO_1M':   '프로 1M (9,000건/무제한발송)',
             'PRO_1Y':   '프로 1Y (108,000건/무제한발송)',
-            'DELUXE':   '스타트 (레거시)',
+            'DELUXE':   '스타트',
             'TRIAL':    '체험판',
             'TEST':     '테스트',
-            '1M':       '플러스 (레거시)',
-            '3M':       '프로 (레거시)',
-            '6M':       '6개월 (무제한)',
-            'LIFETIME': '영구 (무제한)',
-            'PREMIUM':  '프로 (레거시)',
-            'STANDARD': '스타트 (레거시)'
+            '1M':       '플러스',
+            '3M':       '프로',
+            '6M':       '6개월',
+            'LIFETIME': '영구',
+            'PREMIUM':  '프로',
+            'STANDARD': '스타트'
         };
-        const typeLabel = licenseType ? (mapping[licenseType] || licenseType) : '';
-        if (collectionLimit && collectionLimit > 0 && !typeLabel) {
+        const rawType = licenseType ? (mapping[licenseType] || licenseType) : '';
+        const cleanType = rawType.replace(/\s*\(레거시\)/g, '').trim();
+
+        if (collectionLimit && collectionLimit > 0 && !cleanType) {
             return `${productId} (${collectionLimit.toLocaleString()}건 한도)`;
         }
-        return typeLabel ? `${productId} (${typeLabel})` : productId;
+        if (!cleanType) return productId;
+        if (cleanType.startsWith('(') && cleanType.endsWith(')')) {
+            return `${productId} ${cleanType}`;
+        }
+        return `${productId} (${cleanType})`;
     };
 
     const openExtendModal = (lic: License) => {
