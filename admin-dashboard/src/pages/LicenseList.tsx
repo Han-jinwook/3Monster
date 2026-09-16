@@ -19,7 +19,8 @@ import {
     ChevronUp,
     Sparkles,
     Receipt,
-    X
+    X,
+    Key
 } from 'lucide-react';
 import { format, addMonths } from 'date-fns';
 import { cn } from '../lib/utils';
@@ -883,16 +884,31 @@ export const LicenseList = () => {
                 </div>
             )}
 
-            <div className="flex justify-between items-center">
-                <h1 className="text-3xl font-black text-slate-800 tracking-tight">구매자 관리</h1>
-                <div className="relative w-72">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                    <Input
-                        placeholder="ID / 이메일 / 라이선스 키 검색"
-                        className="pl-11 bg-white border border-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 text-sm font-bold rounded-xl h-10"
-                        value={searchTerm}
-                        onChange={e => setSearchTerm(e.target.value)}
-                    />
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                <div className="flex items-center gap-3">
+                    <h1 className="text-3xl font-black text-slate-800 tracking-tight">구매자 관리</h1>
+                    <span className="text-xs font-black bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-full border border-indigo-200/80">
+                        총 {licenses.length}건
+                    </span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                    <div className="relative w-64 sm:w-72">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                        <Input
+                            placeholder="ID / 이메일 / 라이선스 키 검색"
+                            className="pl-11 bg-white border border-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 text-xs sm:text-sm font-bold rounded-xl h-10"
+                            value={searchTerm}
+                            onChange={e => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                    <Button
+                        onClick={() => navigate('/admin/generator')}
+                        className="h-10 px-3.5 sm:px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black rounded-xl shadow-md shadow-indigo-600/20 flex items-center gap-1.5 shrink-0 cursor-pointer transition-all"
+                        title="크몽 주문, B2B 법인 계약, 비상 시 수동으로 라이선스 키 생성"
+                    >
+                        <Key className="w-3.5 h-3.5" />
+                        <span>수동 키 발급</span>
+                    </Button>
                 </div>
             </div>
 

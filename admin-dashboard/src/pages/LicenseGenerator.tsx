@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
-import { Copy, CheckCircle2, ChevronRight, Clock } from 'lucide-react';
+import { Copy, CheckCircle2, ChevronRight, Clock, ArrowLeft } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -409,10 +410,33 @@ export const LicenseGenerator = () => {
 
     return (
         <div className="max-w-[1200px] mx-auto space-y-6 pt-0 pb-12 px-4">
-            <div className="flex flex-col gap-1.5">
-                <h1 className="text-3xl font-black text-slate-900 tracking-tight">
-                    라이선스 키 발급
-                </h1>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                        <Link 
+                            to="/admin/licenses" 
+                            className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-indigo-600 transition-colors mr-1"
+                        >
+                            <ArrowLeft className="w-3.5 h-3.5" />
+                            <span>구매자 관리</span>
+                        </Link>
+                        <span className="text-slate-300">/</span>
+                        <span className="text-xs font-bold text-indigo-600">수동 키 발급</span>
+                    </div>
+                    <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                        라이선스 키 수동/비상 발급
+                    </h1>
+                    <p className="text-xs text-slate-400 font-bold">
+                        크몽 외부 주문, B2B 법인 대량 계약, CS 보상 및 비상 시 수동으로 라이선스를 생성합니다.
+                    </p>
+                </div>
+                <Link
+                    to="/admin/licenses"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 shadow-xs transition-colors self-start sm:self-auto"
+                >
+                    <ArrowLeft className="w-3.5 h-3.5" />
+                    <span>목록으로 돌아가기</span>
+                </Link>
             </div>
 
             <div className="grid gap-6 lg:grid-cols-12 items-start">
