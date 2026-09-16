@@ -38,6 +38,7 @@ interface License {
     price_sold?: number;
     license_type?: string;
     collection_limit?: number;
+    used_count?: number;
     contact?: string;
     memo?: string;
     channel?: string;
@@ -365,25 +366,6 @@ export const LicenseList = () => {
         } catch (error: any) { alert(`수정 오류: ${error.message}`); }
     };
 
-    const handleEditFirstRunDate = async (id: string, currentFirstRun: string | undefined, buyerName: string) => {
-        const newDate = window.prompt(`"${buyerName}" 새 실행일자 (YYYY-MM-DD):`, currentFirstRun ? currentFirstRun.split('T')[0] : '');
-        if (newDate === null) return;
-        
-        let firstRunPayload: string | null = null;
-        if (newDate) {
-            const parsedDate = new Date(newDate);
-            if (isNaN(parsedDate.getTime())) { alert('날짜 형식 오류 (YYYY-MM-DD)'); return; }
-            firstRunPayload = parsedDate.toISOString();
-        }
-        
-        try {
-            const { error } = await supabase.from('licenses').update({ first_run_date: firstRunPayload }).eq('id', id);
-            if (error) throw error;
-            fetchLicenses();
-            showToast(`실행일 변경: ${newDate || '대기 상태로 초기화'}`, 'success');
-        } catch (error: any) { alert(`수정 오류: ${error.message}`); }
-    };
-
     const handleToggleStatus = async (id: string, currentStatus: string, buyerName: string) => {
         if (currentStatus === 'blocked') {
             if (!window.confirm(`"${buyerName}" 차단 해제하시겠습니까?`)) return;
@@ -477,39 +459,89 @@ export const LicenseList = () => {
                     </button>
                 </td>
 
-                {/* 구매일자 */}
-                <td className="px-3 py-2 font-bold text-slate-500 whitespace-nowrap">
-                    {lic.created_at ? format(new Date(lic.created_at), 'yyyy.MM.dd') : '-'}
+                {/* 구매일자 (구독 시작일) & 최초 접속 로그 */}
+                <td className="px-3 py-2 whitespace-nowrap">
+                    <div className="font-bold text-slate-800 text-xs">
+                        {lic.created_at ? format(new Date(lic.created_at), 'yyyy.MM.dd') : '-'}
+                    </div>
+                    {lic.first_run_date ? (
+                        <div className="text-[10px] text-slate-400 font-medium flex items-center gap-0.5" title="최초 기기 등록/로그인 일시">
+                            <span>접속:</span>
+                            <span className="text-slate-600 font-mono font-bold">{format(new Date(lic.first_run_date), 'MM.dd')}</span>
+                        </div>
+                    ) : (
+                        <div className="text-[10px] text-indigo-400 font-bold">
+                            미접속
+                        </div>
+                    )}
                 </td>
 
-                {/* 실행일자 */}
-                <td className="px-3 py-2 font-bold text-slate-500 whitespace-nowrap">
-                    <div className="flex items-center gap-1">
-                        <span>{lic.first_run_date ? format(new Date(lic.first_run_date), 'yyyy.MM.dd') : <span className="text-slate-300 text-[10px]">대기</span>}</span>
-                        <button
-                            type="button"
-                            className="text-slate-300 hover:text-indigo-500 transition-colors shrink-0"
-                            onClick={(e) => { e.stopPropagation(); handleEditFirstRunDate(lic.id, lic.first_run_date, lic.buyer_name); }}
-                            title="실행일자 수정"
-                        >
-                            <Pencil className="w-2.5 h-2.5" />
-                        </button>
-                    </div>
+                {/* 수집 사용량 (사용량 / 한도) */}
+                <td className="px-3 py-2 whitespace-nowrap">
+                    {lic.collection_limit && lic.collection_limit > 0 ? (
+                        <div className="space-y-1 min-w-[110px]">
+                            <div className="flex items-center justify-between gap-1 text-[11px] font-bold">
+                                <span className="text-indigo-950 font-black">
+                                    {(lic.used_count || 0).toLocaleString()}
+                                </span>
+                                <span className="text-slate-400 text-[10px]">
+                                    / {lic.collection_limit.toLocaleString()}건
+                                </span>
+                            </div>
+                            {/* 미니 프로그레스 바 */}
+                            <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                <div 
+                                    className={cn(
+                                        "h-full rounded-full transition-all duration-300",
+                                        ((lic.used_count || 0) / lic.collection_limit) >= 0.9 
+                                            ? "bg-rose-500" 
+                                            : ((lic.used_count || 0) / lic.collection_limit) >= 0.7 
+                                                ? "bg-amber-500" 
+                                                : "bg-indigo-600"
+                                    )}
+                                    style={{ width: `${Math.min(100, Math.round(((lic.used_count || 0) / lic.collection_limit) * 100))}%` }}
+                                />
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-1.5">
+                            <span className="text-xs font-black text-slate-800">
+                                {(lic.used_count || 0).toLocaleString()}건
+                            </span>
+                            <span className="text-[10px] font-black text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                                무제한
+                            </span>
+                        </div>
+                    )}
                 </td>
 
                 {/* 만료일자 */}
-                <td className="px-3 py-2 font-bold text-slate-500 whitespace-nowrap">
+                <td className="px-3 py-2 whitespace-nowrap">
                     <div className="flex items-center gap-1">
-                        <span>{lic.expire_date ? format(new Date(lic.expire_date), 'yyyy.MM.dd') : '-'}</span>
+                        <span className="font-bold text-slate-800 text-xs">
+                            {lic.expire_date ? format(new Date(lic.expire_date), 'yyyy.MM.dd') : '-'}
+                        </span>
                         <button
                             type="button"
-                            className="text-slate-300 hover:text-indigo-500 transition-colors shrink-0"
+                            className="text-slate-300 hover:text-indigo-500 transition-colors shrink-0 cursor-pointer"
                             onClick={(e) => { e.stopPropagation(); handleEditExpireDate(lic.id, lic.expire_date, lic.buyer_name); }}
                             title="만료일자 직접 수정"
                         >
                             <Pencil className="w-2.5 h-2.5" />
                         </button>
                     </div>
+                    {lic.expire_date && (
+                        <div className="text-[10px] font-bold">
+                            {(() => {
+                                const exp = new Date(lic.expire_date);
+                                const diff = Math.ceil((exp.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+                                if (diff < 0) return <span className="text-rose-500">만료됨</span>;
+                                if (diff === 0) return <span className="text-rose-600 font-black">D-Day</span>;
+                                if (diff <= 7) return <span className="text-amber-600 font-black">D-{diff} (임박)</span>;
+                                return <span className="text-slate-400 font-medium">D-{diff}</span>;
+                            })()}
+                        </div>
+                    )}
                 </td>
 
                 {/* 상태 - 가로 타원형 뱃지, 줄바꿈 방지 */}
@@ -917,13 +949,13 @@ export const LicenseList = () => {
                     <table className="w-full min-w-[960px] text-left border-collapse">
                         <colgroup>
                             <col style={{ width: '44px' }} />  {/* NO */}
-                            <col style={{ width: '220px' }} /> {/* 구매자 (이메일) */}
+                            <col style={{ width: '210px' }} /> {/* 구매자 (이메일) */}
                             <col style={{ width: 'auto' }} />  {/* 구매 제품 (풀 텍스트) */}
-                            <col style={{ width: '80px' }} />  {/* 라이선스 키(복사) */}
-                            <col style={{ width: '90px' }} />  {/* 구매일자 */}
-                            <col style={{ width: '95px' }} />  {/* 실행일자 */}
-                            <col style={{ width: '95px' }} />  {/* 만료일자 */}
-                            <col style={{ width: '90px' }} />  {/* 상태 */}
+                            <col style={{ width: '75px' }} />  {/* 라이선스 키(복사) */}
+                            <col style={{ width: '95px' }} />  {/* 구매일자 */}
+                            <col style={{ width: '135px' }} /> {/* 수집 사용량 */}
+                            <col style={{ width: '105px' }} /> {/* 만료일자 */}
+                            <col style={{ width: '85px' }} />  {/* 상태 */}
                             <col style={{ width: '185px' }} /> {/* 제어 */}
                         </colgroup>
                         <thead className="bg-slate-900 text-white">
@@ -933,7 +965,7 @@ export const LicenseList = () => {
                                 <th className="px-3 py-2.5 text-slate-200 whitespace-nowrap">구매 제품</th>
                                 <th className="px-3 py-2.5 text-slate-200 text-center whitespace-nowrap">라이선스 키</th>
                                 <th className="px-3 py-2.5 text-slate-200 whitespace-nowrap">구매일자</th>
-                                <th className="px-3 py-2.5 text-slate-200 whitespace-nowrap">실행일자</th>
+                                <th className="px-3 py-2.5 text-slate-200 whitespace-nowrap">수집 사용량</th>
                                 <th className="px-3 py-2.5 text-slate-200 whitespace-nowrap">만료일자</th>
                                 <th className="px-3 py-2.5 text-slate-200 text-center whitespace-nowrap">상태</th>
                                 <th className="px-3 py-2.5 text-right text-slate-200 whitespace-nowrap">제어</th>
