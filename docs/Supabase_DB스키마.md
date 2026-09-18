@@ -1,8 +1,8 @@
 # 🗄 Supabase 전역 DB 스키마 명세서
 
 - **문서 번호**: 3M-DOC-002
-- **버전**: v1.2
-- **갱신 일시**: 2026-06-03
+- **버전**: v2.0
+- **갱신 일시**: 2026-09-18
 - **관리 주체**: Monster 총괄 AI (Hub AI)
 
 ---
@@ -17,7 +17,7 @@
 ## 2. 테이블 상세 명세
 
 ### [테이블명: licenses]
-- **목적**: 전역 라이선스 정보, PC 기기 바인딩(HWID) 상태, 만료 상태 및 사용자 속성 관리.
+- **목적**: 전역 라이선스 정보, PC 기기 바인딩(HWID) 상태, 만료 상태 및 수집량 동기화 관리.
 - **테이블 구조**:
 
 | 컬럼명 | 타입 | 제약 조건 | 설명 |
@@ -25,20 +25,19 @@
 | **id** | BIGINT | PRIMARY KEY (Identity) | 라이선스 고유 순번 ID |
 | **serial_key** | TEXT | NOT NULL | 라이선스 고유 시리얼 키 (예: `CM-XXXX-XXXX-XXXX`) |
 | **product_id** | TEXT | NOT NULL | 적용 대상 제품 식별자 (예: `NPlace-DB`, `CafeCrawler`) |
-| **license_type** | TEXT | NOT NULL | 라이선스 유형 |
-| **buyer_name** | TEXT | NOT NULL | 구매자 성함 또는 상호명 |
-| **contact** | TEXT | NULLABLE | 구매자 연락처 (이메일 등) |
-| **channel** | TEXT | NULLABLE | 판매/유입 채널 |
+| **license_type** | TEXT | NOT NULL | 라이선스 유형 (`STANDARD`, `DELUXE`, `PREMIUM`) |
+| **buyer_name** | TEXT | NOT NULL | 구매자 식별 (이메일 ID 또는 성함) |
+| **contact** | TEXT | NULLABLE | 구매자 이메일 (고객 식별 및 라이선스 매칭 유일 기준) |
+| **channel** | TEXT | NULLABLE | 판매/유입 채널 (예: `3Monster (KCP 카드결제)`) |
 | **price_sold** | INTEGER | DEFAULT 0 | 실제 판매 가격 |
-| **memo** | TEXT | NULLABLE | 특이사항 기록용 메모 |
-| **expire_date** | TIMESTAMPTZ | NOT NULL | 라이선스 만료 일시 (ISO 8601) |
-| **collection_limit**| INTEGER | NULLABLE | 1회/기간 내 최대 수집 제한 건수 (체험판/테스트 키용) |
-| **status** | TEXT | DEFAULT 'unused' | 키 상태 (`active`, `used`, `unused`, `blocked`, `expired` - UI는 정상/만료/정지 3단계) |
-| **collection_limit**| INTEGER | NULLABLE | 1회/기간 내 최대 수집 제한 건수 (체험판/한도 플랜용) |
-| **used_count** | INTEGER | DEFAULT 0 | 정식 라이선스 기간 내 누적 수집 건수 (클라이언트 실시간 동기화) |
+| **memo** | TEXT | NULLABLE | 특이사항 및 결제 주문번호 기록 |
+| **expire_date** | TIMESTAMPTZ | NOT NULL | 라이선스 만료 일시 (구매일 기준 30일, ISO 8601) |
+| **collection_limit**| INTEGER | NULLABLE | 기간 내 최대 수집 제한 건수 (스탠다드 1000, 무제한 NULL) |
+| **status** | TEXT | DEFAULT 'active' | 라이선스 상태 (`active`: 정상, `expired`: 만료, `blocked`: 정지) - *대기중(unused)은 완전 폐지* |
+| **used_count** | INTEGER | DEFAULT 0 | 정식 라이선스 기간 내 누적 수집 건수 (클라이언트 실시간 PATCH 동기화) |
 | **bound_value** | TEXT | NULLABLE | 최초 등록 또는 바인딩된 PC의 HWID |
-| **created_at** | TIMESTAMPTZ | DEFAULT now() | 발행 일시 |
-| **constraint_type** | TEXT | NULLABLE | 기능 제약 등 세부 타입 속성 |
+| **created_at** | TIMESTAMPTZ | DEFAULT now() | 발행 일시 (구매 시점) |
+| **constraint_type** | TEXT | NULLABLE | 기능 제약 등 세부 타입 속성 (`HWID`) |
 
 ---
 

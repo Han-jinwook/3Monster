@@ -4,7 +4,6 @@ import { supabase, supabasePublic } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
 import { 
     User, 
     Mail, 
@@ -15,7 +14,6 @@ import {
     AlertCircle, 
     Shield,
     Sparkles,
-    CheckCircle2,
     Copy,
     ChevronDown,
     ChevronUp,
@@ -48,14 +46,10 @@ export const Profile = () => {
     const userEmail = authEmail || localStorage.getItem('user_email') || '';
 
     const [loading, setLoading] = useState(true);
-    const [savingNickname, setSavingNickname] = useState(false);
-    const [successMessage, setSuccessMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [toasts, setToasts] = useState<Array<{ id: number; message: string }>>([]);
 
     // User Profile state
-    const [name, setName] = useState('');
-    const [initialName, setInitialName] = useState('');
     const [signupDate, setSignupDate] = useState('');
     
     // Notification toggle
@@ -101,21 +95,14 @@ export const Profile = () => {
 
             if (userError) console.warn("User data fetch warning:", userError);
 
-            let currentUserName = '';
-            if (userData) {
-                currentUserName = userData.name || '';
-                setName(currentUserName);
-                setInitialName(currentUserName);
-                if (userData.created_at) {
-                    const date = new Date(userData.created_at);
-                    setSignupDate(`${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`);
-                }
+            if (userData && userData.created_at) {
+                const date = new Date(userData.created_at);
+                setSignupDate(`${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`);
             }
 
-            // 2. Fetch Licenses details (안전하고 완벽한 다중 매칭 - RLS 세션 영향 없는 supabasePublic 사용)
+            // 2. Fetch Licenses details (이메일 기준 매칭)
             const emailClean = userEmail.toLowerCase().trim();
             const emailId = emailClean.split('@')[0].trim();
-            const nameClean = currentUserName.toLowerCase().trim();
 
             const { data: licenseData, error: licenseError } = await supabasePublic
                 .from('licenses')
@@ -128,7 +115,7 @@ export const Profile = () => {
                 // 관리자인 경우 전체 표시
                 setLicenses((licenseData as LicenseItem[]) || []);
             } else {
-                // 구매자/일반유저인 경우 본인 정보와 일치하는 라이선스만 필터링
+                // 구매자/일반유저인 경우 본인 이메일과 일치하는 라이선스 필터링
                 const matched = ((licenseData as LicenseItem[]) || []).filter(lic => {
                     const licContact = (lic.contact || '').toLowerCase().trim();
                     const licBuyer = (lic.buyer_name || '').toLowerCase().trim();
@@ -138,9 +125,7 @@ export const Profile = () => {
                         (emailClean && licContact === emailClean) ||
                         (emailClean && licBuyer === emailClean) ||
                         (emailId && licBuyer === emailId) ||
-                        (emailId && licContactId === emailId) ||
-                        (nameClean && licBuyer === nameClean) ||
-                        (nameClean && licContact === nameClean)
+                        (emailId && licContactId === emailId)
                     );
                 });
                 setLicenses(matched);
@@ -199,32 +184,6 @@ export const Profile = () => {
         }));
     }, [licenses]);
 
-    const handleSaveNickname = async () => {
-        if (!userEmail || name.trim() === initialName) return;
-        setSavingNickname(true);
-        setErrorMessage('');
-        setSuccessMessage('');
-        try {
-            const { error: updateError } = await supabase
-                .from('users')
-                .upsert({
-                    email: userEmail.toLowerCase(),
-                    name: name.trim()
-                }, { onConflict: 'email' });
-
-            if (updateError) throw updateError;
-
-            setInitialName(name.trim());
-            setSuccessMessage("크몽 ID가 성공적으로 변경되었습니다.");
-            setTimeout(() => setSuccessMessage(''), 2000);
-            fetchProfileData();
-        } catch (err: any) {
-            console.error("Error saving nickname:", err);
-            setErrorMessage("저장 중 에러가 발생했습니다: " + err.message);
-        } finally {
-            setSavingNickname(false);
-        }
-    };
 
     const handleCopySerial = (serial: string) => {
         navigator.clipboard.writeText(serial).then(() => showToast(`라이선스 키가 복사되었습니다: ${serial}`));
@@ -290,49 +249,33 @@ export const Profile = () => {
 
         if (status === 'blocked') {
             return (
-                <span className="px-2.5 py-1 text-[10px] font-bold text-rose-600 bg-rose-50 border border-rose-100 rounded-full flex items-center gap-1 w-fit">
-                    <AlertCircle className="w-3 h-3" /> 차단됨
+                <span className="px-2.5 py-1 text-[10px] font-bold text-rose-600 bg-rose-50 border border-rose-200 rounded-full flex items-center gap-1 w-fit">
+                    <AlertCircle className="w-3 h-3" /> 정지
                 </span>
             );
         }
         if (expireDate && expireDate < now) {
             return (
-                <span className="px-2.5 py-1 text-[10px] font-bold text-slate-400 bg-slate-100 border border-slate-200 rounded-full flex items-center gap-1 w-fit">
-                    종료 (만료)
+                <span className="px-2.5 py-1 text-[10px] font-bold text-slate-500 bg-slate-100 border border-slate-200 rounded-full flex items-center gap-1 w-fit">
+                    만료
                 </span>
             );
         }
-        if (expireDate && (status === 'active' || status === 'used')) {
+        if (expireDate) {
             const daysLeft = Math.ceil((expireDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
             if (daysLeft <= 7) {
                 return (
                     <span className="px-2.5 py-1 text-[10px] font-bold text-orange-700 bg-orange-50 border border-orange-200 rounded-full flex items-center gap-1 w-fit">
-                        <Clock className="w-3 h-3" /> 만료 예정 (D-{daysLeft}일)
+                        <Clock className="w-3 h-3" /> 만료 임박 (D-{daysLeft}일)
                     </span>
                 );
             }
         }
-        switch (status) {
-            case 'active':
-            case 'used':
-                return (
-                    <span className="px-2.5 py-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 rounded-full flex items-center gap-1 w-fit">
-                        <Check className="w-3 h-3" /> 유지 (사용중)
-                    </span>
-                );
-            case 'unused':
-                return (
-                    <span className="px-2.5 py-1 text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 rounded-full flex items-center gap-1 w-fit">
-                        대기 (미사용)
-                    </span>
-                );
-            default:
-                return (
-                    <span className="px-2.5 py-1 text-[10px] font-bold text-slate-400 bg-slate-100 border border-slate-200 rounded-full flex items-center gap-1 w-fit">
-                        종료 (만료)
-                    </span>
-                );
-        }
+        return (
+            <span className="px-2.5 py-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/70 rounded-full flex items-center gap-1 w-fit">
+                <Check className="w-3 h-3" /> 정상
+            </span>
+        );
     };
 
     if (loading) {
@@ -387,16 +330,6 @@ export const Profile = () => {
                 </div>
 
                 {/* Status messages */}
-                {successMessage && (
-                    <motion.div 
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="flex items-center gap-3 bg-emerald-50 text-emerald-700 border border-emerald-100 p-4 rounded-2xl"
-                    >
-                        <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                        <p className="text-xs font-bold">{successMessage}</p>
-                    </motion.div>
-                )}
                 {errorMessage && (
                     <motion.div 
                         initial={{ opacity: 0, y: -10 }}
@@ -503,25 +436,16 @@ export const Profile = () => {
                                                                 </div>
                                                             </div>
 
-                                                            {/* 추가구매 / 연장 버튼 (쇼룸 해당 제품 카드로 조용히 이동) */}
+                                                            {/* 30일 신규 재결제 / 쇼룸 이동 버튼 */}
                                                             <div className="flex items-center gap-1.5 shrink-0">
                                                                 <button
                                                                     type="button"
                                                                     onClick={() => handleJumpToProduct(productId)}
-                                                                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black shadow-2xs hover:shadow-xs transition-all cursor-pointer whitespace-nowrap"
-                                                                    title="해당 제품 쇼룸 카드로 이동"
+                                                                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black shadow-xs hover:shadow-md transition-all cursor-pointer whitespace-nowrap"
+                                                                    title="30일 이용권 재구매 및 플랜 갱신"
                                                                 >
-                                                                    <Sparkles className="w-3.5 h-3.5 text-emerald-200 shrink-0" />
-                                                                    <span>기간 연장</span>
-                                                                </button>
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() => handleJumpToProduct(productId)}
-                                                                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-xl text-xs font-black transition-all cursor-pointer whitespace-nowrap"
-                                                                    title="해당 제품 쇼룸 카드로 이동"
-                                                                >
-                                                                    <PlusCircle className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                                                                    <span>추가 구매</span>
+                                                                    <Sparkles className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+                                                                    <span>30일 이용권 재결제</span>
                                                                 </button>
                                                             </div>
                                                         </div>
@@ -636,31 +560,15 @@ export const Profile = () => {
                                         </div>
                                     </div>
 
-                                    {/* 2. Secondary Auth Info */}
-                                    <div className="space-y-3.5 text-left">
-                                        <div className="flex items-center gap-2 pb-2 border-b border-slate-250">
-                                            <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">크몽 ID (구매자 인증 정보)</h4>
+                                    {/* 2. Customer Auth Notice (이메일 단일 인증) */}
+                                    <div className="bg-indigo-50/50 p-3.5 rounded-xl border border-indigo-100 space-y-1 text-left">
+                                        <div className="flex items-center gap-1.5 text-[11px] font-black text-indigo-900">
+                                            <Shield className="w-3.5 h-3.5 text-indigo-600" />
+                                            <span>고객 식별 및 라이선스 정책</span>
                                         </div>
-                                        <div className="space-y-1.5">
-                                            <label className="text-[10px] font-bold text-slate-400 pl-0.5">크몽 구매자 ID</label>
-                                            <div className="flex gap-2">
-                                                <Input
-                                                    type="text"
-                                                    value={name}
-                                                    onChange={e => setName(e.target.value)}
-                                                    placeholder="크몽 ID를 입력해 주세요"
-                                                    className="h-10 bg-slate-50 border border-slate-350 hover:border-slate-400 focus:border-indigo-500 focus-visible:bg-white rounded-lg text-xs flex-1 focus-visible:ring-indigo-100"
-                                                />
-                                                <Button 
-                                                    type="button"
-                                                    onClick={handleSaveNickname}
-                                                    disabled={name.trim() === initialName || savingNickname}
-                                                    className="h-10 px-4 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg disabled:opacity-50 disabled:bg-slate-100 disabled:text-slate-450 transition-all shrink-0 border-none"
-                                                >
-                                                    {savingNickname ? '저장중' : '저장'}
-                                                </Button>
-                                            </div>
-                                        </div>
+                                        <p className="text-[10px] text-slate-500 leading-relaxed font-medium">
+                                            3Monster 플랫폼은 별도의 ID/닉네임 없이 로그인하신 <strong>이메일 단일 계정</strong>으로 모든 구매 및 라이선스를 안전하게 통합 관리합니다.
+                                        </p>
                                     </div>
 
                                     {/* 3. Notifications settings */}
