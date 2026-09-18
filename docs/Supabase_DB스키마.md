@@ -33,7 +33,9 @@
 | **memo** | TEXT | NULLABLE | 특이사항 기록용 메모 |
 | **expire_date** | TIMESTAMPTZ | NOT NULL | 라이선스 만료 일시 (ISO 8601) |
 | **collection_limit**| INTEGER | NULLABLE | 1회/기간 내 최대 수집 제한 건수 (체험판/테스트 키용) |
-| **status** | TEXT | DEFAULT 'unused' | 키 상태 (`active`, `used`, `unused`, `blocked`, `expired`) |
+| **status** | TEXT | DEFAULT 'unused' | 키 상태 (`active`, `used`, `unused`, `blocked`, `expired` - UI는 정상/만료/정지 3단계) |
+| **collection_limit**| INTEGER | NULLABLE | 1회/기간 내 최대 수집 제한 건수 (체험판/한도 플랜용) |
+| **used_count** | INTEGER | DEFAULT 0 | 정식 라이선스 기간 내 누적 수집 건수 (클라이언트 실시간 동기화) |
 | **bound_value** | TEXT | NULLABLE | 최초 등록 또는 바인딩된 PC의 HWID |
 | **created_at** | TIMESTAMPTZ | DEFAULT now() | 발행 일시 |
 | **constraint_type** | TEXT | NULLABLE | 기능 제약 등 세부 타입 속성 |
