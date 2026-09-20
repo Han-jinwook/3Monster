@@ -8,7 +8,12 @@ import {
     Award,
     Calendar,
     BarChart3,
-    Loader2
+    Loader2,
+    ShoppingBag,
+    ExternalLink,
+    ShieldCheck,
+    Sparkles,
+    AlertCircle
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 
@@ -232,9 +237,65 @@ export const Dashboard = () => {
     return (
         <div className="space-y-6">
             {/* Page Header */}
-            <div className="flex flex-col gap-1.5">
-                <h1 className="text-2xl font-black text-slate-800 tracking-tight">관리자 대시보드</h1>
-                <p className="text-xs text-slate-400 font-bold">서비스 이용 현황 및 통합 매출 통계 보드입니다.</p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex flex-col gap-1.5">
+                    <h1 className="text-2xl font-black text-slate-800 tracking-tight">관리자 대시보드</h1>
+                    <p className="text-xs text-slate-400 font-bold">서비스 이용 현황 및 통합 매출 통계 보드입니다.</p>
+                </div>
+            </div>
+
+            {/* 크몽(Kmong) 주문 대응 & 라이선스 발급 안내 배너 */}
+            <div className="bg-gradient-to-r from-amber-500/10 via-indigo-500/5 to-amber-500/10 border-2 border-amber-400/40 rounded-2xl p-5 shadow-sm space-y-3">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div className="flex items-center gap-2">
+                        <span className="p-1.5 bg-amber-500 text-white rounded-xl shadow-xs">
+                            <ShoppingBag className="w-4 h-4" />
+                        </span>
+                        <h3 className="text-sm font-black text-slate-900 flex items-center gap-1.5">
+                            크몽(Kmong) 공식 승인 (#804764) · 주문 인입 시 발급 지침
+                            <span className="text-[10px] px-2 py-0.5 bg-emerald-100 text-emerald-700 font-bold rounded-full">노출중</span>
+                        </h3>
+                    </div>
+                    <a 
+                        href="https://kmong.com/gig/804764" 
+                        target="_blank" 
+                        rel="noreferrer"
+                        className="text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:underline flex items-center gap-1"
+                    >
+                        크몽 서비스 페이지 바로가기 <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                    <div className="bg-white/80 border border-slate-200/80 p-3 rounded-xl space-y-1">
+                        <p className="text-slate-500 font-bold text-[11px] flex items-center gap-1">
+                            <ShieldCheck className="w-3.5 h-3.5 text-indigo-600" /> 1. 고객 이메일 단일 확인
+                        </p>
+                        <p className="text-[11px] text-slate-700 font-medium leading-relaxed">
+                            크몽 ID가 아닌 <strong>"고객 실제 이메일"</strong>을 크몽 채팅으로 전달받아 수동 키 발급 시 연락처에 등록합니다.
+                        </p>
+                    </div>
+
+                    <div className="bg-white/80 border border-slate-200/80 p-3 rounded-xl space-y-1">
+                        <p className="text-slate-500 font-bold text-[11px] flex items-center gap-1">
+                            <Sparkles className="w-3.5 h-3.5 text-amber-500" /> 2. 옵션별 플랜 매핑 규격
+                        </p>
+                        <p className="text-[11px] text-slate-700 font-medium leading-relaxed">
+                            • <strong>STANDARD</strong>: <code>START_1M</code> (월 1,000건)<br />
+                            • <strong>DELUXE</strong>: <code>PLUS_1M</code> (월 3,000건 / 추천)<br />
+                            • <strong>PREMIUM</strong>: <code>PRO_1M</code> (월 9,000건 대량)
+                        </p>
+                    </div>
+
+                    <div className="bg-white/80 border border-slate-200/80 p-3 rounded-xl space-y-1">
+                        <p className="text-slate-500 font-bold text-[11px] flex items-center gap-1">
+                            <AlertCircle className="w-3.5 h-3.5 text-emerald-600" /> 3. 30일 라이선스 키 전달
+                        </p>
+                        <p className="text-[11px] text-slate-700 font-medium leading-relaxed">
+                            상단 <strong>[수동 키 발급]</strong>(채널: 크몽)에서 키 생성 후, 크몽 작업물 발송으로 <strong>시리얼 키 + 다운로드 링크</strong>를 전달합니다.
+                        </p>
+                    </div>
+                </div>
             </div>
 
             {/* General Stats KPIs */}
