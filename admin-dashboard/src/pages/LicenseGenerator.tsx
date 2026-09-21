@@ -56,6 +56,9 @@ export const LicenseGenerator = () => {
     const [searchParams] = useSearchParams();
     const queryBuyer = searchParams.get('buyer') || '';
     const queryEmail = searchParams.get('email') || '';
+    const queryChannel = searchParams.get('channel') || '3Monster 직결제';
+    const queryProduct = searchParams.get('product') || 'NPlace-DB';
+    const queryTier = searchParams.get('tier') || 'START_1M';
 
     const [loading, setLoading] = useState(false);
     const [generatedKey, setGeneratedKey] = useState('');
@@ -76,13 +79,13 @@ export const LicenseGenerator = () => {
     }, []);
 
     const [formData, setFormData] = useState({
-        product_id: 'NPlace-DB',
-        license_type: 'START_1M',
+        product_id: queryProduct,
+        license_type: queryTier,
         constraint_type: 'HWID',
         buyer_name: queryBuyer,
         contact: queryEmail,
-        channel: '3Monster 직결제',
-        price_sold: '5000',
+        channel: queryChannel,
+        price_sold: defaultPrices[queryTier] !== undefined ? String(defaultPrices[queryTier]) : '5000',
         memo: ''
     });
 
@@ -131,15 +134,19 @@ export const LicenseGenerator = () => {
 
     // URL 파라미터가 변경될 때 자동 채우기
     useEffect(() => {
-        if (queryBuyer || queryEmail) {
+        if (queryBuyer || queryEmail || queryChannel || queryProduct || queryTier) {
             setFormData(prev => ({
                 ...prev,
                 buyer_name: queryBuyer || prev.buyer_name,
                 contact: queryEmail || prev.contact,
+                channel: queryChannel !== '3Monster 직결제' ? queryChannel : prev.channel,
+                product_id: queryProduct !== 'NPlace-DB' ? queryProduct : prev.product_id,
+                license_type: queryTier !== 'START_1M' ? queryTier : prev.license_type,
+                price_sold: defaultPrices[queryTier] !== undefined ? String(defaultPrices[queryTier]) : prev.price_sold
             }));
-            setEmailAutoFilled(true);
+            if (queryBuyer || queryEmail) setEmailAutoFilled(true);
         }
-    }, [queryBuyer, queryEmail]);
+    }, [queryBuyer, queryEmail, queryChannel, queryProduct, queryTier]);
 
     const defaultPricingList: PricingItem[] = [
         // 마케팅몬스터 제품군
