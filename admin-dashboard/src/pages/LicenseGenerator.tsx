@@ -82,7 +82,7 @@ export const LicenseGenerator = () => {
         buyer_name: queryBuyer,
         contact: queryEmail,
         channel: '3Monster 직결제',
-        price_sold: '9900',
+        price_sold: '5000',
         memo: ''
     });
 
@@ -280,7 +280,7 @@ export const LicenseGenerator = () => {
         );
         if (matched) return String(matched.price);
         if (defaultPrices[licType] !== undefined) return String(defaultPrices[licType]);
-        return '9900';
+        return '5000';
     };
 
     const handleLicenseTypeChange = (licenseType: string) => {

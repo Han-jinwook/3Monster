@@ -152,8 +152,8 @@ export const TIER_PRICES: Record<SubscriptionTierKey, TierInfo> = {
         features: ['1,000건 추출 한도', '구독 기간 내 이메일 무제한 발송', '구독 기간 내 인스타DM 무제한 발송']
     },
     '1M': {
-        name: 'Deluxe',
-        label: '디럭스 30일 이용권 (무제한)',
+        name: 'Plus',
+        label: '플러스 30일 이용권 (무제한)',
         tier: 'PLUS',
         cycle: '1M',
         normalPrice: 9000,
@@ -166,8 +166,8 @@ export const TIER_PRICES: Record<SubscriptionTierKey, TierInfo> = {
         features: ['건수 제한 없는 무제한 추출', '구독 기간 내 이메일 무제한 발송', '구독 기간 내 인스타DM 무제한 발송', '20대 업종별 실전 콜드문자 템플릿']
     },
     '3M': {
-        name: 'Premium',
-        label: '프리미엄 3개월 특가 (무제한)',
+        name: 'Pro',
+        label: '프로 3개월 특가 (무제한)',
         tier: 'PRO',
         cycle: '1M',
         normalPrice: 21000,

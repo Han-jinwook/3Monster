@@ -207,18 +207,18 @@ export const Profile = () => {
     };
 
     const getPlanLabel = (_productId: string, licenseType?: string, collectionLimit?: number) => {
+        const t = (licenseType || '').toUpperCase();
         if (collectionLimit && collectionLimit > 0) {
             return {
-                name: 'STANDARD',
-                detail: `1개월 / ${collectionLimit.toLocaleString()}건 제한`,
+                name: 'START',
+                detail: t.includes('1Y') ? `1년 / ${collectionLimit.toLocaleString()}건 총량` : `1개월 / ${collectionLimit.toLocaleString()}건 제한`,
                 badgeColor: 'text-indigo-700 bg-indigo-50 border-indigo-200'
             };
         }
-        const t = (licenseType || '').toUpperCase();
-        if (t === 'PREMIUM' || t === '3M') {
+        if (t.startsWith('PRO') || t === 'PREMIUM' || t === '3M') {
             return {
-                name: 'PREMIUM',
-                detail: '3개월 / 무제한',
+                name: 'PRO',
+                detail: t.includes('1Y') ? '1년 / 무제한' : '3개월 / 무제한 특가',
                 badgeColor: 'text-purple-700 bg-purple-50 border-purple-200'
             };
         }
@@ -236,9 +236,16 @@ export const Profile = () => {
                 badgeColor: 'text-amber-700 bg-amber-50 border-amber-200'
             };
         }
+        if (t.startsWith('START') || t === 'STANDARD') {
+            return {
+                name: 'START',
+                detail: t.includes('1Y') ? '1년 / 12,000건 제한' : '1개월 / 1,000건 제한',
+                badgeColor: 'text-indigo-700 bg-indigo-50 border-indigo-200'
+            };
+        }
         return {
-            name: 'DELUXE',
-            detail: '1개월 / 무제한',
+            name: 'PLUS',
+            detail: t.includes('1Y') ? '1년 / 무제한' : '1개월 / 무제한',
             badgeColor: 'text-emerald-700 bg-emerald-50 border-emerald-200'
         };
     };

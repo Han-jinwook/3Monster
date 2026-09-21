@@ -189,13 +189,14 @@ export const LicenseList = () => {
     };
 
     const getProductLabel = (productId: string, licenseType?: string, collectionLimit?: number) => {
+        const isMap = productId.toLowerCase().includes('nplace') || productId.toLowerCase().includes('map');
         const mapping: Record<string, string> = {
-            'START_1M': '스타트 1M (1,000건/무제한발송)',
-            'START_1Y': '스타트 1Y (12,000건/무제한발송)',
-            'PLUS_1M':  '플러스 1M (3,000건/무제한발송)',
-            'PLUS_1Y':  '플러스 1Y (36,000건/무제한발송)',
-            'PRO_1M':   '프로 1M (9,000건/무제한발송)',
-            'PRO_1Y':   '프로 1Y (108,000건/무제한발송)',
+            'START_1M': isMap ? '스타트 1M (1,000건 추출)' : '스타트 1M (1,000건/발송무제한)',
+            'START_1Y': isMap ? '스타트 1Y (12,000건 추출)' : '스타트 1Y (12,000건/발송무제한)',
+            'PLUS_1M':  isMap ? '플러스 1M (무제한 추출)' : '플러스 1M (3,000건/발송무제한)',
+            'PLUS_1Y':  isMap ? '플러스 1Y (연간 무제한)' : '플러스 1Y (36,000건/발송무제한)',
+            'PRO_1M':   isMap ? '프로 3M (3개월 무제한)' : '프로 3M (9,000건/발송무제한)',
+            'PRO_1Y':   isMap ? '프로 1Y (연간 무제한)' : '프로 1Y (108,000건/발송무제한)',
             'DELUXE':   '스타트',
             'TRIAL':    '체험판',
             'TEST':     '테스트',
