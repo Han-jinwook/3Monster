@@ -1592,7 +1592,7 @@ export const Showroom = () => {
                                                                 {isCafe ? (
                                                                     <span>내 카페 보호 안전 가이드: <strong>지능형 딜레이 알고리즘</strong> 탑재로 안전한 카페 운영 관리를 지원합니다.</span>
                                                                 ) : (
-                                                                    <span>네이버 계정 보호 안전 가이드: <strong>하루 권장 300건, 최대 500건 추출</strong>을 준수합니다.</span>
+                                                                    <span>초고속 실시간 지도 정밀 파싱: <strong>원하는 지역·업종별 타겟 매장 데이터</strong>를 자유롭게 수집하세요.</span>
                                                                 )}
                                                             </div>
 
@@ -1709,16 +1709,16 @@ export const Showroom = () => {
                                                                     {billingCycle === 'annual' ? (
                                                                         <div className="mb-3">
                                                                             <div className="flex items-baseline gap-1">
-                                                                                <span className="text-xl font-black text-slate-900">82,800</span>
+                                                                                <span className="text-xl font-black text-slate-900">42,000</span>
                                                                                 <span className="text-xs font-bold text-slate-500">원 / 1년</span>
                                                                                 <span className="text-[10px] font-extrabold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded ml-auto">30% 할인</span>
                                                                             </div>
-                                                                            <p className="text-[11px] text-slate-400 font-bold mt-0.5">월 6,900원꼴 (일시납)</p>
+                                                                            <p className="text-[11px] text-slate-400 font-bold mt-0.5">월 3,500원꼴 (일시납)</p>
                                                                         </div>
                                                                     ) : (
                                                                         <div className="mb-3">
                                                                             <div className="flex items-baseline gap-1">
-                                                                                <span className="text-xl font-black text-slate-900">9,900</span>
+                                                                                <span className="text-xl font-black text-slate-900">5,000</span>
                                                                                 <span className="text-xs font-bold text-slate-500">원 / 월</span>
                                                                             </div>
                                                                         </div>
@@ -1763,23 +1763,21 @@ export const Showroom = () => {
                                                                 )}
                                                             >
                                                                 <div className="flex justify-between items-start mb-1.5">
-                                                                    <span className="text-[11px] font-black text-indigo-600 uppercase tracking-wider">Plus</span>
-                                                                    <span className="text-[10px] font-bold bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">실전 운영 매니저</span>
+                                                                    <span className="text-[11px] font-black text-indigo-600 uppercase tracking-wider">Deluxe</span>
+                                                                    <span className="text-[10px] font-bold bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">👑 가성비 1위 추천</span>
                                                                 </div>
-                                                                <h5 className="font-black text-slate-900 text-base mb-1">플러스 {billingCycle === 'annual' ? '연간구독' : '월구독'}</h5>
+                                                                <h5 className="font-black text-slate-900 text-base mb-1">디럭스 {billingCycle === 'annual' ? '연간이용권' : '월구독'}</h5>
                                                                 <p className="text-[11px] font-extrabold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md w-fit mb-3">
-                                                                    {billingCycle === 'annual' 
-                                                                        ? (isComment ? '연 36,000건 응대 한도' : isEvent ? '연 36,000건 집계 한도' : '연 36,000건 수집 한도') 
-                                                                        : (isComment ? '월 3,000건 응대 한도' : isEvent ? '월 3,000건 집계 한도' : '월 3,000건 수집 한도')}
+                                                                    {isCafe ? (billingCycle === 'annual' ? '연 36,000건 대량 지원' : '월 3,000건 실전 지원') : '🔥 무제한 실시간 추출'}
                                                                 </p>
 
                                                                 <ul className="text-xs text-slate-600 space-y-1.5 mb-5">
                                                                     <li className="flex items-center gap-1.5 font-bold text-indigo-950">
                                                                         <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
                                                                         <span>
-                                                                            {billingCycle === 'annual'
-                                                                                ? (isComment ? '연 36,000건 자유 소진 (일 100건 안전 응대)' : isEvent ? '연 36,000건 정기 이벤트 총량 집계' : '연 36,000건 연간 총량 자유 소진')
-                                                                                : (isComment ? '월 3,000건 크레딧 (일 100건 안전 응대)' : isEvent ? '월 3,000건 정기 이벤트 집계' : '월 3,000건 추출 크레딧')}
+                                                                            {isCafe 
+                                                                                ? (billingCycle === 'annual' ? '연 36,000건 연간 총량 자유 소진' : '월 3,000건 크레딧') 
+                                                                                : '건수 제한 없는 무제한 추출'}
                                                                         </span>
                                                                     </li>
                                                                     <li className="flex items-center gap-1.5 font-black text-slate-900">
@@ -1791,7 +1789,7 @@ export const Showroom = () => {
                                                                     <li className="flex items-center gap-1.5">
                                                                         <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
                                                                         <span>
-                                                                            {isComment ? '다중 템플릿 순환 및 제외 닉네임 필터링' : isEvent ? '글자수·출석 가중치 및 회원 랭킹 산출' : isCrawler ? '회원별 활동 히스토리 정밀 아카이빙' : '저장 엑셀 파일 불러와서 재발송'}
+                                                                            {isComment ? '다중 템플릿 순환 및 제외 닉네임 필터링' : isEvent ? '글자수·출석 가중치 및 회원 랭킹 산출' : isCrawler ? '회원별 활동 히스토리 정밀 아카이빙' : '20대 업종별 실전 콜드문자 템플릿'}
                                                                         </span>
                                                                     </li>
                                                                     <li className="flex items-center gap-1.5">
@@ -1804,16 +1802,16 @@ export const Showroom = () => {
                                                                     {billingCycle === 'annual' ? (
                                                                         <div className="mb-3">
                                                                             <div className="flex items-baseline gap-1">
-                                                                                <span className="text-xl font-black text-indigo-700">156,000</span>
+                                                                                <span className="text-xl font-black text-indigo-700">75,600</span>
                                                                                 <span className="text-xs font-bold text-slate-500">원 / 1년</span>
-                                                                                <span className="text-[10px] font-extrabold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded ml-auto">31% 할인</span>
+                                                                                <span className="text-[10px] font-extrabold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded ml-auto">30% 할인</span>
                                                                             </div>
-                                                                            <p className="text-[11px] text-indigo-600 font-bold mt-0.5">월 13,000원꼴 (일시납)</p>
+                                                                            <p className="text-[11px] text-indigo-600 font-bold mt-0.5">월 6,300원꼴 (일시납)</p>
                                                                         </div>
                                                                     ) : (
                                                                         <div className="mb-3">
                                                                             <div className="flex items-baseline gap-1">
-                                                                                <span className="text-xl font-black text-slate-900">19,000</span>
+                                                                                <span className="text-xl font-black text-slate-900">9,000</span>
                                                                                 <span className="text-xs font-bold text-slate-500">원 / 월</span>
                                                                             </div>
                                                                         </div>
@@ -1858,14 +1856,16 @@ export const Showroom = () => {
                                                                 )}
                                                             >
                                                                 <div className="flex justify-between items-start mb-1.5">
-                                                                    <span className="text-[11px] font-black text-slate-400 uppercase tracking-wider">Pro</span>
-                                                                    <span className="text-[10px] font-bold bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full">대형 카페 / 팀</span>
+                                                                    <span className="text-[11px] font-black text-slate-400 uppercase tracking-wider">Premium</span>
+                                                                    <span className="text-[10px] font-bold bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full">대행사 / 전문 영업팀</span>
                                                                 </div>
-                                                                <h5 className="font-black text-slate-900 text-base mb-1">프로 {billingCycle === 'annual' ? '연간구독' : '월구독'}</h5>
+                                                                <h5 className="font-black text-slate-900 text-base mb-1">
+                                                                    {billingCycle === 'annual' ? '프리미엄 연간이용권' : '프리미엄 3개월 특가'}
+                                                                </h5>
                                                                 <p className="text-[11px] font-extrabold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md w-fit mb-3">
                                                                     {billingCycle === 'annual' 
-                                                                        ? (isComment ? '연 108,000건 대량 응대' : isEvent ? '연 108,000건 대량 집계' : '연 108,000건 대량 수집') 
-                                                                        : (isComment ? '월 9,000건 대량 응대' : isEvent ? '월 9,000건 대량 집계' : '월 9,000건 대량 수집')}
+                                                                        ? '1년 무제한 추출 (월 6,000원꼴)' 
+                                                                        : '3개월 무제한 (월 7,000원꼴)'}
                                                                 </p>
 
                                                                 <ul className="text-xs text-slate-600 space-y-1.5 mb-5">
@@ -1873,26 +1873,22 @@ export const Showroom = () => {
                                                                         <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
                                                                         <span>
                                                                             {billingCycle === 'annual'
-                                                                                ? (isComment ? '연 108,000건 자유 소진 (일 300건 고속 응대)' : isEvent ? '연 108,000건 대형 이벤트 무제한 집계' : '연 108,000건 대량 총량 자유 소진')
-                                                                                : (isComment ? '월 9,000건 대량 크레딧 (일 300건 고속 응대)' : isEvent ? '월 9,000건 대형 이벤트 집계' : '월 9,000건 대량 추출 크레딧')}
+                                                                                ? '1년 내내 무제한 추출'
+                                                                                : '3개월 내내 무제한 추출'}
                                                                         </span>
                                                                     </li>
                                                                     <li className="flex items-center gap-1.5 font-bold text-slate-800">
                                                                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                                                                        <span>
-                                                                            {isComment ? '다중 게시판 순회 및 고속 자동 응대 비서' : isEvent ? '다중 이벤트 복합 연산 & 다중 당첨자 추첨' : isCrawler ? '전체 게시판 대량 수집 및 종합 아카이빙' : '이메일 & 인스타DM 무제한 발송'}
-                                                                        </span>
+                                                                        <span>이메일 & 인스타DM 무제한 발송</span>
+                                                                    </li>
+                                                                    <li className="flex items-center gap-1.5">
+                                                                        <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                                                                        <span>저장 엑셀 파일 불러와서 재발송</span>
                                                                     </li>
                                                                     <li className="flex items-center gap-1.5">
                                                                         <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
                                                                         <span>
-                                                                            {isComment ? '스탭 전용 무제한 템플릿 및 자동화 지원' : isEvent ? '공정한 조작 방지 추첨 및 엑셀 상세 리포트' : isCrawler ? '대형 커뮤니티 전문 고속 아카이빙' : '저장 엑셀 파일 불러와서 재발송'}
-                                                                        </span>
-                                                                    </li>
-                                                                    <li className="flex items-center gap-1.5">
-                                                                        <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                                                                        <span>
-                                                                            {isCafe ? '전문 운영팀·스탭 전용 고속 처리' : '대행사·영업팀 전용 고속 처리'}
+                                                                            VIP 기술 지원 & 로직 변경 시 우선 패치
                                                                         </span>
                                                                     </li>
                                                                 </ul>
@@ -1901,18 +1897,20 @@ export const Showroom = () => {
                                                                     {billingCycle === 'annual' ? (
                                                                         <div className="mb-3">
                                                                             <div className="flex items-baseline gap-1">
-                                                                                <span className="text-xl font-black text-slate-900">324,000</span>
+                                                                                <span className="text-xl font-black text-slate-900">72,000</span>
                                                                                 <span className="text-xs font-bold text-slate-500">원 / 1년</span>
-                                                                                <span className="text-[10px] font-extrabold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded ml-auto">30% 할인</span>
+                                                                                <span className="text-[10px] font-extrabold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded ml-auto">대행사 특가</span>
                                                                             </div>
-                                                                            <p className="text-[11px] text-slate-400 font-bold mt-0.5">월 27,000원꼴 (일시납)</p>
+                                                                            <p className="text-[11px] text-slate-400 font-bold mt-0.5">월 6,000원꼴 (일시납)</p>
                                                                         </div>
                                                                     ) : (
                                                                         <div className="mb-3">
                                                                             <div className="flex items-baseline gap-1">
-                                                                                <span className="text-xl font-black text-slate-900">39,000</span>
-                                                                                <span className="text-xs font-bold text-slate-500">원 / 월</span>
+                                                                                <span className="text-xl font-black text-slate-900">21,000</span>
+                                                                                <span className="text-xs font-bold text-slate-500">원 / 3개월</span>
+                                                                                <span className="text-[10px] font-extrabold text-indigo-600 bg-indigo-50 px-1.5 py-0.2 rounded ml-auto">월 7,000원꼴</span>
                                                                             </div>
+                                                                            <p className="text-[11px] text-slate-400 font-bold mt-0.5">3개월 일시납 특가</p>
                                                                         </div>
                                                                     )}
                                                                     <Button 
@@ -1939,7 +1937,7 @@ export const Showroom = () => {
                                                                                 : "bg-slate-900 hover:bg-slate-800 text-white"
                                                                         )}
                                                                     >
-                                                                        {!isLoggedIn ? '로그인 후 구독하기' : '프로 시작하기'}
+                                                                        {!isLoggedIn ? '로그인 후 구독하기' : '프리미엄 시작하기'}
                                                                     </Button>
                                                                 </div>
                                                             </div>
