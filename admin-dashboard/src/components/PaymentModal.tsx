@@ -69,21 +69,21 @@ export const TIER_PRICES: Record<SubscriptionTierKey, TierInfo> = {
     },
     'START_1Y': {
         name: 'Start',
-        label: '스타트 1년 연간이용권',
+        label: '스타트 1년 연간이용권 (총 42,000원)',
         tier: 'START',
         cycle: '1Y',
         normalPrice: 42000,
         discountPrice: 42000,
         monthlyEquivalent: 3500,
-        limitText: '연 12,000건 추출 (월 3,500원꼴)',
+        limitText: '연 12,000건 (연간 총 42,000원)',
         months: 12,
         limit: 12000,
         badge: '30% 할인',
         features: ['연 12,000건 연간 총량 자유 소진', '구독 기간 내 이메일 무제한 발송', '구독 기간 내 인스타DM 무제한 발송']
     },
     'PLUS_1M': {
-        name: 'Deluxe',
-        label: '디럭스 30일 이용권 (무제한)',
+        name: 'Plus',
+        label: '플러스 30일 이용권 (무제한)',
         tier: 'PLUS',
         cycle: '1M',
         normalPrice: 9000,
@@ -96,45 +96,45 @@ export const TIER_PRICES: Record<SubscriptionTierKey, TierInfo> = {
         features: ['건수 제한 없는 무제한 추출', '구독 기간 내 이메일 무제한 발송', '구독 기간 내 인스타DM 무제한 발송', '20대 업종별 실전 콜드문자 템플릿']
     },
     'PLUS_1Y': {
-        name: 'Deluxe',
-        label: '디럭스 1년 연간이용권 (무제한)',
+        name: 'Plus',
+        label: '플러스 1년 연간이용권 (총 75,600원)',
         tier: 'PLUS',
         cycle: '1Y',
         normalPrice: 75600,
         discountPrice: 75600,
         monthlyEquivalent: 6300,
-        limitText: '1년 무제한 추출 (월 6,300원꼴)',
+        limitText: '1년 무제한 (연간 총 75,600원)',
         months: 12,
         limit: null,
         badge: '👑 최고인기 (30% 할인)',
         features: ['1년 내내 무제한 추출', '구독 기간 내 이메일 무제한 발송', '구독 기간 내 인스타DM 무제한 발송', '20대 업종별 실전 콜드문자 템플릿']
     },
     'PRO_1M': {
-        name: 'Premium',
-        label: '프리미엄 3개월 특가 (무제한)',
+        name: 'Pro',
+        label: '프로 3개월 특가 (무제한)',
         tier: 'PRO',
         cycle: '1M',
         normalPrice: 21000,
         discountPrice: 21000,
         monthlyEquivalent: 7000,
-        limitText: '3개월 무제한 (월 7,000원꼴)',
+        limitText: '3개월 무제한 (총 21,000원)',
         months: 3,
         limit: null,
         badge: '대행사/영업팀 특가',
         features: ['3개월 내내 무제한 추출', '구독 기간 내 이메일 무제한 발송', '구독 기간 내 인스타DM 무제한 발송', '로직 변경 시 무상 우선 패치']
     },
     'PRO_1Y': {
-        name: 'Premium',
-        label: '프리미엄 1년 대행사권 (무제한)',
+        name: 'Pro',
+        label: '프로 1년 연간이용권 (준비중)',
         tier: 'PRO',
         cycle: '1Y',
-        normalPrice: 72000,
-        discountPrice: 72000,
-        monthlyEquivalent: 6000,
-        limitText: '1년 무제한 추출 (월 6,000원꼴)',
+        normalPrice: 0,
+        discountPrice: 0,
+        monthlyEquivalent: 0,
+        limitText: '연간 구독 준비중',
         months: 12,
         limit: null,
-        badge: '대행사 VIP (파격 특가)',
+        badge: '준비중',
         features: ['1년 내내 무제한 추출', '구독 기간 내 이메일 무제한 발송', '구독 기간 내 인스타DM 무제한 발송', 'VIP 기술 지원 & 우선 로직 패치']
     },
     // 기존 호환성 유지 매핑
@@ -743,6 +743,32 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                                 const price = info.normalPrice;
                                 const isSelected = selectedTier === tierKey;
                                 const isPlus = tierKey.startsWith('PLUS');
+                                const isDisabled = tierKey === 'PRO_1Y';
+
+                                if (isDisabled) {
+                                    return (
+                                        <div
+                                            key={tierKey}
+                                            className="p-3 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/80 opacity-50 cursor-not-allowed flex flex-col justify-between relative text-left select-none"
+                                        >
+                                            <span className="absolute -top-2.5 right-2 bg-slate-400 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">
+                                                연간 제외
+                                            </span>
+                                            <div>
+                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Pro</p>
+                                                <p className="text-xs font-black text-slate-400 leading-tight mt-0.5">프로</p>
+                                                <p className="text-[10px] text-slate-400 font-bold mt-1 bg-slate-100 px-1.5 py-0.5 rounded w-fit">
+                                                    월간/3개월 전용
+                                                </p>
+                                            </div>
+                                            <div className="mt-2.5 pt-2 border-t border-slate-200">
+                                                <p className="text-xs font-black text-slate-400">
+                                                    연간 미운영
+                                                </p>
+                                            </div>
+                                        </div>
+                                    );
+                                }
 
                                 return (
                                     <div
@@ -779,8 +805,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                                                 {price.toLocaleString()}<span className="text-[10px] font-normal text-slate-500 ml-0.5">원</span>
                                             </p>
                                             {info.cycle === '1Y' && (
-                                                <p className="text-[9px] text-emerald-600 font-bold">
-                                                    월 {info.monthlyEquivalent.toLocaleString()}원꼴
+                                                <p className="text-[9px] text-indigo-600 font-extrabold mt-0.5">
+                                                    1년 일시납 (월 {info.monthlyEquivalent.toLocaleString()}원꼴)
                                                 </p>
                                             )}
                                         </div>
