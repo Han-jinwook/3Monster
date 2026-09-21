@@ -37,16 +37,16 @@ interface PricingItem {
 
 const defaultPrices: { [key: string]: number } = {
     'TEST': 0,
-    'START_1M': 9900,
-    'START_1Y': 82800,
-    'PLUS_1M': 19000,
-    'PLUS_1Y': 156000,
-    'PRO_1M': 39000,
-    'PRO_1Y': 324000,
-    'DELUXE': 9900,
-    '1M': 19000,
-    '3M': 39000,
-    '1Y': 156000
+    'START_1M': 5000,
+    'START_1Y': 42000,
+    'PLUS_1M': 9000,
+    'PLUS_1Y': 75600,
+    'PRO_1M': 21000,
+    'PRO_1Y': 0,
+    'DELUXE': 5000,
+    '1M': 9000,
+    '3M': 21000,
+    '1Y': 75600
 };
 
 import { useSearchParams } from 'react-router-dom';
@@ -143,52 +143,52 @@ export const LicenseGenerator = () => {
 
     const defaultPricingList: PricingItem[] = [
         // 마케팅몬스터 제품군
-        { id: 1, product: 'NPlace-DB', pkg: 'START_1M', label: '[스타트] 1개월 (1,000건 한도 / 발송 무제한)', price: 9900, status: '확정' },
-        { id: 2, product: 'NPlace-DB', pkg: 'PLUS_1M', label: '[플러스] 1개월 (3,000건 한도 / 발송 무제한)', price: 19000, status: '확정' },
-        { id: 3, product: 'NPlace-DB', pkg: 'PRO_1M', label: '[프로] 1개월 (9,000건 대량 / 발송 무제한)', price: 39000, status: '확정' },
-        { id: 4, product: 'NPlace-DB', pkg: 'START_1Y', label: '[스타트] 연간 (12,000건 총량 / 30%할인)', price: 82800, status: '확정' },
-        { id: 5, product: 'NPlace-DB', pkg: 'PLUS_1Y', label: '[플러스] 연간 (36,000건 총량 / 31%할인)', price: 156000, status: '확정' },
-        { id: 6, product: 'NPlace-DB', pkg: 'PRO_1Y', label: '[프로] 연간 (108,000건 총량 / 30%할인)', price: 324000, status: '확정' },
+        { id: 1, product: 'NPlace-DB', pkg: 'START_1M', label: '[스타트] 1개월 (1,000건 한도 / 발송 무제한)', price: 5000, status: '확정' },
+        { id: 2, product: 'NPlace-DB', pkg: 'PLUS_1M', label: '[플러스] 1개월 (무제한 추출 / 발송 무제한)', price: 9000, status: '확정' },
+        { id: 3, product: 'NPlace-DB', pkg: 'PRO_1M', label: '[프로] 3개월 (무제한 추출 / 대행사 VIP)', price: 21000, status: '확정' },
+        { id: 4, product: 'NPlace-DB', pkg: 'START_1Y', label: '[스타트] 연간 (12,000건 총량 / 30%할인)', price: 42000, status: '확정' },
+        { id: 5, product: 'NPlace-DB', pkg: 'PLUS_1Y', label: '[플러스] 연간 (무제한 추출 / 30%할인)', price: 75600, status: '확정' },
+        { id: 6, product: 'NPlace-DB', pkg: 'PRO_1Y', label: '[프로] 연간 (연간 미운영)', price: 0, status: '안' },
 
-        { id: 7, product: 'ContentCrawler', pkg: 'START_1M', label: '[스타트] 1개월 (1,000건 추출)', price: 9900, status: '확정' },
-        { id: 8, product: 'ContentCrawler', pkg: 'PLUS_1M', label: '[플러스] 1개월 (3,000건 추출)', price: 19000, status: '확정' },
-        { id: 9, product: 'ContentCrawler', pkg: 'PRO_1M', label: '[프로] 1개월 (9,000건 추출)', price: 39000, status: '확정' },
-        { id: 10, product: 'ContentCrawler', pkg: 'START_1Y', label: '[스타트] 연간 (12,000건 총량 / 30%할인)', price: 82800, status: '확정' },
-        { id: 11, product: 'ContentCrawler', pkg: 'PLUS_1Y', label: '[플러스] 연간 (36,000건 총량 / 31%할인)', price: 156000, status: '확정' },
-        { id: 12, product: 'ContentCrawler', pkg: 'PRO_1Y', label: '[프로] 연간 (108,000건 총량 / 30%할인)', price: 324000, status: '확정' },
+        { id: 7, product: 'ContentCrawler', pkg: 'START_1M', label: '[스타트] 1개월 (1,000건 추출)', price: 5000, status: '확정' },
+        { id: 8, product: 'ContentCrawler', pkg: 'PLUS_1M', label: '[플러스] 1개월 (무제한 추출)', price: 9000, status: '확정' },
+        { id: 9, product: 'ContentCrawler', pkg: 'PRO_1M', label: '[프로] 3개월 (무제한 추출)', price: 21000, status: '확정' },
+        { id: 10, product: 'ContentCrawler', pkg: 'START_1Y', label: '[스타트] 연간 (12,000건 총량 / 30%할인)', price: 42000, status: '확정' },
+        { id: 11, product: 'ContentCrawler', pkg: 'PLUS_1Y', label: '[플러스] 연간 (무제한 추출 / 30%할인)', price: 75600, status: '확정' },
+        { id: 12, product: 'ContentCrawler', pkg: 'PRO_1Y', label: '[프로] 연간 (연간 미운영)', price: 0, status: '안' },
 
-        { id: 13, product: 'UserManager', pkg: 'START_1M', label: '[스타트] 1개월 (1,000명 관리)', price: 9900, status: '확정' },
-        { id: 14, product: 'UserManager', pkg: 'PLUS_1M', label: '[플러스] 1개월 (3,000명 관리)', price: 19000, status: '확정' },
-        { id: 15, product: 'UserManager', pkg: 'PRO_1M', label: '[프로] 1개월 (9,000명 관리)', price: 39000, status: '확정' },
-        { id: 16, product: 'UserManager', pkg: 'START_1Y', label: '[스타트] 연간 (12,000명 / 30%할인)', price: 82800, status: '확정' },
-        { id: 17, product: 'UserManager', pkg: 'PLUS_1Y', label: '[플러스] 연간 (36,000명 / 31%할인)', price: 156000, status: '확정' },
-        { id: 18, product: 'UserManager', pkg: 'PRO_1Y', label: '[프로] 연간 (108,000명 / 30%할인)', price: 324000, status: '확정' },
+        { id: 13, product: 'UserManager', pkg: 'START_1M', label: '[스타트] 1개월 (1,000명 관리)', price: 5000, status: '확정' },
+        { id: 14, product: 'UserManager', pkg: 'PLUS_1M', label: '[플러스] 1개월 (무제한 관리)', price: 9000, status: '확정' },
+        { id: 15, product: 'UserManager', pkg: 'PRO_1M', label: '[프로] 3개월 (무제한 관리)', price: 21000, status: '확정' },
+        { id: 16, product: 'UserManager', pkg: 'START_1Y', label: '[스타트] 연간 (12,000명 / 30%할인)', price: 42000, status: '확정' },
+        { id: 17, product: 'UserManager', pkg: 'PLUS_1Y', label: '[플러스] 연간 (무제한 관리 / 30%할인)', price: 75600, status: '확정' },
+        { id: 18, product: 'UserManager', pkg: 'PRO_1Y', label: '[프로] 연간 (연간 미운영)', price: 0, status: '안' },
 
         // 카페몬스터 제품군
-        { id: 19, product: 'CafeCrawler', pkg: 'START_1M', label: '[스타트] 1개월 (1,000건 수집)', price: 9900, status: '확정' },
-        { id: 20, product: 'CafeCrawler', pkg: 'PLUS_1M', label: '[플러스] 1개월 (3,000건 수집)', price: 19000, status: '확정' },
-        { id: 21, product: 'CafeCrawler', pkg: 'PRO_1M', label: '[프로] 1개월 (9,000건 수집)', price: 39000, status: '확정' },
-        { id: 22, product: 'CafeCrawler', pkg: 'START_1Y', label: '[스타트] 연간 (12,000건 총량 / 30%할인)', price: 82800, status: '확정' },
-        { id: 23, product: 'CafeCrawler', pkg: 'PLUS_1Y', label: '[플러스] 연간 (36,000건 총량 / 31%할인)', price: 156000, status: '확정' },
-        { id: 24, product: 'CafeCrawler', pkg: 'PRO_1Y', label: '[프로] 연간 (108,000건 총량 / 30%할인)', price: 324000, status: '확정' },
+        { id: 19, product: 'CafeCrawler', pkg: 'START_1M', label: '[스타트] 1개월 (1,000건 수집)', price: 5000, status: '확정' },
+        { id: 20, product: 'CafeCrawler', pkg: 'PLUS_1M', label: '[플러스] 1개월 (3,000건 수집)', price: 9000, status: '확정' },
+        { id: 21, product: 'CafeCrawler', pkg: 'PRO_1M', label: '[프로] 3개월 (9,000건 수집)', price: 21000, status: '확정' },
+        { id: 22, product: 'CafeCrawler', pkg: 'START_1Y', label: '[스타트] 연간 (12,000건 총량 / 30%할인)', price: 42000, status: '확정' },
+        { id: 23, product: 'CafeCrawler', pkg: 'PLUS_1Y', label: '[플러스] 연간 (36,000건 총량 / 30%할인)', price: 75600, status: '확정' },
+        { id: 24, product: 'CafeCrawler', pkg: 'PRO_1Y', label: '[프로] 연간 (연간 미운영)', price: 0, status: '안' },
 
-        { id: 25, product: 'EventStats', pkg: 'START_1M', label: '[스타트] 1개월 (1,000건 분석)', price: 9900, status: '확정' },
-        { id: 26, product: 'EventStats', pkg: 'PLUS_1M', label: '[플러스] 1개월 (3,000건 분석)', price: 19000, status: '확정' },
-        { id: 27, product: 'EventStats', pkg: 'PRO_1M', label: '[프로] 1개월 (9,000건 분석)', price: 39000, status: '확정' },
-        { id: 28, product: 'EventStats', pkg: 'START_1Y', label: '[스타트] 연간 (12,000건 총량 / 30%할인)', price: 82800, status: '확정' },
-        { id: 29, product: 'EventStats', pkg: 'PLUS_1Y', label: '[플러스] 연간 (36,000건 총량 / 31%할인)', price: 156000, status: '확정' },
-        { id: 30, product: 'EventStats', pkg: 'PRO_1Y', label: '[프로] 연간 (108,000건 총량 / 30%할인)', price: 324000, status: '확정' },
+        { id: 25, product: 'EventStats', pkg: 'START_1M', label: '[스타트] 1개월 (1,000건 분석)', price: 5000, status: '확정' },
+        { id: 26, product: 'EventStats', pkg: 'PLUS_1M', label: '[플러스] 1개월 (3,000건 분석)', price: 9000, status: '확정' },
+        { id: 27, product: 'EventStats', pkg: 'PRO_1M', label: '[프로] 3개월 (9,000건 분석)', price: 21000, status: '확정' },
+        { id: 28, product: 'EventStats', pkg: 'START_1Y', label: '[스타트] 연간 (12,000건 총량 / 30%할인)', price: 42000, status: '확정' },
+        { id: 29, product: 'EventStats', pkg: 'PLUS_1Y', label: '[플러스] 연간 (36,000건 총량 / 30%할인)', price: 75600, status: '확정' },
+        { id: 30, product: 'EventStats', pkg: 'PRO_1Y', label: '[프로] 연간 (연간 미운영)', price: 0, status: '안' },
 
-        { id: 31, product: 'AutoComment', pkg: 'START_1M', label: '[스타트] 1개월 (1,000건 등록)', price: 9900, status: '확정' },
-        { id: 32, product: 'AutoComment', pkg: 'PLUS_1M', label: '[플러스] 1개월 (3,000건 등록)', price: 19000, status: '확정' },
-        { id: 33, product: 'AutoComment', pkg: 'PRO_1M', label: '[프로] 1개월 (9,000건 등록)', price: 39000, status: '확정' },
-        { id: 34, product: 'AutoComment', pkg: 'START_1Y', label: '[스타트] 연간 (12,000건 총량 / 30%할인)', price: 82800, status: '확정' },
-        { id: 35, product: 'AutoComment', pkg: 'PLUS_1Y', label: '[플러스] 연간 (36,000건 총량 / 31%할인)', price: 156000, status: '확정' },
-        { id: 36, product: 'AutoComment', pkg: 'PRO_1Y', label: '[프로] 연간 (108,000건 총량 / 30%할인)', price: 324000, status: '확정' }
+        { id: 31, product: 'AutoComment', pkg: 'START_1M', label: '[스타트] 1개월 (1,000건 등록)', price: 5000, status: '확정' },
+        { id: 32, product: 'AutoComment', pkg: 'PLUS_1M', label: '[플러스] 1개월 (3,000건 등록)', price: 9000, status: '확정' },
+        { id: 33, product: 'AutoComment', pkg: 'PRO_1M', label: '[프로] 3개월 (9,000건 등록)', price: 21000, status: '확정' },
+        { id: 34, product: 'AutoComment', pkg: 'START_1Y', label: '[스타트] 연간 (12,000건 총량 / 30%할인)', price: 42000, status: '확정' },
+        { id: 35, product: 'AutoComment', pkg: 'PLUS_1Y', label: '[플러스] 연간 (36,000건 총량 / 30%할인)', price: 75600, status: '확정' },
+        { id: 36, product: 'AutoComment', pkg: 'PRO_1Y', label: '[프로] 연간 (연간 미운영)', price: 0, status: '안' }
     ];
 
     const [pricing, setPricing] = useState<PricingItem[]>(() => {
-        const saved = localStorage.getItem('3monster_pricing_policies_v3');
+        const saved = localStorage.getItem('3monster_pricing_policies_v4');
         if (saved) {
             try { return JSON.parse(saved); } catch (e) {}
         }
@@ -197,7 +197,7 @@ export const LicenseGenerator = () => {
 
     // Force update localStorage with current standard pricing
     useEffect(() => {
-        localStorage.setItem('3monster_pricing_policies_v3', JSON.stringify(pricing));
+        localStorage.setItem('3monster_pricing_policies_v4', JSON.stringify(pricing));
     }, [pricing]);
 
     // 크몽 ID 입력 시 users 테이블에서 이메일 자동완성
@@ -333,6 +333,8 @@ export const LicenseGenerator = () => {
             const expireDate = new Date();
             let collectionLimit: number | null = null;
 
+            const isMapScraper = formData.product_id.toLowerCase().includes('nplace') || formData.product_id.toLowerCase().includes('map');
+
             if (formData.license_type === 'START_1M' || formData.license_type === 'DELUXE' || formData.license_type === 'STANDARD') {
                 expireDate.setMonth(now.getMonth() + 1);
                 collectionLimit = 1000;
@@ -341,16 +343,16 @@ export const LicenseGenerator = () => {
                 collectionLimit = 12000;
             } else if (formData.license_type === 'PLUS_1M' || formData.license_type === '1M') {
                 expireDate.setMonth(now.getMonth() + 1);
-                collectionLimit = 3000;
+                collectionLimit = isMapScraper ? null : 3000;
             } else if (formData.license_type === 'PLUS_1Y') {
                 expireDate.setFullYear(now.getFullYear() + 1);
-                collectionLimit = 36000;
+                collectionLimit = isMapScraper ? null : 36000;
             } else if (formData.license_type === 'PRO_1M' || formData.license_type === '3M' || formData.license_type === 'PREMIUM') {
-                expireDate.setMonth(now.getMonth() + 1);
-                collectionLimit = 9000;
+                expireDate.setMonth(now.getMonth() + 3); // 프로 3개월 특가
+                collectionLimit = isMapScraper ? null : 9000;
             } else if (formData.license_type === 'PRO_1Y') {
                 expireDate.setFullYear(now.getFullYear() + 1);
-                collectionLimit = 108000;
+                collectionLimit = isMapScraper ? null : 108000;
             } else if (formData.license_type === 'TEST') {
                 expireDate.setFullYear(now.getFullYear() + 100);
                 collectionLimit = 50;
@@ -375,7 +377,7 @@ export const LicenseGenerator = () => {
                     serial_key: serial,
                     expire_date: expireDate.toISOString(),
                     collection_limit: collectionLimit,
-                    status: 'unused',
+                    status: 'active',
                     bound_value: null,
                     price_sold: Number(parsePrice(formData.price_sold)) || 0
                 }]);
@@ -481,14 +483,13 @@ export const LicenseGenerator = () => {
                                             onChange={(e) => handleLicenseTypeChange(e.target.value)}
                                         >
                                             <optgroup label="월간 구독 플랜">
-                                                <option value="START_1M">스타트 1M (1,000건 한도 / 9,900원)</option>
-                                                <option value="PLUS_1M">플러스 1M (3,000건 한도 / 19,000원)</option>
-                                                <option value="PRO_1M">프로 1M (9,000건 대량 / 39,000원)</option>
+                                                <option value="START_1M">스타트 1M (1,000건 한도 / 5,000원)</option>
+                                                <option value="PLUS_1M">플러스 1M (무제한 추출 / 9,000원)</option>
+                                                <option value="PRO_1M">프로 3M (3개월 무제한 특가 / 21,000원)</option>
                                             </optgroup>
                                             <optgroup label="연간 구독 플랜 (30% 할인)">
-                                                <option value="START_1Y">스타트 1Y (12,000건 총량 / 82,800원)</option>
-                                                <option value="PLUS_1Y">플러스 1Y (36,000건 총량 / 156,000원)</option>
-                                                <option value="PRO_1Y">프로 1Y (108,000건 총량 / 324,000원)</option>
+                                                <option value="START_1Y">스타트 1Y (12,000건 총량 / 42,000원)</option>
+                                                <option value="PLUS_1Y">플러스 1Y (연간 무제한 / 75,600원)</option>
                                             </optgroup>
                                             <optgroup label="테스트 및 특수">
                                                 <option value="TEST">테스트 (50건 제한 / 0원)</option>

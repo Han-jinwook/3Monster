@@ -281,9 +281,9 @@ export const Dashboard = () => {
                             <Sparkles className="w-3.5 h-3.5 text-amber-500" /> 2. 옵션별 플랜 매핑 규격
                         </p>
                         <p className="text-[11px] text-slate-700 font-medium leading-relaxed">
-                            • <strong>STANDARD</strong>: <code>START_1M</code> (월 1,000건)<br />
-                            • <strong>DELUXE</strong>: <code>PLUS_1M</code> (월 3,000건 / 추천)<br />
-                            • <strong>PREMIUM</strong>: <code>PRO_1M</code> (월 9,000건 대량)
+                            • <strong>STANDARD (5,000원)</strong>: <code>START_1M</code> (1,000건 맛보기)<br />
+                            • <strong>DELUXE (9,000원)</strong>: <code>PLUS_1M</code> (1개월 무제한 추출 / 추천)<br />
+                            • <strong>PREMIUM (21,000원)</strong>: <code>PRO_1M</code> (3개월 무제한 추출 특가)
                         </p>
                     </div>
 
