@@ -11,18 +11,7 @@ import {
     Loader2,
     ShoppingBag,
     ExternalLink,
-    ShieldCheck,
-    Sparkles,
-    Copy,
-    Check,
-    Send,
-    ChevronDown,
-    ChevronUp,
-    ArrowRight,
-    HelpCircle,
-    FileText,
-    CheckCircle2,
-    Zap
+    ArrowRight
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { Link } from 'react-router-dom';
@@ -56,119 +45,6 @@ export const Dashboard = () => {
     const [loading, setLoading] = useState(true);
 
     const [statPeriod, setStatPeriod] = useState<'daily' | 'monthly'>('daily');
-    const [copiedTemplate, setCopiedTemplate] = useState(false);
-    const [showGuideDetails, setShowGuideDetails] = useState(true);
-
-    // 크몽 초고속 원클릭 발급기 상태
-    const [quickBuyerName, setQuickBuyerName] = useState('마법사멀린');
-    const [quickTier, setQuickTier] = useState<'START_1M' | 'PLUS_1M' | 'PRO_1M'>('START_1M');
-    const [issuingQuick, setIssuingQuick] = useState(false);
-    const [lastIssuedKey, setLastIssuedKey] = useState('');
-    const [quickCopied, setQuickCopied] = useState(false);
-    const [quickSuccessMessage, setQuickSuccessMessage] = useState('');
-
-    const generateKmongMessage = (serialKey: string) => {
-        return `안녕하세요, 고객님! [3Monster] 네이버 플레이스 DB 정밀 추출기를 구매해 주셔서 진심으로 감사드립니다.
-
-고객님의 정품 라이선스 키와 프로그램 다운로드 안내드립니다.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🔑 [정품 라이선스 키]
-${serialKey}
-
-📥 [최신 프로그램 다운로드]
-https://github.com/Han-jinwook/n-place-db/releases/latest/download/NPlace-DB-Pro.zip
-(공식 홈페이지: https://sundreamer.app)
-
-💬 [1:1 고객지원 & A/S 안내]
-https://sundreamer.app/support
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-💡 [초간단 3초 사용 방법]
-1. 다운로드 받은 ZIP 파일의 압축을 완전히 해제합니다.
-2. 폴더 내 [NPlace_DB_Launcher.exe]를 실행합니다.
-3. 위 정품 라이선스 키와 이메일을 입력 후 [인증하기]를 클릭하시면 즉시 활성화됩니다.
-(첫 인증 시 고객님의 PC에 1:1 자동 등록되어 안전하게 보호됩니다.)
-
-💡 [정품 등록 혜택 안내]
-• PC 포맷 또는 라이선스 키 분실 시 등록된 이메일로 1초 복구
-• 네이버 지도 로직 자동 업데이트 및 중요 패치 알림
-• 3Monster 1:1 기술지원 센터 원클릭 연동
-
-궁금하신 점이나 사용 중 도움이 필요하시면 크몽 메시지 또는 위 고객센터로 언제든 편하게 문의주세요.
-항상 최고의 솔루션으로 보답하겠습니다. 감사합니다!`;
-    };
-
-    const handleCopyTemplate = (keyToUse?: string) => {
-        const text = generateKmongMessage(keyToUse || lastIssuedKey || '{발급받은_라이선스_키를_여기에_붙여넣으세요}');
-        navigator.clipboard.writeText(text);
-        setCopiedTemplate(true);
-        setTimeout(() => setCopiedTemplate(false), 2500);
-    };
-
-    const handleQuickIssueKmong = async () => {
-        if (!quickBuyerName.trim()) {
-            alert('크몽 별명(구매자 닉네임)을 입력해 주세요.');
-            return;
-        }
-        setIssuingQuick(true);
-        setQuickSuccessMessage('');
-        try {
-            const prefix = quickTier.startsWith('START') ? 'START' : quickTier.startsWith('PRO') ? 'PRO' : 'PLUS';
-            const s = () => Math.random().toString(36).substring(2, 6).toUpperCase();
-            const serial = `${prefix}-${s()}-${s()}-${s()}`;
-            
-            const now = new Date();
-            const expireDate = new Date();
-            let collectionLimit: number | null = null;
-            let price = 5000;
-
-            if (quickTier === 'START_1M') {
-                expireDate.setMonth(now.getMonth() + 1);
-                collectionLimit = 1000;
-                price = 5000;
-            } else if (quickTier === 'PLUS_1M') {
-                expireDate.setMonth(now.getMonth() + 1);
-                collectionLimit = null;
-                price = 9000;
-            } else if (quickTier === 'PRO_1M') {
-                expireDate.setMonth(now.getMonth() + 3);
-                collectionLimit = null;
-                price = 21000;
-            }
-
-            const { error } = await supabase.from('licenses').insert([{
-                product_id: 'NPlace-DB',
-                license_type: quickTier,
-                constraint_type: 'HWID',
-                buyer_name: quickBuyerName.trim(),
-                contact: null,
-                channel: '크몽',
-                price_sold: price,
-                serial_key: serial,
-                expire_date: expireDate.toISOString(),
-                collection_limit: collectionLimit,
-                status: 'active',
-                bound_value: null,
-                memo: '크몽 대시보드 초고속 원클릭 발급'
-            }]);
-
-            if (error) throw error;
-
-            setLastIssuedKey(serial);
-            const filledText = generateKmongMessage(serial);
-            await navigator.clipboard.writeText(filledText);
-            setQuickCopied(true);
-            setQuickSuccessMessage(`🎉 [${serial}] 라이선스 발급 완료! 발송문이 클립보드에 복사되었습니다. 크몽 작업물 발송창에 바로 붙여넣기(Ctrl+V) 하세요.`);
-            setTimeout(() => setQuickCopied(false), 3500);
-            fetchDashboardData();
-        } catch (err: any) {
-            console.error("Quick issue error:", err);
-            alert(`발급 실패: ${err.message}`);
-        } finally {
-            setIssuingQuick(false);
-        }
-    };
 
     const fetchDashboardData = async () => {
         try {
@@ -367,288 +243,46 @@ https://sundreamer.app/support
                 </div>
             </div>
 
-            {/* 크몽(Kmong) 주문 대응 & 라이선스 발급 통합 실무 가이드 */}
-            <div className="bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-indigo-500/5 border-2 border-amber-300/80 rounded-2xl p-5 sm:p-6 shadow-sm space-y-4">
-                {/* 상단 헤더 & 액션 버튼군 */}
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-amber-200/80 pb-4">
-                    <div className="space-y-1">
+            {/* 크몽(Kmong) 주문 대응 안내 슬림 배너 */}
+            <div className="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-indigo-500/5 border border-amber-300/80 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
+                <div className="flex items-center gap-3">
+                    <span className="p-2.5 bg-gradient-to-tr from-amber-600 to-amber-500 text-white rounded-xl shadow-xs shrink-0">
+                        <ShoppingBag className="w-5 h-5" />
+                    </span>
+                    <div className="space-y-0.5">
                         <div className="flex items-center gap-2 flex-wrap">
-                            <span className="p-2 bg-gradient-to-tr from-amber-600 to-amber-500 text-white rounded-xl shadow-xs">
-                                <ShoppingBag className="w-5 h-5" />
-                            </span>
-                            <h2 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2 flex-wrap">
-                                크몽(Kmong) 공식 승인 상품 운영 & 라이선스 발급 가이드
-                                <span className="text-[11px] px-2.5 py-0.5 bg-emerald-100 text-emerald-800 font-extrabold rounded-full border border-emerald-300">
-                                    ● 서비스 승인 노출중
-                                </span>
+                            <h2 className="text-sm sm:text-base font-black text-slate-900">
+                                크몽(Kmong) 공식 승인 상품 운영 중
                             </h2>
+                            <span className="text-[10px] px-2 py-0.5 bg-emerald-100 text-emerald-800 font-extrabold rounded-full border border-emerald-300">
+                                ● 판매중 (#804764)
+                            </span>
                         </div>
-                        <p className="text-xs font-semibold text-slate-600 pl-1">
-                            대상 상품: <strong className="text-indigo-900">네이버 플레이스 지도 DB 수집기 Pro (#804764)</strong> · 주문 인입 시 즉시 아래 순서대로 처리하세요.
+                        <p className="text-xs font-semibold text-slate-600">
+                            주문 인입 시 <strong>수동 키 발급</strong> 페이지에서 별명 입력 후 <strong>[크몽 발송문 팝업]</strong>으로 1초 만에 복사하여 전달하세요.
                         </p>
-                    </div>
-
-                    <div className="flex items-center gap-2 flex-wrap">
-                        <Link 
-                            to="/admin/generator?channel=크몽&product=NPlace-DB"
-                            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-black rounded-xl shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
-                        >
-                            <Key className="w-3.5 h-3.5" />
-                            <span>크몽 주문 수동키 발급하기</span>
-                            <ArrowRight className="w-3.5 h-3.5" />
-                        </Link>
-                        <a 
-                            href="https://kmong.com/gig/804764" 
-                            target="_blank" 
-                            rel="noreferrer"
-                            className="inline-flex items-center gap-1 px-3 py-2 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-xl border border-slate-300 shadow-xs transition-colors"
-                        >
-                            <span>크몽 상품페이지</span>
-                            <ExternalLink className="w-3 h-3 text-slate-400" />
-                        </a>
-                        <button
-                            type="button"
-                            onClick={() => setShowGuideDetails(!showGuideDetails)}
-                            className="inline-flex items-center gap-1 px-2.5 py-2 bg-white/70 hover:bg-white text-slate-600 text-xs font-bold rounded-xl border border-slate-200 transition-colors cursor-pointer"
-                        >
-                            {showGuideDetails ? (
-                                <><span>가이드 접기</span><ChevronUp className="w-3.5 h-3.5" /></>
-                            ) : (
-                                <><span>상세 펼치기</span><ChevronDown className="w-3.5 h-3.5" /></>
-                            )}
-                        </button>
                     </div>
                 </div>
 
-                {showGuideDetails && (
-                    <div className="space-y-4 pt-1 animate-in fade-in duration-200">
-                        {/* 4단계 실무 처리 워크플로우 그리드 */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-                            {/* STEP 1 */}
-                            <div className="bg-white border border-slate-200/90 p-4 rounded-xl space-y-2 shadow-xs flex flex-col justify-between">
-                                <div className="space-y-1.5">
-                                    <div className="flex items-center gap-1.5 text-indigo-600 font-black text-xs">
-                                        <ShieldCheck className="w-4 h-4" />
-                                        <span>STEP 1. 크몽 별명 확인</span>
-                                    </div>
-                                    <p className="text-[11px] text-slate-700 leading-relaxed font-medium">
-                                        크몽 채팅으로 이메일을 묻지 마시고, 주문서의 <strong className="text-indigo-900 bg-indigo-50 px-1 py-0.5 rounded">크몽 별명(닉네임)</strong>만 확인합니다.
-                                    </p>
-                                </div>
-                                <div className="p-2 bg-indigo-50/70 border border-indigo-100 rounded-lg text-[10px] text-indigo-800 font-semibold leading-tight mt-2">
-                                    💡 고객 이메일은 프로그램 최초 실행 시 정품 보안 등록창에서 고객이 직접 입력하므로 완전 자동화됩니다.
-                                </div>
-                            </div>
-
-                            {/* STEP 2 */}
-                            <div className="bg-white border border-slate-200/90 p-4 rounded-xl space-y-2 shadow-xs flex flex-col justify-between">
-                                <div className="space-y-1.5">
-                                    <div className="flex items-center gap-1.5 text-amber-600 font-black text-xs">
-                                        <Sparkles className="w-4 h-4" />
-                                        <span>STEP 2. 옵션별 플랜 매핑</span>
-                                    </div>
-                                    <div className="space-y-1 text-[11px] text-slate-700 font-medium">
-                                        <div className="flex items-center justify-between border-b border-slate-100 pb-1">
-                                            <span className="font-bold text-slate-800">🥉 STANDARD (5천원)</span>
-                                            <span className="font-mono text-indigo-600 font-black">START_1M</span>
-                                        </div>
-                                        <div className="text-[10px] text-slate-500 pl-1">↳ 1,000건 추출 맛보기 (30일)</div>
-                                        
-                                        <div className="flex items-center justify-between border-b border-slate-100 pb-1 pt-1">
-                                            <span className="font-bold text-amber-700">🥈 DELUXE (9천원)</span>
-                                            <span className="font-mono text-amber-600 font-black">PLUS_1M</span>
-                                        </div>
-                                        <div className="text-[10px] text-amber-600 font-bold pl-1">↳ 🔥 무제한 추출 (30일 / 추천)</div>
-
-                                        <div className="flex items-center justify-between pt-1">
-                                            <span className="font-bold text-purple-700">🥇 PREMIUM (2.1만원)</span>
-                                            <span className="font-mono text-purple-600 font-black">PRO_1M</span>
-                                        </div>
-                                        <div className="text-[10px] text-purple-600 font-bold pl-1">↳ 👑 3개월 무제한 특가 (90일)</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* STEP 3 */}
-                            <div className="bg-white border border-slate-200/90 p-4 rounded-xl space-y-2 shadow-xs flex flex-col justify-between">
-                                <div className="space-y-1.5">
-                                    <div className="flex items-center gap-1.5 text-emerald-600 font-black text-xs">
-                                        <Key className="w-4 h-4" />
-                                        <span>STEP 3. 초고속 원클릭 발급</span>
-                                    </div>
-                                    <p className="text-[11px] text-slate-700 leading-relaxed font-medium">
-                                        아래 <strong>[크몽 초고속 발급기]</strong>에 별명 넣고 <strong>[발급 & 복사]</strong> 버튼을 누릅니다.
-                                    </p>
-                                    <p className="text-[10px] text-slate-500 font-medium">
-                                        키가 생성됨과 동시에 완성된 발송문이 컴퓨터 클립보드에 자동 복사됩니다.
-                                    </p>
-                                </div>
-                                <div className="p-2 bg-emerald-50/70 border border-emerald-100 rounded-lg text-[10px] text-emerald-800 font-semibold leading-tight mt-2">
-                                    ⚡ 키 복사 + 템플릿 채워넣기 과정이 1초 만에 자동 완성됩니다.
-                                </div>
-                            </div>
-
-                            {/* STEP 4 */}
-                            <div className="bg-white border border-slate-200/90 p-4 rounded-xl space-y-2 shadow-xs flex flex-col justify-between">
-                                <div className="space-y-1.5">
-                                    <div className="flex items-center gap-1.5 text-blue-600 font-black text-xs">
-                                        <Send className="w-4 h-4" />
-                                        <span>STEP 4. 크몽 작업물 발송</span>
-                                    </div>
-                                    <p className="text-[11px] text-slate-700 leading-relaxed font-medium">
-                                        크몽 [작업물 발송] 모달 ➔ <strong>[의뢰인에게 보내는 메시지]</strong>에 <strong className="text-blue-700">Ctrl + V (붙여넣기)</strong> 하세요.
-                                    </p>
-                                </div>
-                                <div className="p-2 bg-blue-50/70 border border-blue-100 rounded-lg text-[10px] text-blue-800 font-semibold leading-tight mt-2">
-                                    📤 하단의 [작업물 발송] 버튼을 누르면 고객에게 전달되고 주문 처리가 완료됩니다.
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* ⚡ 크몽 주문 초고속 발급기 패널 */}
-                        <div className="bg-amber-500/10 border-2 border-amber-400/80 rounded-2xl p-4 sm:p-5 space-y-3.5 shadow-xs">
-                            <div className="flex items-center justify-between flex-wrap gap-2">
-                                <div className="flex items-center gap-2">
-                                    <span className="p-1.5 bg-amber-500 text-white rounded-xl shadow-xs">
-                                        <Zap className="w-4 h-4" />
-                                    </span>
-                                    <div>
-                                        <h3 className="text-sm font-black text-slate-900 flex items-center gap-2">
-                                            크몽 초고속 원클릭 발급기 (3초 발송문 완성)
-                                            <span className="text-[10px] font-bold text-amber-800 bg-amber-200/70 px-2 py-0.5 rounded-full">
-                                                이메일 불필요
-                                            </span>
-                                        </h3>
-                                        <p className="text-[11px] text-slate-600 font-medium">
-                                            크몽 별명과 주문 옵션을 선택하고 버튼을 누르면, 라이선스가 즉시 발급되고 크몽 작업물 발송문이 100% 채워져 클립보드에 자동 복사됩니다.
-                                        </p>
-                                    </div>
-                                </div>
-                                {lastIssuedKey && (
-                                    <span className="text-xs font-mono font-black text-emerald-800 bg-emerald-100 border border-emerald-300 px-3 py-1 rounded-xl flex items-center gap-1.5 shadow-xs">
-                                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> 최근 발급: {lastIssuedKey}
-                                    </span>
-                                )}
-                            </div>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 pt-1">
-                                {/* 크몽 별명 입력란 */}
-                                <div className="sm:col-span-5 space-y-1">
-                                    <label className="text-xs font-black text-slate-800 flex items-center gap-1">
-                                        크몽 별명 (구매자 닉네임) <span className="text-rose-500">*</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={quickBuyerName}
-                                        onChange={(e) => setQuickBuyerName(e.target.value)}
-                                        placeholder="예: 마법사멀린"
-                                        className="w-full h-11 px-3.5 text-sm font-black bg-white border border-slate-300 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none text-slate-900 shadow-xs"
-                                    />
-                                </div>
-
-                                {/* 플랜 선택 */}
-                                <div className="sm:col-span-4 space-y-1">
-                                    <label className="text-xs font-black text-slate-800">구매 옵션 플랜</label>
-                                    <select
-                                        value={quickTier}
-                                        onChange={(e) => setQuickTier(e.target.value as any)}
-                                        className="w-full h-11 px-3.5 text-xs font-black bg-white border border-slate-300 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none text-slate-900 cursor-pointer shadow-xs"
-                                    >
-                                        <option value="START_1M">STANDARD (5,000원 / 1,000건)</option>
-                                        <option value="PLUS_1M">DELUXE (9,000원 / 무제한 추출)</option>
-                                        <option value="PRO_1M">PREMIUM (21,000원 / 3개월 무제한)</option>
-                                    </select>
-                                </div>
-
-                                {/* 발급 & 복사 버튼 */}
-                                <div className="sm:col-span-3 flex items-end">
-                                    <button
-                                        type="button"
-                                        onClick={handleQuickIssueKmong}
-                                        disabled={issuingQuick || !quickBuyerName.trim()}
-                                        className={cn(
-                                            "w-full h-11 font-black text-xs text-white rounded-xl shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer",
-                                            quickBuyerName.trim()
-                                                ? "bg-amber-600 hover:bg-amber-700 active:scale-95 shadow-amber-600/20"
-                                                : "bg-slate-300 cursor-not-allowed"
-                                        )}
-                                    >
-                                        {issuingQuick ? (
-                                            <Loader2 className="w-4 h-4 animate-spin" />
-                                        ) : quickCopied ? (
-                                            <>
-                                                <Check className="w-4 h-4 text-emerald-300" />
-                                                <span>복사 완료! Ctrl+V</span>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Zap className="w-4 h-4 text-amber-200" />
-                                                <span>⚡ 1초 발급 & 발송문 복사</span>
-                                            </>
-                                        )}
-                                    </button>
-                                </div>
-                            </div>
-
-                            {quickSuccessMessage && (
-                                <div className="p-3 bg-emerald-50 border border-emerald-300 rounded-xl text-xs text-emerald-900 font-bold flex items-center justify-between gap-2 animate-in fade-in duration-150">
-                                    <div className="flex items-center gap-2">
-                                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                                        <span>{quickSuccessMessage}</span>
-                                    </div>
-                                    <button
-                                        type="button"
-                                        onClick={() => handleCopyTemplate(lastIssuedKey)}
-                                        className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-black shrink-0 transition-colors shadow-xs"
-                                    >
-                                        다시 복사하기
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* 크몽 작업물 발송 메시지 템플릿 카드 */}
-                        <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-2">
-                            <div className="flex items-center justify-between flex-wrap gap-2">
-                                <div className="flex items-center gap-1.5">
-                                    <FileText className="w-4 h-4 text-indigo-600" />
-                                    <span className="text-xs font-black text-slate-800">
-                                        크몽 작업물 발송 메시지 미리보기 (위 발급 버튼 클릭 시 자동 채움 & 복사됨)
-                                    </span>
-                                </div>
-                                <button
-                                    type="button"
-                                    onClick={() => handleCopyTemplate(lastIssuedKey)}
-                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-indigo-600 text-white text-[11px] font-bold rounded-lg transition-colors shadow-xs cursor-pointer"
-                                >
-                                    {copiedTemplate ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                                    <span>{copiedTemplate ? '클립보드에 복사됨!' : '메시지 템플릿 전체 복사'}</span>
-                                </button>
-                            </div>
-                            <pre className="bg-slate-50 border border-slate-200 rounded-lg p-3.5 text-[11px] font-mono text-slate-700 whitespace-pre-wrap leading-relaxed select-all max-h-72 overflow-y-auto">
-                                {generateKmongMessage(lastIssuedKey || '{발급받은_정품_라이선스_키가_여기에_자동으로_삽입됩니다}')}
-                            </pre>
-                        </div>
-
-                        {/* 실무 꿀팁 & FAQ 바 */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                            <div className="bg-amber-50/70 border border-amber-200/70 rounded-xl p-3 flex items-start gap-2.5">
-                                <HelpCircle className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
-                                <div className="text-[11px] text-amber-900 leading-snug">
-                                    <strong className="block text-amber-950 font-bold mb-0.5">고객이 PC를 변경/포맷했다고 재인증을 요청할 때</strong>
-                                    [구매자 관리] 목록에서 해당 구매자를 검색한 후 <strong>[기기 바인딩 초기화(HWID Reset)]</strong> 버튼을 클릭해주시면 새 PC에서 즉시 다시 인증됩니다.
-                                </div>
-                            </div>
-                            <div className="bg-blue-50/70 border border-blue-200/70 rounded-xl p-3 flex items-start gap-2.5">
-                                <CheckCircle2 className="w-4 h-4 text-blue-700 shrink-0 mt-0.5" />
-                                <div className="text-[11px] text-blue-900 leading-snug">
-                                    <strong className="block text-blue-950 font-bold mb-0.5">키 체계 및 라이선스 작동 안내</strong>
-                                    자사몰 직결제든 크몽 수동 발급이든 프로그램 동작 방식은 100% 동일합니다. 고객이 프로그램을 켜고 키를 입력하면 서버가 자동으로 권한을 검증합니다.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
+                <div className="flex items-center gap-2 shrink-0">
+                    <Link 
+                        to="/admin/generator?channel=크몽&product=NPlace-DB"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-black rounded-xl shadow-xs transition-all hover:scale-[1.02] active:scale-[0.98]"
+                    >
+                        <Key className="w-3.5 h-3.5" />
+                        <span>크몽 수동키 발급하기</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                    <a 
+                        href="https://kmong.com/gig/804764" 
+                        target="_blank" 
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 px-3 py-2 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-xl border border-slate-300 shadow-xs transition-colors"
+                    >
+                        <span>크몽 상품</span>
+                        <ExternalLink className="w-3 h-3 text-slate-400" />
+                    </a>
+                </div>
             </div>
 
             {/* General Stats KPIs */}

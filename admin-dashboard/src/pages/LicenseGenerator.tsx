@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
-import { Copy, CheckCircle2, ChevronRight, Clock, ArrowLeft } from 'lucide-react';
+import { Copy, CheckCircle2, ChevronRight, Clock, ArrowLeft, ShoppingBag, X, Check } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -13,6 +13,91 @@ const generateSerial = () => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     const segment = () => Array(4).fill(0).map(() => chars.charAt(Math.floor(Math.random() * chars.length))).join('');
     return `CM-${segment()}-${segment()}-${segment()}`;
+};
+
+export const getGitHubDownloadUrl = (productId: string, type: 'Pro' | 'Trial') => {
+    const repoMap: Record<string, string> = {
+        'NPlace-DB': 'n-place-db',
+        'ContentCrawler': 'content-crawler',
+        'UserManager': 'user-manager',
+        'CafeCrawler': 'CafeScraper',
+        'EventStats': 'CafeScraper',
+        'AutoComment': 'CafeScraper'
+    };
+    const repo = repoMap[productId] || productId.toLowerCase();
+    if (type === 'Trial' && (productId === 'CafeCrawler' || productId === 'EventStats' || productId === 'AutoComment')) {
+        return `https://github.com/Han-jinwook/CafeScraper/releases/latest/download/CafeMonster-Trial.zip`;
+    }
+    return `https://github.com/Han-jinwook/${repo}/releases/latest/download/${productId}-${type}.zip`;
+};
+
+export const generateKmongMessage = (productId: string, serialKey: string, buyerName?: string) => {
+    const pId = productId || 'NPlace-DB';
+    let productNameKr = '[3Monster] 네이버 플레이스 DB 정밀 추출기';
+    let launcherExe = 'NPlace_DB_Launcher.exe';
+    let repoName = 'n-place-db';
+    let zipName = 'NPlace-DB-Pro.zip';
+
+    if (pId === 'CafeCrawler') {
+        productNameKr = '[3Monster] 네이버 카페 수집기 Pro';
+        launcherExe = 'CafeMonster.exe';
+        repoName = 'CafeScraper';
+        zipName = 'CafeCrawler-Pro.zip';
+    } else if (pId === 'EventStats') {
+        productNameKr = '[3Monster] 카페 이벤트 활동 분석기';
+        launcherExe = 'EventStats.exe';
+        repoName = 'CafeScraper';
+        zipName = 'EventStats-Pro.zip';
+    } else if (pId === 'AutoComment') {
+        productNameKr = '[3Monster] 네이버 카페 댓글 관리기';
+        launcherExe = 'AutoComment.exe';
+        repoName = 'CafeScraper';
+        zipName = 'AutoComment-Pro.zip';
+    } else if (pId === 'ContentCrawler') {
+        productNameKr = '[3Monster] 사이트 콘텐츠 추출기';
+        launcherExe = 'ContentCrawler.exe';
+        repoName = 'content-crawler';
+        zipName = 'ContentCrawler-Pro.zip';
+    } else if (pId === 'UserManager') {
+        productNameKr = '[3Monster] 회원관리 확장팩';
+        launcherExe = 'UserManager.exe';
+        repoName = 'user-manager';
+        zipName = 'UserManager-Pro.zip';
+    }
+
+    const downloadUrl = `https://github.com/Han-jinwook/${repoName}/releases/latest/download/${zipName}`;
+    const displayKey = serialKey || '{발급받은_정품_라이선스_키가_여기에_들어갑니다}';
+    const clientName = buyerName ? `${buyerName} 고객님` : '고객님';
+
+    return `안녕하세요, ${clientName}! ${productNameKr}를 구매해 주셔서 진심으로 감사드립니다.
+
+고객님의 정품 라이선스 키와 프로그램 다운로드 안내드립니다.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔑 [정품 라이선스 키]
+${displayKey}
+
+📥 [최신 프로그램 다운로드]
+${downloadUrl}
+(공식 홈페이지: https://sundreamer.app)
+
+💬 [1:1 고객지원 & A/S 안내]
+https://sundreamer.app/support
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 [초간단 3초 사용 방법]
+1. 위 다운로드 링크에서 압축 파일(ZIP)을 다운로드 후 완전히 해제합니다.
+2. 폴더 내 [${launcherExe}]를 실행합니다.
+3. 위 정품 라이선스 키와 이메일을 입력 후 [인증하기]를 클릭하시면 즉시 활성화됩니다.
+(첫 인증 시 고객님의 PC에 1:1 자동 등록되어 안전하게 보호됩니다.)
+
+💡 [정품 등록 혜택 안내]
+• PC 포맷 또는 라이선스 키 분실 시 등록된 이메일로 1초 복구
+• 포털 로직 변경 시 자동 업데이트 및 중요 패치 알림
+• 3Monster 1:1 기술지원 센터 원클릭 연동
+
+궁금하신 점이나 사용 중 도움이 필요하시면 크몽 메시지 또는 위 고객센터로 언제든 편하게 문의주세요.
+항상 최고의 솔루션으로 보답하겠습니다. 감사합니다!`;
 };
 
 const formatPrice = (value: string | number) => {
@@ -66,6 +151,25 @@ export const LicenseGenerator = () => {
     const [existingBuyers, setExistingBuyers] = useState<Array<{ buyer_name: string; contact: string; channel?: string }>>([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const buyerDropdownRef = useRef<HTMLDivElement>(null);
+
+    const [isKmongModalOpen, setIsKmongModalOpen] = useState(false);
+    const [copiedKmongText, setCopiedKmongText] = useState(false);
+    const [copiedDownloadType, setCopiedDownloadType] = useState<string | null>(null);
+
+    const handleCopyDownloadUrl = (productId: string, type: 'Pro' | 'Trial') => {
+        const url = getGitHubDownloadUrl(productId, type);
+        navigator.clipboard.writeText(url);
+        const label = type === 'Pro' ? `${productId} 정식` : `${productId} 체험판`;
+        setCopiedDownloadType(label);
+        setTimeout(() => setCopiedDownloadType(null), 2500);
+    };
+
+    const handleCopyKmongTemplate = () => {
+        const text = generateKmongMessage(formData.product_id, generatedKey, formData.buyer_name);
+        navigator.clipboard.writeText(text);
+        setCopiedKmongText(true);
+        setTimeout(() => setCopiedKmongText(false), 2500);
+    };
 
     // 바깥 영역 클릭 시 자동완성 드롭다운 닫기
     useEffect(() => {
@@ -391,6 +495,7 @@ export const LicenseGenerator = () => {
                 }]);
 
             if (error) throw error;
+            setIsKmongModalOpen(true);
 
         } catch (error: any) {
             console.error("Error creating license:", error);
@@ -399,23 +504,6 @@ export const LicenseGenerator = () => {
         } finally {
             setLoading(false);
         }
-    };
-
-    const getDownloadUrl = (productId: string, type: 'Pro' | 'Trial') => {
-        const repoMap: Record<string, string> = {
-            'NPlace-DB': 'n-place-db',
-            'ContentCrawler': 'content-crawler',
-            'UserManager': 'user-manager',
-            'CafeCrawler': 'CafeScraper',
-            'EventStats': 'CafeScraper',
-            'AutoComment': 'CafeScraper'
-        };
-        const repo = repoMap[productId] || productId.toLowerCase();
-        const t = Date.now();
-        if (type === 'Trial' && (productId === 'CafeCrawler' || productId === 'EventStats' || productId === 'AutoComment')) {
-            return `https://github.com/Han-jinwook/CafeScraper/releases/latest/download/CafeMonster-Trial.zip?t=${t}`;
-        }
-        return `https://github.com/Han-jinwook/${repo}/releases/latest/download/${productId}-${type}.zip?t=${t}`;
     };
 
     return (
@@ -628,18 +716,48 @@ export const LicenseGenerator = () => {
                                 <Input placeholder="기타 연락처나 특이사항이 있다면 입력하세요" className="h-14 bg-white border border-slate-400 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150 text-base font-extrabold px-4 text-slate-955 rounded-xl shadow-sm" value={formData.memo} onChange={e => setFormData({ ...formData, memo: e.target.value })} />
                             </div>
 
-                            <Button type="submit" className="w-full h-16 text-white font-black text-lg shadow-md hover:bg-indigo-750 active:scale-[0.99] transition-all bg-indigo-600 rounded-xl border-b-4 border-indigo-900 border-none animate-none" isLoading={loading}>
-                                라이선스 키 즉시 발급하기 <ChevronRight className="ml-1 w-5 h-5" />
-                            </Button>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <Button type="submit" className="h-16 text-white font-black text-base sm:text-lg shadow-md hover:bg-indigo-750 active:scale-[0.99] transition-all bg-indigo-600 rounded-xl border-b-4 border-indigo-900 border-none animate-none flex items-center justify-center gap-1 cursor-pointer" isLoading={loading}>
+                                    <span>라이선스 키 즉시 발급하기</span>
+                                    <ChevronRight className="w-5 h-5" />
+                                </Button>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsKmongModalOpen(true)}
+                                    className="h-16 px-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-black text-base rounded-xl shadow-md border-b-4 border-amber-800 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
+                                >
+                                    <ShoppingBag className="w-5 h-5 text-amber-200" />
+                                    <span>📋 크몽 발송문 팝업</span>
+                                </button>
+                            </div>
 
                             <div className="pt-4 border-t border-slate-200 mt-4 space-y-3">
-                                <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">최신 버전 다운로드 (고객 전달용)</label>
-                                <div className="flex gap-2">
-                                    <Button type="button" className="flex-1 h-14 bg-slate-800 hover:bg-slate-700 text-white rounded-xl shadow border-none text-sm font-bold" onClick={() => window.open(getDownloadUrl(formData.product_id, 'Pro'), '_blank')}>
-                                        💎 {formData.product_id} 정식
+                                <div className="flex items-center justify-between">
+                                    <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">
+                                        GitHub 최신 다운로드 링크 (고객 전달 / 체험판 배포용)
+                                    </label>
+                                    {copiedDownloadType && (
+                                        <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 animate-in fade-in">
+                                            ✓ {copiedDownloadType} URL 복사완료!
+                                        </span>
+                                    )}
+                                </div>
+                                <div className="flex flex-col sm:flex-row gap-2">
+                                    <Button
+                                        type="button"
+                                        className="flex-1 h-14 bg-slate-800 hover:bg-slate-700 text-white rounded-xl shadow border-none text-xs sm:text-sm font-bold flex items-center justify-center gap-2 cursor-pointer"
+                                        onClick={() => handleCopyDownloadUrl(formData.product_id, 'Pro')}
+                                    >
+                                        <Copy className="w-4 h-4 text-slate-300" />
+                                        <span>💎 {formData.product_id} 정식 GitHub URL 복사</span>
                                     </Button>
-                                    <Button type="button" className="flex-1 h-14 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl shadow border-none text-sm font-bold" onClick={() => window.open(getDownloadUrl(formData.product_id, 'Trial'), '_blank')}>
-                                        🎁 {formData.product_id} 체험판
+                                    <Button
+                                        type="button"
+                                        className="flex-1 h-14 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl shadow border-none text-xs sm:text-sm font-bold flex items-center justify-center gap-2 cursor-pointer"
+                                        onClick={() => handleCopyDownloadUrl(formData.product_id, 'Trial')}
+                                    >
+                                        <Copy className="w-4 h-4 text-emerald-200" />
+                                        <span>🎁 {formData.product_id} 체험판 GitHub URL 복사</span>
                                     </Button>
                                 </div>
                             </div>
@@ -664,13 +782,22 @@ export const LicenseGenerator = () => {
                                     <div className="rounded-xl bg-white/10 p-4 text-center">
                                         <p className="font-mono text-base font-black tracking-wider">{generatedKey}</p>
                                     </div>
-                                    <Button
-                                        onClick={() => { navigator.clipboard.writeText(generatedKey); alert('Copy Success!'); }}
-                                        fullWidth
-                                        className="bg-white text-slate-900 hover:bg-slate-50 h-12 font-bold text-xs rounded-xl"
-                                    >
-                                        <Copy className="mr-2 h-4 w-4" /> 키 복사하기
-                                    </Button>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                        <Button
+                                            onClick={() => { navigator.clipboard.writeText(generatedKey); alert('라이선스 키가 복사되었습니다!'); }}
+                                            fullWidth
+                                            className="bg-white text-slate-900 hover:bg-slate-50 h-12 font-bold text-xs rounded-xl"
+                                        >
+                                            <Copy className="mr-1.5 h-4 w-4" /> 키만 복사
+                                        </Button>
+                                        <Button
+                                            onClick={() => setIsKmongModalOpen(true)}
+                                            fullWidth
+                                            className="bg-amber-400 hover:bg-amber-300 text-amber-950 h-12 font-black text-xs rounded-xl border-none"
+                                        >
+                                            <ShoppingBag className="mr-1.5 h-4 w-4 text-amber-900" /> 크몽 발송문 열기
+                                        </Button>
+                                    </div>
                                 </Card>
                             </motion.div>
                         )}
@@ -831,6 +958,111 @@ export const LicenseGenerator = () => {
                     </Card>
                 </div>
             </div>
+
+            {/* 크몽 작업물 발송 안내 모달 (팝업) */}
+            {isKmongModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full border border-slate-200 overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-150">
+                        {/* Modal Header */}
+                        <div className="px-6 py-4 bg-gradient-to-r from-amber-500 via-amber-600 to-indigo-700 text-white flex items-center justify-between">
+                            <div className="flex items-center gap-2.5">
+                                <span className="p-2 bg-white/20 rounded-xl shadow-xs">
+                                    <ShoppingBag className="w-5 h-5 text-white" />
+                                </span>
+                                <div>
+                                    <h3 className="font-black text-base text-white flex items-center gap-2">
+                                        크몽 작업물 발송 메시지 완성기
+                                    </h3>
+                                    <p className="text-[11px] text-amber-100 font-medium">
+                                        크몽 [작업물 발송] 모달의 [의뢰인에게 보내는 메시지]에 그대로 붙여넣기 하세요.
+                                    </p>
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setIsKmongModalOpen(false)}
+                                className="p-1.5 hover:bg-white/20 rounded-lg text-white/80 hover:text-white transition-colors cursor-pointer"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        {/* Modal Body */}
+                        <div className="p-6 space-y-4 overflow-y-auto flex-1 text-slate-800">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-amber-50 border border-amber-200 rounded-xl p-3.5 gap-2 text-xs text-amber-900 font-semibold">
+                                <div className="flex items-center gap-2">
+                                    <span className="px-2 py-0.5 bg-amber-200 text-amber-950 font-black rounded text-[10px]">
+                                        구매자 & 플랜
+                                    </span>
+                                    <span>
+                                        <strong>{formData.buyer_name || '구매자(별명)'}</strong> 님 · {formData.product_id} ({formData.license_type})
+                                    </span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                    <span className="text-slate-500 font-medium">발급 키:</span>
+                                    {generatedKey ? (
+                                        <strong className="font-mono text-indigo-700 font-black bg-white px-2 py-0.5 rounded border border-indigo-200 shadow-2xs">
+                                            {generatedKey}
+                                        </strong>
+                                    ) : (
+                                        <span className="text-amber-700 font-bold bg-amber-100/80 px-2 py-0.5 rounded">
+                                            ⚠️ 키 발급 전 (임시키 표시됨)
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <div className="flex items-center justify-between">
+                                    <label className="text-xs font-black text-slate-700">전송 메시지 본문 미리보기</label>
+                                    <span className="text-[11px] text-slate-400 font-medium">클릭하거나 아래 버튼으로 원클릭 전체 복사</span>
+                                </div>
+                                <pre className="bg-slate-900 text-emerald-300 p-4 rounded-xl text-xs font-mono whitespace-pre-wrap leading-relaxed border border-slate-800 max-h-72 overflow-y-auto select-all shadow-inner">
+                                    {generateKmongMessage(formData.product_id, generatedKey, formData.buyer_name)}
+                                </pre>
+                            </div>
+
+                            <div className="p-3 bg-blue-50/80 border border-blue-200/80 rounded-xl text-xs text-blue-900 font-medium space-y-1">
+                                <div className="font-bold flex items-center gap-1.5 text-blue-950">
+                                    <CheckCircle2 className="w-4 h-4 text-blue-600" />
+                                    <span>크몽 발송 실무 안내</span>
+                                </div>
+                                <p className="text-[11px] text-blue-800 leading-normal pl-5">
+                                    크몽 거래창의 <strong>[작업물 발송]</strong> 모달을 열고 <strong>[의뢰인에게 보내는 메시지]</strong> 입력창에 <strong className="text-indigo-900 bg-white px-1 py-0.5 rounded border border-blue-200">Ctrl + V (붙여넣기)</strong> 하신 뒤 발송 완료를 누르시면 됩니다.
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Modal Footer */}
+                        <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setIsKmongModalOpen(false)}
+                                className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-300 transition-colors cursor-pointer"
+                            >
+                                닫기
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleCopyKmongTemplate}
+                                className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs sm:text-sm rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+                            >
+                                {copiedKmongText ? (
+                                    <>
+                                        <Check className="w-4 h-4 text-emerald-300" />
+                                        <span>✓ 클립보드 복사 완료! (크몽에 Ctrl+V)</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Copy className="w-4 h-4" />
+                                        <span>📋 크몽 발송문 전체 복사하기</span>
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
