@@ -380,6 +380,7 @@ export const LicenseGenerator = () => {
                 .from('licenses')
                 .insert([{
                     ...formData,
+                    contact: formData.contact ? formData.contact.trim() : null,
                     buyer_name: finalBuyerName,
                     serial_key: serial,
                     expire_date: expireDate.toISOString(),
@@ -546,14 +547,14 @@ export const LicenseGenerator = () => {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div ref={buyerDropdownRef} className="space-y-2 relative">
-                                    <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">구매자 ID (크몽 등)</label>
+                                    <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">크몽 별명 (구매자 ID)</label>
                                     <Input
                                         required
-                                        placeholder="구매자의 ID를 입력하세요"
+                                        placeholder="크몽 별명 또는 구매자 ID를 입력하세요"
                                         className="h-14 bg-white border border-slate-400 focus:border-indigo-650 focus:ring-4 focus:ring-indigo-150 text-base font-extrabold px-4 rounded-xl text-slate-955 placeholder:text-slate-400 shadow-sm"
                                         value={formData.buyer_name}
                                         onFocus={() => {
-                                            if (trimmedBuyer.length >= 1) setShowSuggestions(true);
+                                             if (trimmedBuyer.length >= 1) setShowSuggestions(true);
                                         }}
                                         onChange={e => {
                                             const val = e.target.value;
@@ -599,16 +600,15 @@ export const LicenseGenerator = () => {
                                     )}
                                 </div>
                                 <div className="space-y-2 relative">
-                                    <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">이메일 주소</label>
+                                    <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">이메일 주소 (선택 사항)</label>
                                     {emailAutoFilled && (
                                         <span className="absolute right-0 top-0 text-[10px] font-black text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
                                             ✓ 기존 회원 자동연동
                                         </span>
                                     )}
                                     <Input
-                                        required
                                         type="email"
-                                        placeholder="구매자의 이메일 주소를 입력하세요"
+                                        placeholder="이메일 주소 (미입력 시 크몽 별명만으로 발급)"
                                         className={`h-14 bg-white text-base font-extrabold px-4 rounded-xl shadow-sm ${
                                             emailAutoFilled
                                                 ? 'border-emerald-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100'
