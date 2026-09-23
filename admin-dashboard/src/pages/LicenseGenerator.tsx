@@ -33,33 +33,33 @@ export const getGitHubDownloadUrl = (productId: string, type: 'Pro' | 'Trial') =
 
 export const generateKmongMessage = (productId: string, serialKey: string, buyerName?: string) => {
     const pId = productId || 'NPlace-DB';
-    let productNameKr = '[3Monster] 네이버 플레이스 DB 정밀 추출기';
+    let productNameKr = '[3몬스터] 네이버 플레이스 DB 정밀 추출기';
     let launcherExe = 'NPlace_DB_Launcher.exe';
     let repoName = 'n-place-db';
     let zipName = 'NPlace-DB-Pro.zip';
 
     if (pId === 'CafeCrawler') {
-        productNameKr = '[3Monster] 네이버 카페 수집기 Pro';
+        productNameKr = '[3몬스터] 네이버 카페 수집기 Pro';
         launcherExe = 'CafeMonster.exe';
         repoName = 'CafeScraper';
         zipName = 'CafeCrawler-Pro.zip';
     } else if (pId === 'EventStats') {
-        productNameKr = '[3Monster] 카페 이벤트 활동 분석기';
+        productNameKr = '[3몬스터] 카페 이벤트 활동 분석기';
         launcherExe = 'EventStats.exe';
         repoName = 'CafeScraper';
         zipName = 'EventStats-Pro.zip';
     } else if (pId === 'AutoComment') {
-        productNameKr = '[3Monster] 네이버 카페 댓글 관리기';
+        productNameKr = '[3몬스터] 네이버 카페 댓글 관리기';
         launcherExe = 'AutoComment.exe';
         repoName = 'CafeScraper';
         zipName = 'AutoComment-Pro.zip';
     } else if (pId === 'ContentCrawler') {
-        productNameKr = '[3Monster] 사이트 콘텐츠 추출기';
+        productNameKr = '[3몬스터] 사이트 콘텐츠 추출기';
         launcherExe = 'ContentCrawler.exe';
         repoName = 'content-crawler';
         zipName = 'ContentCrawler-Pro.zip';
     } else if (pId === 'UserManager') {
-        productNameKr = '[3Monster] 회원관리 확장팩';
+        productNameKr = '[3몬스터] 회원관리 확장팩';
         launcherExe = 'UserManager.exe';
         repoName = 'user-manager';
         zipName = 'UserManager-Pro.zip';
@@ -79,24 +79,22 @@ ${displayKey}
 
 📥 [최신 프로그램 다운로드]
 ${downloadUrl}
-(공식 홈페이지: https://sundreamer.app)
 
 💬 [1:1 고객지원 & A/S 안내]
-https://sundreamer.app/support
+사용 중 궁금하신 점이나 도움이 필요하시면 언제든 크몽 메시지로 편하게 문의주세요.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 💡 [초간단 3초 사용 방법]
-1. 위 다운로드 링크에서 압축 파일(ZIP)을 다운로드 후 완전히 해제합니다.
+1. 위 다운로드 링크에서 압축 파일(ZIP)을 다운로드하신 후, [바탕화면 등 원하시는 폴더]에 위치시킨 뒤 압축을 완전히 해제합니다.
 2. 폴더 내 [${launcherExe}]를 실행합니다.
-3. 위 정품 라이선스 키와 이메일을 입력 후 [인증하기]를 클릭하시면 즉시 활성화됩니다.
+3. 위 [정품 라이선스 키]를 입력 후 [인증하기]를 클릭하시면 즉시 활성화됩니다.
 (첫 인증 시 고객님의 PC에 1:1 자동 등록되어 안전하게 보호됩니다.)
 
 💡 [정품 등록 혜택 안내]
-• PC 포맷 또는 라이선스 키 분실 시 등록된 이메일로 1초 복구
-• 포털 로직 변경 시 자동 업데이트 및 중요 패치 알림
-• 3Monster 1:1 기술지원 센터 원클릭 연동
+• PC 포맷 또는 라이선스 키 분실 시 1초 즉시 복구 지원
+• 포털 지도 로직 변경 시 자동 업데이트 및 중요 패치 알림
+• 3몬스터 1:1 고객지원 기술지원 연동
 
-궁금하신 점이나 사용 중 도움이 필요하시면 크몽 메시지 또는 위 고객센터로 언제든 편하게 문의주세요.
 항상 최고의 솔루션으로 보답하겠습니다. 감사합니다!`;
 };
 
