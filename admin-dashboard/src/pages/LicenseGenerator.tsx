@@ -15,7 +15,7 @@ const generateSerial = () => {
     return `CM-${segment()}-${segment()}-${segment()}`;
 };
 
-export const getGitHubDownloadUrl = (productId: string, type: 'Pro' | 'Trial') => {
+export const getGitHubDownloadUrl = (productId: string) => {
     const repoMap: Record<string, string> = {
         'NPlace-DB': 'n-place-db',
         'ContentCrawler': 'content-crawler',
@@ -25,10 +25,7 @@ export const getGitHubDownloadUrl = (productId: string, type: 'Pro' | 'Trial') =
         'AutoComment': 'CafeScraper'
     };
     const repo = repoMap[productId] || productId.toLowerCase();
-    if (type === 'Trial' && (productId === 'CafeCrawler' || productId === 'EventStats' || productId === 'AutoComment')) {
-        return `https://github.com/Han-jinwook/CafeScraper/releases/latest/download/CafeMonster-Trial.zip`;
-    }
-    return `https://github.com/Han-jinwook/${repo}/releases/latest/download/${productId}-${type}.zip`;
+    return `https://github.com/Han-jinwook/${repo}/releases/latest/download/${productId}-Pro.zip`;
 };
 
 export const generateKmongMessage = (productId: string, serialKey: string, buyerName?: string) => {
@@ -73,27 +70,27 @@ export const generateKmongMessage = (productId: string, serialKey: string, buyer
 
 고객님의 정품 라이선스 키와 프로그램 다운로드 안내드립니다.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🔑 [정품 라이선스 키]
+--------------------------------------------------
+[1] 정품 라이선스 키
 ${displayKey}
 
-📥 [최신 프로그램 다운로드]
+[2] 최신 프로그램 다운로드
 ${downloadUrl}
 
-💬 [1:1 고객지원 & A/S 안내]
+[3] 고객지원 및 A/S 안내
 사용 중 궁금하신 점이나 도움이 필요하시면 언제든 크몽 메시지로 편하게 문의주세요.
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+--------------------------------------------------
 
-💡 [초간단 3초 사용 방법]
+[초간단 사용 방법]
 1. 위 다운로드 링크에서 압축 파일(ZIP)을 다운로드하신 후, [바탕화면 등 원하시는 폴더]에 위치시킨 뒤 압축을 완전히 해제합니다.
 2. 폴더 내 [${launcherExe}]를 실행합니다.
 3. 위 [정품 라이선스 키]를 입력 후 [인증하기]를 클릭하시면 즉시 활성화됩니다.
 (첫 인증 시 고객님의 PC에 1:1 자동 등록되어 안전하게 보호됩니다.)
 
-💡 [정품 등록 혜택 안내]
-• PC 포맷 또는 라이선스 키 분실 시 1초 즉시 복구 지원
-• 포털 지도 로직 변경 시 자동 업데이트 및 중요 패치 알림
-• 3몬스터 1:1 고객지원 기술지원 연동
+[정품 등록 혜택 안내]
+- PC 포맷 또는 라이선스 키 분실 시 1초 즉시 복구 지원
+- 포털 지도 로직 변경 시 자동 업데이트 및 중요 패치 알림
+- 3몬스터 1:1 고객지원 기술지원 연동
 
 항상 최고의 솔루션으로 보답하겠습니다. 감사합니다!`;
 };
@@ -154,11 +151,10 @@ export const LicenseGenerator = () => {
     const [copiedKmongText, setCopiedKmongText] = useState(false);
     const [copiedDownloadType, setCopiedDownloadType] = useState<string | null>(null);
 
-    const handleCopyDownloadUrl = (productId: string, type: 'Pro' | 'Trial') => {
-        const url = getGitHubDownloadUrl(productId, type);
+    const handleCopyDownloadUrl = (productId: string) => {
+        const url = getGitHubDownloadUrl(productId);
         navigator.clipboard.writeText(url);
-        const label = type === 'Pro' ? `${productId} 정식` : `${productId} 체험판`;
-        setCopiedDownloadType(label);
+        setCopiedDownloadType(productId);
         setTimeout(() => setCopiedDownloadType(null), 2500);
     };
 
@@ -729,35 +725,28 @@ export const LicenseGenerator = () => {
                                 </button>
                             </div>
 
-                            <div className="pt-4 border-t border-slate-200 mt-4 space-y-3">
+                            <div className="pt-4 border-t border-slate-200 mt-4 space-y-2.5">
                                 <div className="flex items-center justify-between">
                                     <label className="text-sm font-black text-slate-955 uppercase tracking-wide ml-0.5">
-                                        GitHub 최신 다운로드 링크 (고객 전달 / 체험판 배포용)
+                                        GitHub 최신 다운로드 링크 (정품 / 무료체험 단일 공용)
                                     </label>
                                     {copiedDownloadType && (
                                         <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 animate-in fade-in">
-                                            ✓ {copiedDownloadType} URL 복사완료!
+                                            ✓ {copiedDownloadType} 최신 다운로드 URL 복사완료!
                                         </span>
                                     )}
                                 </div>
-                                <div className="flex flex-col sm:flex-row gap-2">
-                                    <Button
-                                        type="button"
-                                        className="flex-1 h-14 bg-slate-800 hover:bg-slate-700 text-white rounded-xl shadow border-none text-xs sm:text-sm font-bold flex items-center justify-center gap-2 cursor-pointer"
-                                        onClick={() => handleCopyDownloadUrl(formData.product_id, 'Pro')}
-                                    >
-                                        <Copy className="w-4 h-4 text-slate-300" />
-                                        <span>💎 {formData.product_id} 정식 GitHub URL 복사</span>
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        className="flex-1 h-14 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl shadow border-none text-xs sm:text-sm font-bold flex items-center justify-center gap-2 cursor-pointer"
-                                        onClick={() => handleCopyDownloadUrl(formData.product_id, 'Trial')}
-                                    >
-                                        <Copy className="w-4 h-4 text-emerald-200" />
-                                        <span>🎁 {formData.product_id} 체험판 GitHub URL 복사</span>
-                                    </Button>
-                                </div>
+                                <Button
+                                    type="button"
+                                    className="w-full h-14 bg-slate-900 hover:bg-slate-800 text-white rounded-xl shadow border-none text-xs sm:text-sm font-black flex items-center justify-center gap-2 cursor-pointer"
+                                    onClick={() => handleCopyDownloadUrl(formData.product_id)}
+                                >
+                                    <Copy className="w-4 h-4 text-indigo-300" />
+                                    <span>[최신 배포본] {formData.product_id} 다운로드 URL 복사</span>
+                                </Button>
+                                <p className="text-[11px] text-slate-500 font-medium pl-0.5 leading-tight">
+                                    ※ 정품 구매 고객과 무료 체험 희망자 모두 위 단일 파일(링크 1개)로 전달하시면 됩니다. 프로그램 실행 시 정품 키 유무에 따라 자동 분기됩니다.
+                                </p>
                             </div>
                         </form>
                     </CardContent>
