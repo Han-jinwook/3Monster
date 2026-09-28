@@ -181,7 +181,7 @@ export const TIER_PRICES: Record<SubscriptionTierKey, TierInfo> = {
     }
 };
 
-const KCP_SITE_CD = 'ALRJ8'; // (주)썬드림 2호 디지털 PG
+const KCP_SITE_CD = 'AM1FA'; // (주)썬드림 3호 3Monster 회원제 PG (기간제 라이선스)
 
 export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, product }) => {
     const [selectedTier, setSelectedTier] = useState<SubscriptionTierKey>('PLUS_1M');
