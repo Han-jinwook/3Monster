@@ -115,7 +115,10 @@
 
 ### 6.1 PG 연동 환경
 * **PG 대행사**: NHN KCP
-* **가맹점 코드 (Site Code)**: `ALRJ8` ((주)썬드림 2호 디지털 PG, sundreamer.app 공식 도메인 승인)
+* **공식 도메인**: `https://3monster.net`
+* **가맹점 코드 (Site Code) 체계**:
+  * `AM1FA` ((주)썬드림 3호 3Monster 회원제 PG, 30일/90일 라이선스 이용권 연동)
+  * `ALRJ8` ((주)썬드림 2호 코인 충전 PG, 3Monster 디지털 포인트 충전 연동)
 * **지원 결제 수단**:
   - `card`: 국내/해외 신용카드 및 체크카드
   - `bank`: 실시간 계좌이체
