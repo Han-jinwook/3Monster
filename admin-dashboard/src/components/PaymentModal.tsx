@@ -420,84 +420,6 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
         }
     };
 
-    // 무통장 입금 신청 안내 이메일 발송
-    const sendBankTransferEmail = async ({
-        email,
-        productTitle,
-        tierLabel,
-        price,
-        depositorName,
-        receiptType,
-        receiptNumber,
-        orderId
-    }: {
-        email: string;
-        productTitle: string;
-        tierLabel: string;
-        price: number;
-        depositorName: string;
-        receiptType: string;
-        receiptNumber: string;
-        orderId: string;
-    }) => {
-        try {
-            const apiKey = import.meta.env.VITE_RESEND_API_KEY;
-            if (!apiKey) return;
-
-            await fetch('/api/resend/emails', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${apiKey}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    from: '3Monster <admin@3monster.net>',
-                    to: [email.trim()],
-                    subject: `[3Monster] ${productTitle} (${tierLabel}) 연간 구독 무통장 입금 신청 접수 안내`,
-                    html: `
-                        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 30px; background-color: #f8fafc; color: #1e293b; line-height: 1.6;">
-                            <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 20px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);">
-                                <div style="background: #0f172a; padding: 32px 24px; text-align: center;">
-                                    <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 900; letter-spacing: -0.03em;">3Monster</h1>
-                                    <p style="color: #94a3b8; font-size: 13px; font-weight: 600; margin: 8px 0 0 0;">연간 30% 할인 플랜 무통장 입금 안내</p>
-                                </div>
-                                <div style="padding: 32px 28px;">
-                                    <div style="text-align: center; margin-bottom: 24px;">
-                                        <div style="display: inline-block; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 9999px; padding: 6px 16px; color: #059669; font-size: 12px; font-weight: 800; margin-bottom: 12px;">
-                                            ✔ 입금 신청 접수 완료 (입금 대기)
-                                        </div>
-                                        <h2 style="font-size: 20px; font-weight: 800; color: #0f172a; margin: 0 0 6px 0;">${productTitle}</h2>
-                                        <p style="font-size: 13px; color: #64748b; margin: 0;">플랜: <strong>${tierLabel}</strong> · 주문번호: <strong>${orderId}</strong></p>
-                                    </div>
-                                    <div style="background: #f8fafc; border-radius: 16px; padding: 22px; margin: 24px 0; border: 1px solid #e2e8f0;">
-                                        <h4 style="margin: 0 0 14px 0; font-size: 14px; font-weight: 800; color: #0f172a; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">💳 법인 입금 계좌 정보</h4>
-                                        <p style="margin: 6px 0; font-size: 14px;"><strong>은행명:</strong> ${BANK_INFO.bankName}</p>
-                                        <p style="margin: 8px 0; font-size: 17px; color: #4338ca;"><strong>계좌번호:</strong> <span style="font-family: monospace; font-weight: 900;">${BANK_INFO.accountNumber}</span></p>
-                                        <p style="margin: 6px 0; font-size: 14px;"><strong>예금주:</strong> ${BANK_INFO.accountHolder}</p>
-                                        <p style="margin: 8px 0; font-size: 15px; font-weight: 800; color: #0f172a;"><strong>입금 금액:</strong> ${price.toLocaleString()}원</p>
-                                        <p style="margin: 6px 0; font-size: 14px;"><strong>입금자명:</strong> ${depositorName}</p>
-                                        <p style="margin: 6px 0; font-size: 14px;"><strong>증빙 신청:</strong> ${receiptType} ${receiptNumber ? `(${receiptNumber})` : ''}</p>
-                                    </div>
-                                    <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 14px; padding: 18px; margin-bottom: 24px; font-size: 12px; color: #1e40af; line-height: 1.6;">
-                                        <p style="margin: 0 0 6px 0; font-weight: 800;">⚡ 발급 및 세금계산서 발행 절차</p>
-                                        <p style="margin: 2px 0;">• 위 계좌로 입금해 주시면, 입금 확인 즉시(영업시간 내 평균 10분) 본 이메일로 정품 라이선스 키가 자동 발송됩니다.</p>
-                                        <p style="margin: 2px 0;">• 신청하신 세금계산서/현금영수증은 국세청 홈택스로 당일 전자 발행됩니다.</p>
-                                    </div>
-                                    <div style="border-top: 1px solid #f1f5f9; padding-top: 20px; font-size: 11px; color: #94a3b8; text-align: center;">
-                                        <p style="margin: 0;">썬드림 주식회사 | 사업자등록번호: 333-87-00482 | 대표자: 백은숙</p>
-                                        <p style="margin: 4px 0 0 0;">문의사항: 3Monster 공식 홈페이지 고객센터</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `
-                })
-            });
-        } catch (err) {
-            console.error('sendBankTransferEmail error:', err);
-        }
-    };
-
     // 결제 완료 후 라이선스 DB 자동 등록
     const handlePaymentComplete = async (ordr_idxx: string) => {
         try {
@@ -738,19 +660,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                 console.warn('Support ticket insert warning:', ticketErr);
             }
 
-            // 2. 고객 이메일로 무통장 입금 안내 메일 발송
-            await sendBankTransferEmail({
-                email: buyerClean,
-                productTitle: product.title,
-                tierLabel: currentTierInfo.label,
-                price: finalPrice,
-                depositorName: cleanDepositor,
-                receiptType: receiptLabel,
-                receiptNumber: receiptNumber.trim(),
-                orderId
-            });
-
-            // 3. 완료 화면 세팅
+            // 2. 완료 화면 세팅
             setBankTransferSuccess({
                 orderId,
                 productTitle: product.title,
@@ -864,9 +774,9 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                             빠른 발급 및 세금계산서 안내
                         </p>
                         <p className="text-[11px] text-blue-800 leading-relaxed">
-                            • 안내 메일이 등록하신 <strong>{bankTransferSuccess.buyerEmail}</strong>(으)로 발송되었습니다.<br />
+                            • 위 계좌로 송금해 주시면, 입금 확인 즉시 등록하신 이메일(<strong>{bankTransferSuccess.buyerEmail}</strong>)로 정품 라이선스 키가 발송됩니다.<br />
                             • 세금계산서/현금영수증은 국세청 홈택스로 당일 전자 발행됩니다.<br />
-                            • 특이사항이나 빠른 확인은 홈페이지 고객센터로 문의해 주시기 바랍니다.
+                            • 입금 후 빠른 처리가 필요하신 경우 고객센터(Q&A)로 문의해 주시기 바랍니다.
                         </p>
                     </div>
 
@@ -1124,60 +1034,20 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                                 </span>
                             </div>
 
-                            {/* 기업은행 법인 계좌 카드 */}
-                            <div className="p-4 bg-gradient-to-br from-slate-900 to-indigo-950 text-white rounded-2xl shadow-sm border border-slate-800 space-y-3">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-7 h-7 rounded-lg bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-400">
-                                            <Building2 className="w-4 h-4" />
-                                        </div>
-                                        <span className="text-xs font-bold text-slate-300">법인 입금 계좌</span>
+                            {/* 결제 수단 선택 안내 */}
+                            <div className="p-3.5 bg-slate-900 text-white rounded-2xl flex items-center justify-between shadow-xs">
+                                <div className="flex items-center gap-2.5">
+                                    <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-400">
+                                        <Building2 className="w-4 h-4" />
                                     </div>
-                                    <span className="text-[10px] font-bold text-amber-300 bg-amber-400/10 border border-amber-400/20 px-2 py-0.5 rounded-full">
-                                        예금주: 썬드림 주식회사
-                                    </span>
-                                </div>
-
-                                <div className="bg-white/10 rounded-xl p-3 flex items-center justify-between border border-white/10">
                                     <div>
-                                        <p className="text-[11px] text-slate-400 font-semibold">기업은행</p>
-                                        <p className="text-base font-black text-white tracking-wide font-mono mt-0.5">
-                                            114-155484-01-011
-                                        </p>
-                                    </div>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            navigator.clipboard.writeText('114-155484-01-011');
-                                            setAccountCopied(true);
-                                            setTimeout(() => setAccountCopied(false), 2000);
-                                        }}
-                                        className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black flex items-center gap-1 transition-all cursor-pointer shadow-xs"
-                                    >
-                                        {accountCopied ? (
-                                            <>
-                                                <Check className="w-3.5 h-3.5 text-white" />
-                                                <span>복사됨!</span>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Copy className="w-3.5 h-3.5 text-white" />
-                                                <span>계좌 복사</span>
-                                            </>
-                                        )}
-                                    </button>
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-300 pt-1">
-                                    <div>
-                                        <span className="text-slate-400">입금 금액: </span>
-                                        <strong className="text-amber-300 font-black text-xs">{finalPrice.toLocaleString()}원</strong>
-                                    </div>
-                                    <div className="text-right">
-                                        <span className="text-slate-400">증빙: </span>
-                                        <strong className="text-slate-200">전자세금계산서/현금영수증</strong>
+                                        <p className="text-xs font-black text-white">법인계좌 무통장 입금 (기업은행)</p>
+                                        <p className="text-[10px] text-slate-400 font-medium">주문 완료 즉시 입금 전용 계좌번호가 화면에 안내됩니다.</p>
                                     </div>
                                 </div>
+                                <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md shrink-0">
+                                    세금계산서 발행
+                                </span>
                             </div>
 
                             {/* 입금자명 및 증빙 신청 입력폼 */}
@@ -1320,8 +1190,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                                 </>
                             ) : modalBillingCycle === 'annual' ? (
                                 <>
-                                    <Building2 className="w-5 h-5 text-emerald-200" />
-                                    <span>{finalPrice.toLocaleString()}원 입금 신청 및 계산서 발행 요청</span>
+                                    <CheckCircle2 className="w-5 h-5 text-emerald-200" />
+                                    <span>{finalPrice.toLocaleString()}원 주문 완료 및 입금 계좌 확인</span>
                                 </>
                             ) : (
                                 <>
