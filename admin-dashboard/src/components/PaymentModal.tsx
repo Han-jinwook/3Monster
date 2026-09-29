@@ -680,11 +680,12 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
     };
 
     const isAnnual = modalBillingCycle === 'annual';
+    const shortTitle = (product.title || '').split('(')[0].trim();
     const modalTitle = bankTransferSuccess 
-        ? "🎉 연간 구독 무통장 입금 신청 접수 완료" 
+        ? "🎉 연간 입금 접수 완료" 
         : successData 
-            ? "🎉 결제 및 라이선스 키 발급 완료" 
-            : `🛒 ${product.title} 라이선스 ${isAnnual ? '연간 할인 신청' : '결제'}`;
+            ? "🎉 라이선스 발급 완료" 
+            : `🛒 ${shortTitle || product.title} ${isAnnual ? '연간 할인 신청' : '결제'}`;
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} title={modalTitle}>
@@ -710,27 +711,27 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
 
             {bankTransferSuccess ? (
                 /* 무통장 입금 신청 완료 화면 */
-                <div className="space-y-6 py-2 text-left">
-                    <div className="text-center space-y-2 bg-emerald-50/80 p-6 rounded-2xl border border-emerald-200">
-                        <CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto" />
-                        <h3 className="text-xl font-black text-slate-900">연간 구독 입금 신청이 접수되었습니다!</h3>
-                        <p className="text-xs text-slate-600 font-medium leading-relaxed">
+                <div className="space-y-3 py-1 text-left">
+                    <div className="text-center space-y-1 bg-emerald-50/80 p-3.5 rounded-xl border border-emerald-200">
+                        <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto" />
+                        <h3 className="text-base sm:text-lg font-black text-slate-900">연간 구독 입금 신청이 접수되었습니다!</h3>
+                        <p className="text-[11px] text-slate-600 font-medium leading-relaxed">
                             아래 법인 전용 계좌로 입금해 주시면, 입금 확인 즉시(영업시간 내 평균 10분)<br />
                             <strong>{bankTransferSuccess.buyerEmail}</strong>(으)로 정품 라이선스 키가 자동 발송됩니다.
                         </p>
                     </div>
 
                     {/* 입금 계좌 상세 카드 */}
-                    <div className="p-4 bg-slate-900 text-white rounded-2xl space-y-3 shadow-sm">
-                        <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                            <span className="text-xs font-bold text-slate-400">입금 계좌 안내</span>
-                            <span className="text-xs font-black text-amber-300">기업은행 (썬드림 주식회사)</span>
+                    <div className="p-3 bg-slate-900 text-white rounded-xl space-y-2 shadow-sm">
+                        <div className="flex items-center justify-between border-b border-slate-800 pb-1.5">
+                            <span className="text-[11px] font-bold text-slate-400">입금 계좌 안내</span>
+                            <span className="text-[11px] font-black text-amber-300">기업은행 (썬드림 주식회사)</span>
                         </div>
 
-                        <div className="flex items-center justify-between bg-slate-800/80 p-3 rounded-xl">
+                        <div className="flex items-center justify-between bg-slate-800/80 px-3 py-2 rounded-lg">
                             <div>
-                                <p className="text-[11px] text-slate-400">계좌번호</p>
-                                <p className="text-lg font-black text-white font-mono tracking-wider">
+                                <p className="text-[9.5px] text-slate-400">계좌번호</p>
+                                <p className="text-base sm:text-lg font-black text-white font-mono tracking-wider leading-tight">
                                     114-155484-01-011
                                 </p>
                             </div>
@@ -741,49 +742,48 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                                     setAccountCopied(true);
                                     setTimeout(() => setAccountCopied(false), 2000);
                                 }}
-                                className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center gap-1 transition-all cursor-pointer"
+                                className="px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center gap-1 transition-all cursor-pointer shrink-0"
                             >
                                 {accountCopied ? <Check className="w-3.5 h-3.5 text-white" /> : <Copy className="w-3.5 h-3.5 text-white" />}
                                 <span>{accountCopied ? '복사됨!' : '계좌 복사'}</span>
                             </button>
                         </div>
 
-                        <div className="space-y-1.5 text-xs text-slate-300 pt-1">
+                        <div className="space-y-1 text-xs text-slate-300 pt-0.5">
                             <div className="flex justify-between">
-                                <span className="text-slate-400">입금 금액:</span>
-                                <strong className="text-amber-300 text-sm font-black">{bankTransferSuccess.price.toLocaleString()}원</strong>
+                                <span className="text-slate-400 text-[11px]">입금 금액:</span>
+                                <strong className="text-amber-300 text-xs sm:text-sm font-black">{bankTransferSuccess.price.toLocaleString()}원</strong>
                             </div>
-                            <div className="flex justify-between">
+                            <div className="flex justify-between text-[11px]">
                                 <span className="text-slate-400">입금자명:</span>
                                 <strong className="text-white">{bankTransferSuccess.depositorName}</strong>
                             </div>
-                            <div className="flex justify-between">
+                            <div className="flex justify-between text-[11px]">
                                 <span className="text-slate-400">증빙 신청:</span>
                                 <strong className="text-emerald-400">{bankTransferSuccess.receiptType} {bankTransferSuccess.receiptNumber ? `(${bankTransferSuccess.receiptNumber})` : ''}</strong>
                             </div>
-                            <div className="flex justify-between">
-                                <span className="text-slate-400">접수 주문번호:</span>
-                                <span className="font-mono text-slate-400 text-[11px]">{bankTransferSuccess.orderId}</span>
+                            <div className="flex justify-between text-[11px]">
+                                <span className="text-slate-400">주문번호:</span>
+                                <span className="font-mono text-slate-400 text-[10px]">{bankTransferSuccess.orderId}</span>
                             </div>
                         </div>
                     </div>
 
-                    <div className="p-3.5 bg-blue-50 border border-blue-200 rounded-xl text-xs text-blue-900 space-y-1">
-                        <p className="font-bold flex items-center gap-1.5">
-                            <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+                    <div className="p-2.5 bg-blue-50 border border-blue-200 rounded-xl text-[11px] text-blue-900 space-y-1">
+                        <p className="font-bold flex items-center gap-1">
+                            <Sparkles className="w-3 h-3 text-blue-600" />
                             빠른 발급 및 세금계산서 안내
                         </p>
-                        <p className="text-[11px] text-blue-800 leading-relaxed">
-                            • 위 계좌로 송금해 주시면, 입금 확인 즉시 등록하신 이메일(<strong>{bankTransferSuccess.buyerEmail}</strong>)로 정품 라이선스 키가 발송됩니다.<br />
-                            • 세금계산서/현금영수증은 국세청 홈택스로 당일 전자 발행됩니다.<br />
-                            • 입금 후 빠른 처리가 필요하신 경우 고객센터(Q&A)로 문의해 주시기 바랍니다.
+                        <p className="text-[10px] text-blue-800 leading-relaxed">
+                            • 송금 확인 즉시 등록 계정(<strong>{bankTransferSuccess.buyerEmail}</strong>)으로 라이선스 키가 전송됩니다.<br />
+                            • 세금계산서/현금영수증은 홈택스로 당일 전자 발행됩니다.
                         </p>
                     </div>
 
-                    <div className="pt-2">
+                    <div className="pt-1">
                         <Button 
                             onClick={onClose}
-                            className="w-full h-12 bg-slate-900 hover:bg-slate-800 text-white font-black text-sm rounded-xl"
+                            className="w-full h-10 bg-slate-900 hover:bg-slate-800 text-white font-black text-xs rounded-xl"
                         >
                             확인 및 창 닫기
                         </Button>
@@ -791,71 +791,71 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                 </div>
             ) : successData ? (
                 /* 결제 완료 및 라이선스 키 발급 성공 화면 */
-                <div className="space-y-6 py-2">
-                    <div className="text-center space-y-2 bg-emerald-50/80 p-6 rounded-2xl border border-emerald-200">
-                        <CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto animate-bounce" />
-                        <h3 className="text-xl font-black text-slate-900">결제가 안전하게 완료되었습니다!</h3>
-                        <p className="text-xs text-slate-600 font-bold">
+                <div className="space-y-3 py-1">
+                    <div className="text-center space-y-1 bg-emerald-50/80 p-3.5 rounded-xl border border-emerald-200">
+                        <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto animate-bounce" />
+                        <h3 className="text-base sm:text-lg font-black text-slate-900">결제가 안전하게 완료되었습니다!</h3>
+                        <p className="text-[11px] text-slate-600 font-bold">
                             고객님의 정식 라이선스 키가 즉시 생성되었습니다.
                         </p>
                     </div>
 
-                    <div className="space-y-3 bg-slate-900 text-white p-6 rounded-2xl shadow-xl">
-                        <div className="flex justify-between items-center text-xs text-slate-400 font-bold">
+                    <div className="space-y-2 bg-slate-900 text-white p-3.5 rounded-xl shadow-xl">
+                        <div className="flex justify-between items-center text-[11px] text-slate-400 font-bold">
                             <span>{successData.productName} ({successData.tierLabel})</span>
                             <span>만료일: {successData.expireDate}</span>
                         </div>
-                        <div className="space-y-1.5">
-                            <label className="text-[11px] font-black uppercase text-indigo-400 tracking-wider">발급된 라이선스 키</label>
-                            <div className="flex items-center gap-2">
+                        <div className="space-y-1">
+                            <label className="text-[10px] font-black uppercase text-indigo-400 tracking-wider">발급된 라이선스 키</label>
+                            <div className="flex items-center gap-1.5">
                                 <input 
                                     readOnly 
                                     value={successData.serialKey} 
-                                    className="w-full bg-slate-800 border border-slate-700 text-amber-300 font-mono text-base sm:text-lg font-black px-4 py-3 rounded-xl focus:outline-none select-all text-center tracking-wider"
+                                    className="w-full bg-slate-800 border border-slate-700 text-amber-300 font-mono text-sm sm:text-base font-black px-3 py-2 rounded-lg focus:outline-none select-all text-center tracking-wider"
                                 />
                                 <Button 
                                     onClick={() => handleCopy(successData.serialKey)}
                                     className={cn(
-                                        "h-12 px-5 font-black text-xs shrink-0 transition-all rounded-xl border-none",
+                                        "h-9 px-3.5 font-black text-xs shrink-0 transition-all rounded-lg border-none",
                                         copied ? "bg-emerald-600 text-white" : "bg-indigo-600 hover:bg-indigo-500 text-white"
                                     )}
                                 >
-                                    {copied ? <CheckCircle2 className="w-4 h-4 mr-1" /> : <Copy className="w-4 h-4 mr-1" />}
+                                    {copied ? <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> : <Copy className="w-3.5 h-3.5 mr-1" />}
                                     {copied ? "복사됨!" : "복사"}
                                 </Button>
                             </div>
                         </div>
                     </div>
 
-                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600 space-y-1.5">
-                        <p className="font-black text-slate-800 flex items-center gap-1.5">
-                            <Sparkles className="w-4 h-4 text-amber-500" /> 다음 사용 안내:
+                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-[11px] text-slate-600 space-y-1">
+                        <p className="font-black text-slate-800 flex items-center gap-1">
+                            <Sparkles className="w-3.5 h-3.5 text-amber-500" /> 다음 사용 안내:
                         </p>
                         <p>1. 다운로드받은 프로그램 실행 후 <strong>라이선스 키 입력창</strong>에 위 키를 붙여넣기(Ctrl+V) 하세요.</p>
-                        <p>2. 입력 즉시 정식 버전의 모든 기능이 즉시 활성화됩니다.</p>
+                        <p>2. 입력 즉시 정식 버전의 모든 기능이 활성화됩니다.</p>
                     </div>
 
-                    <div className="space-y-2.5">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div className="space-y-2">
+                        <div className="grid grid-cols-2 gap-2">
                             <a href={successData.downloadUrl} className="block">
-                                <Button className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm">
-                                    <Download className="w-4 h-4" /> 프로그램 다운로드
+                                <Button className="w-full h-10 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs flex items-center justify-center gap-1.5 shadow-sm">
+                                    <Download className="w-3.5 h-3.5" /> 프로그램 다운로드
                                 </Button>
                             </a>
                             <a href={successData.docsUrl || `/docs/${product.id}`} target="_blank" rel="noreferrer" className="block">
                                 <Button 
                                     type="button"
                                     variant="outline"
-                                    className="w-full h-12 rounded-xl font-black text-xs sm:text-sm border-2 border-indigo-200 text-indigo-700 hover:bg-indigo-50 flex items-center justify-center gap-2 shadow-sm"
+                                    className="w-full h-10 rounded-xl font-black text-xs border border-indigo-200 text-indigo-700 hover:bg-indigo-50 flex items-center justify-center gap-1.5 shadow-sm"
                                 >
-                                    <BookOpen className="w-4 h-4" /> 📖 설치 & 사용 가이드
+                                    <BookOpen className="w-3.5 h-3.5" /> 📖 설치 가이드
                                 </Button>
                             </a>
                         </div>
                         <Button 
                             onClick={onClose} 
                             variant="ghost"
-                            className="w-full h-10 rounded-xl font-bold text-xs text-slate-500 hover:text-slate-800"
+                            className="w-full h-8 rounded-xl font-bold text-xs text-slate-500 hover:text-slate-800"
                         >
                             닫기
                         </Button>
@@ -863,14 +863,14 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                 </div>
             ) : (
                 /* 결제 입력 폼 */
-                <form onSubmit={modalBillingCycle === 'annual' ? handleBankTransferSubmit : handleKcpSubmit} className="space-y-6 text-left">
+                <form onSubmit={modalBillingCycle === 'annual' ? handleBankTransferSubmit : handleKcpSubmit} className="space-y-3 sm:space-y-3.5 text-left">
                     {/* 플랜 선택 */}
-                    <div className="space-y-3">
-                        <div className="flex items-center justify-between flex-wrap gap-2">
-                            <label className="text-xs font-black text-slate-900 uppercase tracking-wider">구독 플랜 선택</label>
+                    <div className="space-y-2">
+                        <div className="flex items-center justify-between flex-wrap gap-1.5">
+                            <label className="text-[11px] font-black text-slate-900 uppercase tracking-wider">구독 플랜 선택</label>
                             
                             {/* 월간 / 연간 30% 할인 토글 */}
-                            <div className="inline-flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner">
+                            <div className="inline-flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200 shadow-inner">
                                 <button
                                     type="button"
                                     onClick={() => {
@@ -879,7 +879,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                                         setSelectedTier(currentBase as SubscriptionTierKey);
                                     }}
                                     className={cn(
-                                        "px-2.5 py-1 rounded-lg text-xs font-black transition-all",
+                                        "px-2 py-0.5 rounded-md text-[11px] font-black transition-all",
                                         modalBillingCycle === 'monthly'
                                             ? "bg-white text-slate-900 shadow-xs"
                                             : "text-slate-500 hover:text-slate-800"
@@ -895,7 +895,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                                         setSelectedTier(currentBase as SubscriptionTierKey);
                                     }}
                                     className={cn(
-                                        "px-2.5 py-1 rounded-lg text-xs font-black transition-all flex items-center gap-1",
+                                        "px-2 py-0.5 rounded-md text-[11px] font-black transition-all flex items-center gap-1",
                                         modalBillingCycle === 'annual'
                                             ? "bg-indigo-600 text-white shadow-xs"
                                             : "text-indigo-600 hover:text-indigo-700 font-bold"
@@ -903,17 +903,17 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                                 >
                                     <span>연간 구독</span>
                                     <span className={cn(
-                                        "text-[9px] px-1.5 py-0.2 rounded-full font-black",
+                                        "text-[8px] px-1 py-0.2 rounded-full font-black",
                                         modalBillingCycle === 'annual' ? "bg-white text-indigo-700" : "bg-indigo-100 text-indigo-700"
                                     )}>
-                                        30% 할인
+                                        30%↓
                                     </span>
                                 </button>
                             </div>
                         </div>
 
                         {/* 플랜 3종 카드 */}
-                        <div className="grid grid-cols-3 gap-2.5">
+                        <div className="grid grid-cols-3 gap-2">
                             {((modalBillingCycle === 'annual' 
                                 ? ['START_1Y', 'PLUS_1Y', 'PRO_1Y'] 
                                 : ['START_1M', 'PLUS_1M', 'PRO_1M']) as SubscriptionTierKey[]).map((tierKey) => {
@@ -927,20 +927,20 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                                     return (
                                         <div
                                             key={tierKey}
-                                            className="p-3 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/80 opacity-50 cursor-not-allowed flex flex-col justify-between relative text-left select-none"
+                                            className="p-2 sm:p-2.5 rounded-xl border border-dashed border-slate-200 bg-slate-50/80 opacity-50 cursor-not-allowed flex flex-col justify-between relative text-left select-none"
                                         >
-                                            <span className="absolute -top-2.5 right-2 bg-slate-400 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">
+                                            <span className="absolute -top-2 right-1.5 bg-slate-400 text-white text-[7.5px] font-black px-1 py-0.2 rounded uppercase tracking-wider">
                                                 연간 제외
                                             </span>
                                             <div>
-                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Pro</p>
+                                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Pro</p>
                                                 <p className="text-xs font-black text-slate-400 leading-tight mt-0.5">프로</p>
-                                                <p className="text-[10px] text-slate-400 font-bold mt-1 bg-slate-100 px-1.5 py-0.5 rounded w-fit">
-                                                    월간/3개월 전용
+                                                <p className="text-[9px] text-slate-400 font-bold mt-1 bg-slate-100 px-1 py-0.5 rounded w-fit">
+                                                    월간 전용
                                                 </p>
                                             </div>
-                                            <div className="mt-2.5 pt-2 border-t border-slate-200">
-                                                <p className="text-xs font-black text-slate-400">
+                                            <div className="mt-2 pt-1 border-t border-slate-200">
+                                                <p className="text-[11px] font-black text-slate-400">
                                                     연간 미운영
                                                 </p>
                                             </div>
@@ -953,9 +953,9 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                                         key={tierKey}
                                         onClick={() => setSelectedTier(tierKey)}
                                         className={cn(
-                                            "cursor-pointer p-3 rounded-2xl border-2 transition-all flex flex-col justify-between relative text-left",
+                                            "cursor-pointer p-2 sm:p-2.5 rounded-xl border-2 transition-all flex flex-col justify-between relative text-left",
                                             isSelected 
-                                                ? "border-indigo-600 bg-indigo-50/60 shadow-sm" 
+                                                ? "border-indigo-600 bg-indigo-50/60 shadow-xs" 
                                                 : isPlus
                                                     ? "border-indigo-200 bg-indigo-50/20 hover:border-indigo-300"
                                                     : "border-slate-200 hover:border-slate-300 bg-white"
@@ -963,7 +963,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                                     >
                                         {info.badge && (
                                             <span className={cn(
-                                                "absolute -top-2.5 right-2 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider shadow-2xs",
+                                                "absolute -top-2 right-1.5 text-white text-[7.5px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider shadow-2xs",
                                                 isPlus ? "bg-indigo-600" : "bg-slate-800"
                                             )}>
                                                 {info.badge}
@@ -971,20 +971,20 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                                         )}
                                         <div>
                                             <div className="flex items-center justify-between">
-                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">{info.name}</p>
+                                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider">{info.name}</p>
                                             </div>
                                             <p className="text-xs font-black text-slate-900 leading-tight mt-0.5">{info.name === 'Start' ? '스타트' : info.name === 'Plus' ? '플러스' : '프로'}</p>
-                                            <p className="text-[10px] text-indigo-700 font-extrabold mt-1 bg-indigo-50/80 px-1.5 py-0.5 rounded w-fit">
+                                            <p className="text-[9.5px] text-indigo-700 font-extrabold mt-1 bg-indigo-50/80 px-1 py-0.5 rounded w-fit leading-none">
                                                 {info.limitText}
                                             </p>
                                         </div>
-                                        <div className="mt-2.5 pt-2 border-t border-slate-100">
-                                            <p className="text-sm font-black text-slate-900">
-                                                {price.toLocaleString()}<span className="text-[10px] font-normal text-slate-500 ml-0.5">원</span>
+                                        <div className="mt-2 pt-1.5 border-t border-slate-100">
+                                            <p className="text-xs sm:text-sm font-black text-slate-900">
+                                                {price.toLocaleString()}<span className="text-[9px] font-normal text-slate-500 ml-0.5">원</span>
                                             </p>
                                             {info.cycle === '1Y' && (
-                                                <p className="text-[9px] text-indigo-600 font-extrabold mt-0.5">
-                                                    1년 일시납 (월 {info.monthlyEquivalent.toLocaleString()}원꼴)
+                                                <p className="text-[8px] text-indigo-600 font-extrabold mt-0.5">
+                                                    월 {info.monthlyEquivalent.toLocaleString()}원꼴
                                                 </p>
                                             )}
                                         </div>
@@ -994,67 +994,50 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                         </div>
 
                         {/* 무제한 발송 강조 배너 */}
-                        <div className="p-2.5 bg-gradient-to-r from-indigo-50 via-purple-50 to-indigo-50 border border-indigo-200/80 rounded-xl flex items-center justify-between text-[11px] font-bold text-indigo-900">
-                            <span className="flex items-center gap-1.5">
-                                <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                                <span>전 플랜 공통: <strong>구독 기간 내 이메일 & 인스타DM 무제한 발송</strong></span>
+                        <div className="p-2 bg-gradient-to-r from-indigo-50 via-purple-50 to-indigo-50 border border-indigo-100 rounded-lg flex items-center justify-between text-[10px] font-bold text-indigo-900">
+                            <span className="flex items-center gap-1.5 truncate">
+                                <Sparkles className="w-3 h-3 text-amber-500 shrink-0" />
+                                <span className="truncate">전 플랜 공통: <strong>구독 기간 내 이메일 & 인스타DM 무제한 발송</strong></span>
                             </span>
-                            <span className="text-[10px] text-slate-500">일 권장 300~500건</span>
+                            <span className="text-[9px] text-slate-500 shrink-0 ml-1">일 300~500건</span>
                         </div>
                     </div>
 
-                    {/* 라이선스 키 수신 이메일 단일 안내 */}
-                    <div className="p-3.5 bg-slate-50 border border-slate-200/90 rounded-2xl space-y-2.5">
-                        <div className="flex items-center justify-between gap-3">
-                            <div className="flex items-center gap-2 shrink-0">
-                                <div className="w-6 h-6 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shrink-0">
-                                    <Mail className="w-3.5 h-3.5" />
-                                </div>
-                                <span className="text-xs font-black text-slate-700 whitespace-nowrap">
-                                    수신 이메일
-                                </span>
-                            </div>
-                            <span className="text-xs font-black text-slate-900 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs select-all truncate">
-                                {buyerEmail}
-                            </span>
+                    {/* 라이선스 키 수신 이메일 컴팩트 안내 */}
+                    <div className="flex items-center justify-between p-2 bg-slate-50 border border-slate-200/90 rounded-xl text-xs">
+                        <div className="flex items-center gap-1.5 text-slate-700 font-bold shrink-0">
+                            <Mail className="w-3.5 h-3.5 text-indigo-600" />
+                            <span className="text-[11px] font-black">수신 이메일</span>
                         </div>
-                        <div className="flex items-center gap-1.5 pt-2 border-t border-slate-200/70 text-[11px] font-bold text-indigo-600">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                            <span>결제 완료 즉시 위 이메일로 라이선스 키가 자동 발송됩니다.</span>
-                        </div>
+                        <span className="text-xs font-black text-slate-900 bg-white px-2.5 py-0.5 rounded-md border border-slate-200 select-all truncate max-w-[210px]">
+                            {buyerEmail}
+                        </span>
                     </div>
 
                     {/* 결제 수단 (연간: 법인계좌 무통장 입금 및 세금계산서 발행 / 월간: 신용·체크카드) */}
                     {modalBillingCycle === 'annual' ? (
-                        <div className="space-y-3">
+                        <div className="space-y-2.5">
                             <div className="flex items-center justify-between">
-                                <label className="text-xs font-black text-slate-900 uppercase tracking-wider">결제 수단</label>
-                                <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md flex items-center gap-1">
-                                    <Building2 className="w-3 h-3" /> 연간 30% 특가 · 세금계산서 100% 발행
+                                <label className="text-[11px] font-black text-slate-900 uppercase tracking-wider">결제 수단</label>
+                                <span className="text-[9.5px] font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded flex items-center gap-1">
+                                    <Building2 className="w-3 h-3" /> 연간 30% 특가 · 세금계산서 100%
                                 </span>
                             </div>
 
                             {/* 기업은행 법인 계좌 입금 안내 카드 (계좌번호 및 복사 버튼 즉시 노출) */}
-                            <div className="p-4 bg-slate-900 text-white rounded-2xl space-y-3 shadow-md border border-slate-800">
-                                <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-7 h-7 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-400">
-                                            <Building2 className="w-4 h-4" />
-                                        </div>
-                                        <div className="flex items-center gap-1.5">
-                                            <span className="text-xs font-black text-white">기업은행 법인 입금 계좌</span>
-                                            <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded">
-                                                세금계산서 100%
-                                            </span>
-                                        </div>
+                            <div className="p-3 bg-slate-900 text-white rounded-xl space-y-2 border border-slate-800">
+                                <div className="flex items-center justify-between border-b border-slate-800 pb-1.5">
+                                    <div className="flex items-center gap-1.5">
+                                        <Building2 className="w-3.5 h-3.5 text-emerald-400" />
+                                        <span className="text-[11px] font-black text-white">기업은행 법인 입금 계좌</span>
                                     </div>
-                                    <span className="text-xs font-black text-amber-300">예금주: 썬드림 주식회사</span>
+                                    <span className="text-[10px] font-bold text-amber-300">예금주: 썬드림 주식회사</span>
                                 </div>
 
-                                <div className="flex items-center justify-between bg-slate-800/90 p-3 rounded-xl border border-slate-700/60">
+                                <div className="flex items-center justify-between bg-slate-800/90 px-3 py-2 rounded-lg border border-slate-700/60">
                                     <div>
-                                        <p className="text-[10px] text-slate-400 font-medium">송금 계좌번호</p>
-                                        <p className="text-lg font-black text-white font-mono tracking-wider">
+                                        <p className="text-[9px] text-slate-400 font-medium">송금 계좌번호</p>
+                                        <p className="text-base sm:text-lg font-black text-white font-mono tracking-wider leading-tight">
                                             114-155484-01-011
                                         </p>
                                     </div>
@@ -1065,39 +1048,39 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                                             setAccountCopied(true);
                                             setTimeout(() => setAccountCopied(false), 2000);
                                         }}
-                                        className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+                                        className="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-xs font-black flex items-center gap-1 transition-all cursor-pointer shadow-sm shrink-0"
                                     >
-                                        {accountCopied ? <Check className="w-4 h-4 text-white" /> : <Copy className="w-4 h-4 text-white" />}
-                                        <span>{accountCopied ? '복사완료!' : '계좌 복사'}</span>
+                                        {accountCopied ? <Check className="w-3.5 h-3.5 text-white" /> : <Copy className="w-3.5 h-3.5 text-white" />}
+                                        <span>{accountCopied ? '복사됨!' : '계좌 복사'}</span>
                                     </button>
                                 </div>
                             </div>
 
                             {/* 입금자명 및 증빙 신청 입력폼 */}
-                            <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+                            <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
                                 <div className="space-y-1">
-                                    <label className="text-[11px] font-black text-slate-700 flex items-center justify-between">
+                                    <label className="text-[10px] font-black text-slate-700 flex items-center justify-between">
                                         <span>입금자명 <span className="text-rose-500">*</span></span>
-                                        <span className="text-[10px] text-slate-400 font-normal">실제 송금하시는 성함 또는 상호</span>
+                                        <span className="text-[9px] text-slate-400 font-normal">송금자 성함 또는 상호</span>
                                     </label>
                                     <input
                                         type="text"
                                         value={depositorName}
                                         onChange={(e) => setDepositorName(e.target.value)}
                                         placeholder="예: 홍길동 또는 (주)회사명"
-                                        className="w-full px-3 py-2 text-xs font-bold rounded-xl border border-slate-200 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 bg-white"
+                                        className="w-full px-2.5 py-1.5 text-xs font-bold rounded-lg border border-slate-200 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 bg-white"
                                         required
                                     />
                                 </div>
 
-                                <div className="space-y-1.5 pt-1 border-t border-slate-200/80">
-                                    <label className="text-[11px] font-black text-slate-700">증빙 서류 발행 신청</label>
-                                    <div className="grid grid-cols-3 gap-1.5">
+                                <div className="space-y-1 pt-1 border-t border-slate-200/80">
+                                    <label className="text-[10px] font-black text-slate-700">증빙 서류 발행 신청</label>
+                                    <div className="grid grid-cols-3 gap-1">
                                         <button
                                             type="button"
                                             onClick={() => setReceiptType('tax_invoice')}
                                             className={cn(
-                                                "py-1.5 px-2 rounded-xl text-xs font-bold border transition-all text-center",
+                                                "py-1 px-1.5 rounded-lg text-[11px] font-bold border transition-all text-center",
                                                 receiptType === 'tax_invoice'
                                                     ? "bg-indigo-600 text-white border-indigo-600 shadow-2xs"
                                                     : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
@@ -1109,7 +1092,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                                             type="button"
                                             onClick={() => setReceiptType('cash_receipt')}
                                             className={cn(
-                                                "py-1.5 px-2 rounded-xl text-xs font-bold border transition-all text-center",
+                                                "py-1 px-1.5 rounded-lg text-[11px] font-bold border transition-all text-center",
                                                 receiptType === 'cash_receipt'
                                                     ? "bg-indigo-600 text-white border-indigo-600 shadow-2xs"
                                                     : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
@@ -1121,7 +1104,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                                             type="button"
                                             onClick={() => setReceiptType('none')}
                                             className={cn(
-                                                "py-1.5 px-2 rounded-xl text-xs font-bold border transition-all text-center",
+                                                "py-1 px-1.5 rounded-lg text-[11px] font-bold border transition-all text-center",
                                                 receiptType === 'none'
                                                     ? "bg-indigo-600 text-white border-indigo-600 shadow-2xs"
                                                     : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
@@ -1132,16 +1115,16 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                                     </div>
 
                                     {receiptType !== 'none' && (
-                                        <div className="pt-1.5">
+                                        <div className="pt-1">
                                             <input
                                                 type="text"
                                                 value={receiptNumber}
                                                 onChange={(e) => setReceiptNumber(e.target.value)}
                                                 placeholder={receiptType === 'tax_invoice' ? "사업자등록번호 10자리 (- 제외)" : "휴대폰번호 (- 제외)"}
-                                                className="w-full px-3 py-2 text-xs font-bold rounded-xl border border-slate-200 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 bg-white"
+                                                className="w-full px-2.5 py-1.5 text-xs font-bold rounded-lg border border-slate-200 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 bg-white"
                                                 required
                                             />
-                                            <p className="text-[10px] text-slate-500 mt-1 pl-1">
+                                            <p className="text-[9px] text-slate-500 mt-0.5 pl-1">
                                                 {receiptType === 'tax_invoice' 
                                                     ? "※ 입금 확인 후 홈택스 전자세금계산서가 당일 발행됩니다." 
                                                     : "※ 지출증빙/소득공제용 현금영수증이 국세청으로 발행됩니다."}
@@ -1155,40 +1138,39 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                         /* 월간: 신용/체크카드 안내 */
                         <div className="space-y-1.5">
                             <div className="flex items-center justify-between">
-                                <label className="text-xs font-black text-slate-900 uppercase tracking-wider">결제 수단</label>
-                                <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-200/80 px-2 py-0.5 rounded-md">
+                                <label className="text-[11px] font-black text-slate-900 uppercase tracking-wider">결제 수단</label>
+                                <span className="text-[9.5px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-200/80 px-1.5 py-0.5 rounded">
                                     국내 전 카드사 지원
                                 </span>
                             </div>
-                            <div className="p-3.5 bg-slate-900 text-white rounded-2xl flex items-center justify-between shadow-xs">
-                                <div className="flex items-center gap-2.5">
-                                    <div className="w-8 h-8 rounded-xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-400">
-                                        <CreditCard className="w-4 h-4" />
+                            <div className="p-2.5 bg-slate-900 text-white rounded-xl flex items-center justify-between shadow-xs">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-7 h-7 rounded-lg bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-400">
+                                        <CreditCard className="w-3.5 h-3.5" />
                                     </div>
                                     <div>
                                         <p className="text-xs font-black text-white">신용 / 체크카드 (앱카드)</p>
-                                        <p className="text-[10px] text-slate-400 font-medium">KB·신한·현대·삼성·롯데·BC·농협·카카오뱅크 등 지원</p>
+                                        <p className="text-[9.5px] text-slate-400 font-medium">KB·신한·현대·삼성·롯데·BC·농협·카뱅 등 즉시결제</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     )}
 
-
                     {errorMsg && (
-                        <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-xs font-bold flex items-center gap-2">
-                            <AlertCircle className="w-4 h-4 shrink-0" />
+                        <div className="p-2.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-600 text-xs font-bold flex items-center gap-1.5">
+                            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                             <span>{errorMsg}</span>
                         </div>
                     )}
 
                     {/* 결제 / 입금 신청 버튼 */}
-                    <div className="space-y-3 pt-2">
+                    <div className="space-y-2 pt-1">
                         <Button 
                             type="submit" 
                             disabled={processing}
                             className={cn(
-                                "w-full h-14 font-black text-base rounded-2xl shadow-xl transition-all flex items-center justify-center gap-2 border-none",
+                                "w-full h-11 sm:h-12 font-black text-sm rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 border-none",
                                 modalBillingCycle === 'annual'
                                     ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-200 cursor-pointer"
                                     : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-200 cursor-pointer"
@@ -1196,35 +1178,35 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                         >
                             {processing ? (
                                 <>
-                                    <Loader2 className="w-5 h-5 animate-spin" /> {modalBillingCycle === 'annual' ? '신청 접수 중...' : '결제창 호출 및 처리 중...'}
+                                    <Loader2 className="w-4 h-4 animate-spin" /> {modalBillingCycle === 'annual' ? '신청 접수 중...' : '결제창 호출 중...'}
                                 </>
                             ) : modalBillingCycle === 'annual' ? (
                                 <>
-                                    <CheckCircle2 className="w-5 h-5 text-emerald-200" />
+                                    <CheckCircle2 className="w-4 h-4 text-emerald-200" />
                                     <span>{finalPrice.toLocaleString()}원 입금 신청 및 주문 완료</span>
                                 </>
                             ) : (
                                 <>
-                                    <Zap className="w-5 h-5 text-amber-300" />
-                                    <span>{finalPrice.toLocaleString()}원 결제 및 라이선스 키 즉시 발급</span>
+                                    <Zap className="w-4 h-4 text-amber-300" />
+                                    <span>{finalPrice.toLocaleString()}원 카드 결제 및 라이선스 발급</span>
                                 </>
                             )}
                         </Button>
 
-                        <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold px-1">
+                        <div className="flex items-center justify-between text-[10px] text-slate-400 font-bold px-1">
                             {modalBillingCycle === 'annual' ? (
                                 <>
                                     <span className="flex items-center gap-1 text-slate-600 font-semibold">
-                                        <Building2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" /> 썬드림(주) 공식 법인계좌 직영
+                                        <Building2 className="w-3 h-3 text-emerald-600 shrink-0" /> 썬드림(주) 법인계좌 직영
                                     </span>
-                                    <span>전자세금계산서 100% 의무발행</span>
+                                    <span>전자세금계산서 100% 당일 발행</span>
                                 </>
                             ) : (
                                 <>
                                     <span className="flex items-center gap-1">
-                                        <ShieldCheck className="w-3.5 h-3.5 text-indigo-600 shrink-0" /> NHN KCP 정식 전자결제 (안심 암호화)
+                                        <ShieldCheck className="w-3 h-3 text-indigo-600 shrink-0" /> NHN KCP 안심 전자결제
                                     </span>
-                                    <span>전자상거래 소비자보호법 준수</span>
+                                    <span>소비자보호법 준수</span>
                                 </>
                             )}
                         </div>
