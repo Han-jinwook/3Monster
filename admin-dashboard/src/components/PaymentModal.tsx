@@ -1174,19 +1174,6 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                         </div>
                     )}
 
-                    {/* 데이터 합법성 및 컴플라이언스 준수 공식 안내 */}
-                    <div className="p-3 bg-slate-100/90 border border-slate-200/80 rounded-2xl text-[11px] text-slate-500 space-y-1">
-                        <p className="font-black text-slate-700 flex items-center gap-1.5">
-                            <ShieldCheck className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                            데이터 합법성 및 정보통신망법 준수 안내
-                        </p>
-                        <p className="text-[10px] text-slate-500 leading-relaxed">
-                            • 본 소프트웨어는 포털 지도 등에 사업자가 직접 공개한 합법적 사업장 정보만을 상권 분석 및 비즈니스 1:1 소통 목적으로 수집·정리합니다.
-                        </p>
-                        <p className="text-[10px] text-slate-500 leading-relaxed">
-                            • 불법 스팸 전송을 엄격히 금지하며, 메시지 발송 시 정보통신망법 제50조에 따른 (광고) 표기 및 수신거부 의무를 철저히 준수합니다.
-                        </p>
-                    </div>
 
                     {errorMsg && (
                         <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-xs font-bold flex items-center gap-2">
