@@ -1034,20 +1034,43 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                                 </span>
                             </div>
 
-                            {/* 결제 수단 선택 안내 */}
-                            <div className="p-3.5 bg-slate-900 text-white rounded-2xl flex items-center justify-between shadow-xs">
-                                <div className="flex items-center gap-2.5">
-                                    <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-400">
-                                        <Building2 className="w-4 h-4" />
+                            {/* 기업은행 법인 계좌 입금 안내 카드 (계좌번호 및 복사 버튼 즉시 노출) */}
+                            <div className="p-4 bg-slate-900 text-white rounded-2xl space-y-3 shadow-md border border-slate-800">
+                                <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-7 h-7 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-400">
+                                            <Building2 className="w-4 h-4" />
+                                        </div>
+                                        <div className="flex items-center gap-1.5">
+                                            <span className="text-xs font-black text-white">기업은행 법인 입금 계좌</span>
+                                            <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded">
+                                                세금계산서 100%
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="text-xs font-black text-white">법인계좌 무통장 입금 (기업은행)</p>
-                                        <p className="text-[10px] text-slate-400 font-medium">주문 완료 즉시 입금 전용 계좌번호가 화면에 안내됩니다.</p>
-                                    </div>
+                                    <span className="text-xs font-black text-amber-300">예금주: 썬드림 주식회사</span>
                                 </div>
-                                <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md shrink-0">
-                                    세금계산서 발행
-                                </span>
+
+                                <div className="flex items-center justify-between bg-slate-800/90 p-3 rounded-xl border border-slate-700/60">
+                                    <div>
+                                        <p className="text-[10px] text-slate-400 font-medium">송금 계좌번호</p>
+                                        <p className="text-lg font-black text-white font-mono tracking-wider">
+                                            114-155484-01-011
+                                        </p>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            navigator.clipboard.writeText('114-155484-01-011');
+                                            setAccountCopied(true);
+                                            setTimeout(() => setAccountCopied(false), 2000);
+                                        }}
+                                        className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+                                    >
+                                        {accountCopied ? <Check className="w-4 h-4 text-white" /> : <Copy className="w-4 h-4 text-white" />}
+                                        <span>{accountCopied ? '복사완료!' : '계좌 복사'}</span>
+                                    </button>
+                                </div>
                             </div>
 
                             {/* 입금자명 및 증빙 신청 입력폼 */}
@@ -1191,7 +1214,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                             ) : modalBillingCycle === 'annual' ? (
                                 <>
                                     <CheckCircle2 className="w-5 h-5 text-emerald-200" />
-                                    <span>{finalPrice.toLocaleString()}원 주문 완료 및 입금 계좌 확인</span>
+                                    <span>{finalPrice.toLocaleString()}원 입금 신청 및 주문 완료</span>
                                 </>
                             ) : (
                                 <>
