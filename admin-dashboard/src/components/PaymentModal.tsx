@@ -262,11 +262,15 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
         setBankTransferSuccess(null);
         setErrorMsg(null);
         setCopied(false);
-        setAccountCopied(false);
         if (currentEmail) {
             setDepositorName(currentEmail.split('@')[0] || '');
         }
     }, [product, isOpen]);
+
+    // 탭 전환 또는 플랜 변경 시 이전 취소/에러 메시지 즉시 리셋
+    useEffect(() => {
+        setErrorMsg(null);
+    }, [modalBillingCycle, selectedTier]);
 
     // KCP 표준 스크립트 프리로드
     useEffect(() => {
@@ -577,8 +581,12 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
 
                     if (res_cd === "0000") {
                         handlePaymentComplete(orderId);
+                    } else if (res_cd === "3001" || res_msg?.includes("사용자 결제 취소") || res_msg?.includes("취소")) {
+                        setErrorMsg("카드 결제창이 닫히거나 결제가 취소되었습니다.");
+                        setTimeout(() => setErrorMsg(null), 3000);
+                        setProcessing(false);
                     } else {
-                        setErrorMsg(`[결제 취소/실패] ${res_msg} (${res_cd || 'CANCEL'})`);
+                        setErrorMsg(`[결제 오류] ${res_msg} (${res_cd || 'CANCEL'})`);
                         setProcessing(false);
                     }
                 } catch (err: any) {
@@ -1158,8 +1166,16 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                     )}
 
                     {errorMsg && (
-                        <div className="p-2.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-600 text-xs font-bold flex items-center gap-1.5">
-                            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                        <div className={cn(
+                            "p-2.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all",
+                            errorMsg.includes('취소')
+                                ? "bg-slate-100 border border-slate-200 text-slate-700"
+                                : "bg-rose-50 border border-rose-200 text-rose-600"
+                        )}>
+                            <AlertCircle className={cn(
+                                "w-3.5 h-3.5 shrink-0",
+                                errorMsg.includes('취소') ? "text-slate-500" : "text-rose-500"
+                            )} />
                             <span>{errorMsg}</span>
                         </div>
                     )}
