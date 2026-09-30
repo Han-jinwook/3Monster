@@ -881,8 +881,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                         <div className="flex items-center justify-between flex-wrap gap-1.5">
                             <label className="text-[11px] font-black text-slate-900 uppercase tracking-wider">구독 플랜 선택</label>
                             
-                            {/* 월간 / 연간 30% 할인 토글 */}
-                            <div className="inline-flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200 shadow-inner">
+                            {/* 외부 쇼룸과 100% 동일한 월간 / 연간 30% 할인 토글 */}
+                            <div className="shrink-0 inline-flex items-center bg-white p-0.5 rounded-xl border-2 border-indigo-600 shadow-sm shadow-indigo-100">
                                 <button
                                     type="button"
                                     onClick={() => {
@@ -891,10 +891,10 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                                         setSelectedTier(currentBase as SubscriptionTierKey);
                                     }}
                                     className={cn(
-                                        "px-2 py-0.5 rounded-md text-[11px] font-black transition-all",
+                                        "px-2.5 py-1 rounded-lg text-xs font-black transition-all cursor-pointer",
                                         modalBillingCycle === 'monthly'
-                                            ? "bg-white text-slate-900 shadow-xs"
-                                            : "text-slate-500 hover:text-slate-800"
+                                            ? "bg-slate-900 text-white shadow-xs"
+                                            : "text-slate-600 hover:text-slate-900"
                                     )}
                                 >
                                     월간 구독
@@ -907,18 +907,20 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                                         setSelectedTier(currentBase as SubscriptionTierKey);
                                     }}
                                     className={cn(
-                                        "px-2 py-0.5 rounded-md text-[11px] font-black transition-all flex items-center gap-1",
+                                        "px-2.5 py-1 rounded-lg text-xs font-black transition-all flex items-center gap-1 cursor-pointer",
                                         modalBillingCycle === 'annual'
-                                            ? "bg-indigo-600 text-white shadow-xs"
-                                            : "text-indigo-600 hover:text-indigo-700 font-bold"
+                                            ? "bg-indigo-600 text-white shadow-md shadow-indigo-300"
+                                            : "text-indigo-600 hover:text-indigo-700 font-extrabold"
                                     )}
                                 >
                                     <span>연간 구독</span>
                                     <span className={cn(
-                                        "text-[8px] px-1 py-0.2 rounded-full font-black",
-                                        modalBillingCycle === 'annual' ? "bg-white text-indigo-700" : "bg-indigo-100 text-indigo-700"
+                                        "text-[9px] px-1.5 py-0.2 rounded-full font-black transition-transform",
+                                        modalBillingCycle === 'annual' 
+                                            ? "bg-amber-300 text-slate-950 shadow-xs" 
+                                            : "bg-indigo-100 text-indigo-700"
                                     )}>
-                                        30%↓
+                                        30% 할인 🎁
                                     </span>
                                 </button>
                             </div>
