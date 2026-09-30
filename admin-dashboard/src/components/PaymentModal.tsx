@@ -194,6 +194,7 @@ export const BANK_INFO = {
 export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, product }) => {
     const [selectedTier, setSelectedTier] = useState<SubscriptionTierKey>('PLUS_1M');
     const [modalBillingCycle, setModalBillingCycle] = useState<'monthly' | 'annual'>('monthly');
+    const [paymentMethod, setPaymentMethod] = useState<'card' | 'bank'>('card');
     const [buyerEmail, setBuyerEmail] = useState('');
     const [processing, setProcessing] = useState(false);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -250,12 +251,15 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
             setSelectedTier(targetTier);
             if (targetTier.endsWith('_1Y')) {
                 setModalBillingCycle('annual');
+                setPaymentMethod('bank');
             } else {
                 setModalBillingCycle('monthly');
+                setPaymentMethod('card');
             }
         } else if (product?.billingCycle) {
             setModalBillingCycle(product.billingCycle);
             setSelectedTier(product.billingCycle === 'annual' ? 'PLUS_1Y' : 'PLUS_1M');
+            setPaymentMethod(product.billingCycle === 'annual' ? 'bank' : 'card');
         }
 
         setSuccessData(null);
@@ -270,6 +274,9 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
     // 탭 전환 또는 플랜 변경 시 이전 취소/에러 메시지 즉시 리셋
     useEffect(() => {
         setErrorMsg(null);
+        if (modalBillingCycle === 'annual') {
+            setPaymentMethod('bank');
+        }
     }, [modalBillingCycle, selectedTier]);
 
     // KCP 표준 스크립트 프리로드
@@ -653,7 +660,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
         setProcessing(true);
 
         try {
-            const orderId = `3M_ANNUAL_${Date.now()}_${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+            const cyclePrefix = modalBillingCycle === 'annual' ? 'ANNUAL' : 'MONTH';
+            const orderId = `3M_${cyclePrefix}_${Date.now()}_${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
             const buyerClean = buyerEmail.trim().toLowerCase();
             const receiptLabel = receiptType === 'tax_invoice' ? '세금계산서' : receiptType === 'cash_receipt' ? '현금영수증' : '미발행 (개인)';
 
@@ -664,8 +672,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                     email: buyerClean,
                     issue_type: 'bank_transfer_order',
                     status: 'open',
-                    title: `[연간 입금신청] ${product.title} (${currentTierInfo.label}) - ${cleanDepositor} (${finalPrice.toLocaleString()}원)`,
-                    description: `[연간 라이선스 무통장 입금 접수]\n- 제품: ${product.title}\n- 플랜: ${currentTierInfo.label}\n- 입금액: ${finalPrice.toLocaleString()}원\n- 입금계좌: 기업은행 114-155484-01-011 썬드림 주식회사\n- 입금자명: ${cleanDepositor}\n- 증빙신청: ${receiptLabel} (${receiptNumber.trim() || '없음'})\n- 신청계정: ${buyerClean}\n- 주문번호: ${orderId}`,
+                    title: `[${modalBillingCycle === 'annual' ? '연간' : '월간'} 입금신청] ${product.title} (${currentTierInfo.label}) - ${cleanDepositor} (${finalPrice.toLocaleString()}원)`,
+                    description: `[${modalBillingCycle === 'annual' ? '연간' : '월간'} 라이선스 무통장 입금 접수]\n- 제품: ${product.title}\n- 플랜: ${currentTierInfo.label}\n- 입금액: ${finalPrice.toLocaleString()}원\n- 입금계좌: 기업은행 114-155484-01-011 썬드림 주식회사\n- 입금자명: ${cleanDepositor}\n- 증빙신청: ${receiptLabel} (${receiptNumber.trim() || '없음'})\n- 신청계정: ${buyerClean}\n- 주문번호: ${orderId}`,
                 }]);
             } catch (ticketErr) {
                 console.warn('Support ticket insert warning:', ticketErr);
@@ -690,13 +698,13 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
         }
     };
 
-    const isAnnual = modalBillingCycle === 'annual';
+    const isBank = paymentMethod === 'bank';
     const shortTitle = (product.title || '').split('(')[0].trim();
     const modalTitle = bankTransferSuccess 
-        ? "🎉 연간 입금 접수 완료" 
+        ? "🎉 입금 신청 접수 완료" 
         : successData 
             ? "🎉 라이선스 발급 완료" 
-            : `🛒 ${shortTitle || product.title} ${isAnnual ? '연간 할인 신청' : '결제'}`;
+            : `🛒 ${shortTitle || product.title} ${isBank ? '입금 신청' : '결제'}`;
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} title={modalTitle}>
@@ -726,7 +734,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                 <div className="space-y-3 py-1 text-left">
                     <div className="text-center space-y-1 bg-emerald-50/80 p-3.5 rounded-xl border border-emerald-200">
                         <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto" />
-                        <h3 className="text-base sm:text-lg font-black text-slate-900">연간 구독 입금 신청이 접수되었습니다!</h3>
+                        <h3 className="text-base sm:text-lg font-black text-slate-900">{modalBillingCycle === 'annual' ? '연간 구독' : '라이선스'} 입금 신청이 접수되었습니다!</h3>
                         <p className="text-[11px] text-slate-600 font-medium leading-relaxed">
                             아래 법인 전용 계좌로 입금해 주시면, 입금 확인 즉시(영업시간 내 평균 10분)<br />
                             <strong>{bankTransferSuccess.buyerEmail}</strong>(으)로 정품 라이선스 키가 자동 발송됩니다.
@@ -875,7 +883,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                 </div>
             ) : (
                 /* 결제 입력 폼 */
-                <form onSubmit={modalBillingCycle === 'annual' ? handleBankTransferSubmit : handleKcpSubmit} className="space-y-3 sm:space-y-3.5 text-left">
+                <form onSubmit={paymentMethod === 'bank' ? handleBankTransferSubmit : handleKcpSubmit} className="space-y-3 sm:space-y-3.5 text-left">
                     {/* 플랜 선택 */}
                     <div className="space-y-2">
                         <div className="flex items-center justify-between flex-wrap gap-1.5">
@@ -1028,148 +1036,197 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                         </span>
                     </div>
 
-                    {/* 결제 수단 (연간: 법인계좌 무통장 입금 및 세금계산서 발행 / 월간: 신용·체크카드) */}
-                    {modalBillingCycle === 'annual' ? (
-                        <div className="space-y-2.5">
-                            <div className="flex items-center justify-between">
-                                <label className="text-[11px] font-black text-slate-900 uppercase tracking-wider">결제 수단</label>
-                                <span className="text-[9.5px] font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded flex items-center gap-1">
-                                    <Building2 className="w-3 h-3" /> 연간 30% 특가 · 세금계산서 100%
+                    {/* 결제 수단 선택 (신용카드 & 무통장 입금 항상 나란히 배치) */}
+                    <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                            <label className="text-[11px] font-black text-slate-900 uppercase tracking-wider">결제 수단 선택</label>
+                            <span className="text-[9.5px] font-bold text-slate-500">
+                                {paymentMethod === 'card' ? '국내 전 카드사 지원' : '세금계산서 100% 당일 발행'}
+                            </span>
+                        </div>
+
+                        {/* 2개 선택 탭 버튼 (Image 2/3 스타일 완벽 일치) */}
+                        <div className="grid grid-cols-2 gap-2">
+                            {/* 무통장 입금 */}
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setPaymentMethod('bank');
+                                    setErrorMsg(null);
+                                }}
+                                className={cn(
+                                    "p-2.5 rounded-xl border-2 transition-all flex flex-col items-center justify-center gap-1 cursor-pointer text-center relative",
+                                    paymentMethod === 'bank'
+                                        ? "border-slate-900 bg-amber-50/40 text-slate-900 font-black shadow-xs ring-1 ring-slate-900"
+                                        : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 font-bold"
+                                )}
+                            >
+                                <span className="text-xs sm:text-[13px] font-black">무통장 입금</span>
+                                <span className={cn(
+                                    "text-[9px] px-1.5 py-0.2 rounded-full font-black",
+                                    paymentMethod === 'bank' ? "bg-amber-400 text-slate-950 font-black" : "bg-amber-100 text-amber-800"
+                                )}>
+                                    {modalBillingCycle === 'annual' ? '30% 할인적용' : '세금계산서 100%'}
                                 </span>
-                            </div>
+                            </button>
 
-                            {/* 기업은행 법인 계좌 입금 안내 카드 (계좌번호 및 복사 버튼 즉시 노출) */}
-                            <div className="p-3 bg-slate-900 text-white rounded-xl space-y-2 border border-slate-800">
-                                <div className="flex items-center justify-between border-b border-slate-800 pb-1.5">
-                                    <div className="flex items-center gap-1.5">
-                                        <Building2 className="w-3.5 h-3.5 text-emerald-400" />
-                                        <span className="text-[11px] font-black text-white">기업은행 법인 입금 계좌</span>
+                            {/* 신용카드 (KCP) */}
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    if (modalBillingCycle === 'annual') {
+                                        setErrorMsg('연간 30% 할인가 플랜은 법인 세금계산서 발행 및 PG 규정에 따라 [무통장 입금] 전용으로 운영됩니다.');
+                                        return;
+                                    }
+                                    setPaymentMethod('card');
+                                    setErrorMsg(null);
+                                }}
+                                className={cn(
+                                    "p-2.5 rounded-xl border-2 transition-all flex flex-col items-center justify-center gap-1 cursor-pointer text-center relative",
+                                    paymentMethod === 'card'
+                                        ? "border-slate-900 bg-amber-50/40 text-slate-900 font-black shadow-xs ring-1 ring-slate-900"
+                                        : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 font-bold"
+                                )}
+                            >
+                                <span className="text-xs sm:text-[13px] font-black">신용카드 (KCP)</span>
+                                <span className="text-[9px] text-slate-500 font-medium">
+                                    {modalBillingCycle === 'annual' ? '연간 입금전용' : '국내 전 카드사 앱카드'}
+                                </span>
+                            </button>
+                        </div>
+
+                        {/* 선택된 결제 수단에 따른 상세 안내 & 입력 폼 */}
+                        {paymentMethod === 'card' ? (
+                            /* 신용카드 선택 시 안내 (Image 2 스타일) */
+                            <div className="p-3 bg-slate-900 text-white rounded-xl flex items-center justify-between shadow-xs border border-slate-800">
+                                <div className="flex items-center gap-2.5">
+                                    <div className="w-8 h-8 rounded-lg bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-400">
+                                        <CreditCard className="w-4 h-4" />
                                     </div>
-                                    <span className="text-[10px] font-bold text-amber-300">예금주: 썬드림 주식회사</span>
-                                </div>
-
-                                <div className="flex items-center justify-between bg-slate-800/90 px-3 py-2 rounded-lg border border-slate-700/60">
                                     <div>
-                                        <p className="text-[9px] text-slate-400 font-medium">송금 계좌번호</p>
-                                        <p className="text-base sm:text-lg font-black text-white font-mono tracking-wider leading-tight">
-                                            114-155484-01-011
-                                        </p>
+                                        <p className="text-xs font-black text-white">신용 / 체크카드 (앱카드 즉시결제)</p>
+                                        <p className="text-[10px] text-slate-400 font-medium">KB·신한·현대·삼성·롯데·BC·농협·카뱅 등 지원</p>
                                     </div>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            navigator.clipboard.writeText('114-155484-01-011');
-                                            setAccountCopied(true);
-                                            setTimeout(() => setAccountCopied(false), 2000);
-                                        }}
-                                        className="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-xs font-black flex items-center gap-1 transition-all cursor-pointer shadow-sm shrink-0"
-                                    >
-                                        {accountCopied ? <Check className="w-3.5 h-3.5 text-white" /> : <Copy className="w-3.5 h-3.5 text-white" />}
-                                        <span>{accountCopied ? '복사됨!' : '계좌 복사'}</span>
-                                    </button>
                                 </div>
                             </div>
-
-                            {/* 입금자명 및 증빙 신청 입력폼 */}
-                            <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-black text-slate-700 flex items-center justify-between">
-                                        <span>입금자명 <span className="text-rose-500">*</span></span>
-                                        <span className="text-[9px] text-slate-400 font-normal">송금자 성함 또는 상호</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={depositorName}
-                                        onChange={(e) => setDepositorName(e.target.value)}
-                                        placeholder="예: 홍길동 또는 (주)회사명"
-                                        className="w-full px-2.5 py-1.5 text-xs font-bold rounded-lg border border-slate-200 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 bg-white"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="space-y-1 pt-1 border-t border-slate-200/80">
-                                    <label className="text-[10px] font-black text-slate-700">증빙 서류 발행 신청</label>
-                                    <div className="grid grid-cols-3 gap-1">
-                                        <button
-                                            type="button"
-                                            onClick={() => setReceiptType('tax_invoice')}
-                                            className={cn(
-                                                "py-1 px-1.5 rounded-lg text-[11px] font-bold border transition-all text-center",
-                                                receiptType === 'tax_invoice'
-                                                    ? "bg-indigo-600 text-white border-indigo-600 shadow-2xs"
-                                                    : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
-                                            )}
-                                        >
-                                            세금계산서
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => setReceiptType('cash_receipt')}
-                                            className={cn(
-                                                "py-1 px-1.5 rounded-lg text-[11px] font-bold border transition-all text-center",
-                                                receiptType === 'cash_receipt'
-                                                    ? "bg-indigo-600 text-white border-indigo-600 shadow-2xs"
-                                                    : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
-                                            )}
-                                        >
-                                            현금영수증
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => setReceiptType('none')}
-                                            className={cn(
-                                                "py-1 px-1.5 rounded-lg text-[11px] font-bold border transition-all text-center",
-                                                receiptType === 'none'
-                                                    ? "bg-indigo-600 text-white border-indigo-600 shadow-2xs"
-                                                    : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
-                                            )}
-                                        >
-                                            미발행 (개인)
-                                        </button>
+                        ) : (
+                            /* 무통장 입금 선택 시 안내 & 폼 (Image 3 스타일 완벽 일치) */
+                            <div className="space-y-2">
+                                {/* 기업은행 법인 입금 계좌 카드 (Image 3과 동일한 옐로우/앰버 톤) */}
+                                <div className="p-3 bg-amber-50/60 border border-amber-200/90 rounded-xl space-y-2 text-slate-900">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-1.5">
+                                            <span className="text-sm">🏢</span>
+                                            <span className="text-[11px] font-black text-amber-950">법인 입금 계좌 안내</span>
+                                            <span className="text-[9px] font-black text-amber-800 bg-amber-200/90 px-1.5 py-0.2 rounded">
+                                                {modalBillingCycle === 'annual' ? '30% 할인적용' : '세금계산서 100%'}
+                                            </span>
+                                        </div>
+                                        <span className="text-[10px] font-bold text-slate-600">예금주: 썬드림 주식회사</span>
                                     </div>
 
-                                    {receiptType !== 'none' && (
-                                        <div className="pt-1">
-                                            <input
-                                                type="text"
-                                                value={receiptNumber}
-                                                onChange={(e) => setReceiptNumber(e.target.value)}
-                                                placeholder={receiptType === 'tax_invoice' ? "사업자등록번호 10자리 (- 제외)" : "휴대폰번호 (- 제외)"}
-                                                className="w-full px-2.5 py-1.5 text-xs font-bold rounded-lg border border-slate-200 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 bg-white"
-                                                required
-                                            />
-                                            <p className="text-[9px] text-slate-500 mt-0.5 pl-1">
-                                                {receiptType === 'tax_invoice' 
-                                                    ? "※ 입금 확인 후 홈택스 전자세금계산서가 당일 발행됩니다." 
-                                                    : "※ 지출증빙/소득공제용 현금영수증이 국세청으로 발행됩니다."}
+                                    <div className="flex items-center justify-between bg-white px-3 py-2 rounded-lg border border-amber-200/80 shadow-2xs">
+                                        <div>
+                                            <p className="text-[9px] text-slate-500 font-medium">송금 계좌번호</p>
+                                            <p className="text-base sm:text-lg font-black text-blue-950 font-mono tracking-wider leading-tight">
+                                                기업은행 114-155484-01-011
                                             </p>
                                         </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    ) : (
-                        /* 월간: 신용/체크카드 안내 */
-                        <div className="space-y-1.5">
-                            <div className="flex items-center justify-between">
-                                <label className="text-[11px] font-black text-slate-900 uppercase tracking-wider">결제 수단</label>
-                                <span className="text-[9.5px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-200/80 px-1.5 py-0.5 rounded">
-                                    국내 전 카드사 지원
-                                </span>
-                            </div>
-                            <div className="p-2.5 bg-slate-900 text-white rounded-xl flex items-center justify-between shadow-xs">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-7 h-7 rounded-lg bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-400">
-                                        <CreditCard className="w-3.5 h-3.5" />
-                                    </div>
-                                    <div>
-                                        <p className="text-xs font-black text-white">신용 / 체크카드 (앱카드)</p>
-                                        <p className="text-[9.5px] text-slate-400 font-medium">KB·신한·현대·삼성·롯데·BC·농협·카뱅 등 즉시결제</p>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                navigator.clipboard.writeText('114-155484-01-011');
+                                                setAccountCopied(true);
+                                                setTimeout(() => setAccountCopied(false), 2000);
+                                            }}
+                                            className="px-3 py-1.5 rounded-lg bg-amber-400 hover:bg-amber-500 active:scale-95 text-slate-950 text-xs font-black flex items-center gap-1 transition-all cursor-pointer shadow-sm shrink-0"
+                                        >
+                                            {accountCopied ? <Check className="w-3.5 h-3.5 text-slate-950" /> : <Copy className="w-3.5 h-3.5 text-slate-950" />}
+                                            <span>{accountCopied ? '복사완료!' : '계좌복사 📋'}</span>
+                                        </button>
                                     </div>
                                 </div>
+
+                                {/* 입금자명 및 증빙 신청 입력폼 */}
+                                <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-black text-slate-700 flex items-center justify-between">
+                                            <span>입금자명 <span className="text-rose-500">*</span></span>
+                                            <span className="text-[9px] text-slate-400 font-normal">미입력 시 회원 계정명으로 자동 확인</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={depositorName}
+                                            onChange={(e) => setDepositorName(e.target.value)}
+                                            placeholder="예: 홍길동 또는 (주)회사명"
+                                            className="w-full px-2.5 py-1.5 text-xs font-bold rounded-lg border border-slate-200 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 bg-white"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="space-y-1 pt-1 border-t border-slate-200/80">
+                                        <label className="text-[10px] font-black text-slate-700">증빙 서류 발행 신청</label>
+                                        <div className="grid grid-cols-3 gap-1">
+                                            <button
+                                                type="button"
+                                                onClick={() => setReceiptType('tax_invoice')}
+                                                className={cn(
+                                                    "py-1 px-1.5 rounded-lg text-[11px] font-bold border transition-all text-center cursor-pointer",
+                                                    receiptType === 'tax_invoice'
+                                                        ? "bg-indigo-600 text-white border-indigo-600 shadow-2xs font-black"
+                                                        : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
+                                                )}
+                                            >
+                                                세금계산서
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setReceiptType('cash_receipt')}
+                                                className={cn(
+                                                    "py-1 px-1.5 rounded-lg text-[11px] font-bold border transition-all text-center cursor-pointer",
+                                                    receiptType === 'cash_receipt'
+                                                        ? "bg-indigo-600 text-white border-indigo-600 shadow-2xs font-black"
+                                                        : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
+                                                )}
+                                            >
+                                                현금영수증
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setReceiptType('none')}
+                                                className={cn(
+                                                    "py-1 px-1.5 rounded-lg text-[11px] font-bold border transition-all text-center cursor-pointer",
+                                                    receiptType === 'none'
+                                                        ? "bg-indigo-600 text-white border-indigo-600 shadow-2xs font-black"
+                                                        : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
+                                                )}
+                                            >
+                                                미발행 (개인)
+                                            </button>
+                                        </div>
+
+                                        {receiptType !== 'none' && (
+                                            <div className="pt-1">
+                                                <input
+                                                    type="text"
+                                                    value={receiptNumber}
+                                                    onChange={(e) => setReceiptNumber(e.target.value)}
+                                                    placeholder={receiptType === 'tax_invoice' ? "사업자등록번호 10자리 (- 제외)" : "휴대폰번호 (- 제외)"}
+                                                    className="w-full px-2.5 py-1.5 text-xs font-bold rounded-lg border border-slate-200 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 bg-white"
+                                                    required
+                                                />
+                                                <p className="text-[9px] text-slate-500 mt-0.5 pl-1">
+                                                    {receiptType === 'tax_invoice' 
+                                                        ? "※ 입금 확인 후 홈택스 전자세금계산서가 당일 발행됩니다." 
+                                                        : "※ 지출증빙/소득공제용 현금영수증이 국세청으로 발행됩니다."}
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
 
                     {errorMsg && (
                         <div className={cn(
@@ -1193,16 +1250,16 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                             disabled={processing}
                             className={cn(
                                 "w-full h-11 sm:h-12 font-black text-sm rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 border-none",
-                                modalBillingCycle === 'annual'
+                                paymentMethod === 'bank'
                                     ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-200 cursor-pointer"
                                     : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-200 cursor-pointer"
                             )}
                         >
                             {processing ? (
                                 <>
-                                    <Loader2 className="w-4 h-4 animate-spin" /> {modalBillingCycle === 'annual' ? '신청 접수 중...' : '결제창 호출 중...'}
+                                    <Loader2 className="w-4 h-4 animate-spin" /> {paymentMethod === 'bank' ? '신청 접수 중...' : '결제창 호출 중...'}
                                 </>
-                            ) : modalBillingCycle === 'annual' ? (
+                            ) : paymentMethod === 'bank' ? (
                                 <>
                                     <CheckCircle2 className="w-4 h-4 text-emerald-200" />
                                     <span>{finalPrice.toLocaleString()}원 입금 신청 및 주문 완료</span>
@@ -1216,7 +1273,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                         </Button>
 
                         <div className="flex items-center justify-between text-[10px] text-slate-400 font-bold px-1">
-                            {modalBillingCycle === 'annual' ? (
+                            {paymentMethod === 'bank' ? (
                                 <>
                                     <span className="flex items-center gap-1 text-slate-600 font-semibold">
                                         <Building2 className="w-3 h-3 text-emerald-600 shrink-0" /> 썬드림(주) 법인계좌 직영
