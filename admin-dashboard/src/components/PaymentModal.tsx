@@ -549,7 +549,9 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
 
         try {
             const orderId = `3M_${Date.now()}_${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
-            const goodName = `[3Monster] 비즈니스 소프트웨어 - ${currentTierInfo.label}`;
+            const cleanProd = (product.title || '').split('(')[0].trim();
+            const periodText = currentTierInfo.months === 3 ? '90일(3개월)' : '30일';
+            const goodName = `[3Monster] ${cleanProd} ${periodText} 이용권`;
 
             const kcpPayMethod = '100000000000'; // NHN KCP 신용/체크카드 및 간편결제 (카카오페이, 네이버페이, 토스, 앱카드 등)
 
@@ -560,6 +562,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                 ordr_idxx: orderId,
                 good_mny: finalPrice,
                 good_name: goodName,
+                good_expr: '1',
                 buyr_name: defaultBuyerName,
                 buyr_mail: buyerEmail.trim(),
                 buyr_tel1: '010-0000-0000',
@@ -702,6 +705,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                 <input type="hidden" name="ordr_idxx" value={kcpFormData?.ordr_idxx || ''} />
                 <input type="hidden" name="good_name" value={kcpFormData?.good_name || ''} />
                 <input type="hidden" name="good_mny" value={kcpFormData?.good_mny || ''} />
+                <input type="hidden" name="good_expr" value={kcpFormData?.good_expr || '1'} />
                 <input type="hidden" name="buyr_name" value={kcpFormData?.buyr_name || ''} />
                 <input type="hidden" name="buyr_mail" value={kcpFormData?.buyr_mail || ''} />
                 <input type="hidden" name="buyr_tel1" value={kcpFormData?.buyr_tel1 || ''} />
