@@ -29,6 +29,9 @@ interface DbUser {
     name?: string;      // DB 컬럼명 유지, 실제 의미는 크몽 ID
     channel?: string;
     memo?: string;
+    depositor_name?: string;
+    receipt_type?: string;
+    receipt_number?: string;
     created_at: string;
 }
 

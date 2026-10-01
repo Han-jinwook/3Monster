@@ -265,6 +265,48 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
         setErrorMsg(null);
         setCopied(false);
         setDepositorName('');
+
+        // 이전에 저장된 무통장 입금자명 및 증빙 정보 불러오기
+        if (currentEmail) {
+            const cleanEmail = currentEmail.trim().toLowerCase();
+
+            // 1. 로컬 캐시 즉시 복원 (화면 딜레이 없는 빠른 렌더링)
+            try {
+                const localCached = localStorage.getItem(`3m_pay_info_${cleanEmail}`);
+                if (localCached) {
+                    const parsed = JSON.parse(localCached);
+                    if (parsed.depositorName) setDepositorName(parsed.depositorName);
+                    if (parsed.receiptType) setReceiptType(parsed.receiptType);
+                    if (parsed.receiptNumber) setReceiptNumber(parsed.receiptNumber);
+                }
+            } catch (_) {}
+
+            // 2. Supabase DB(public.users)에서 최신 정보 동기화
+            const fetchDbPaymentInfo = async () => {
+                try {
+                    const { data, error } = await supabase
+                        .from('users')
+                        .select('depositor_name, receipt_type, receipt_number')
+                        .eq('email', cleanEmail)
+                        .maybeSingle();
+
+                    if (data && !error) {
+                        if (data.depositor_name) setDepositorName(data.depositor_name);
+                        if (data.receipt_type) setReceiptType(data.receipt_type as any);
+                        if (data.receipt_number) setReceiptNumber(data.receipt_number);
+
+                        localStorage.setItem(`3m_pay_info_${cleanEmail}`, JSON.stringify({
+                            depositorName: data.depositor_name || '',
+                            receiptType: data.receipt_type || 'tax_invoice',
+                            receiptNumber: data.receipt_number || ''
+                        }));
+                    }
+                } catch (err: any) {
+                    console.warn('Load saved payment info error:', err);
+                }
+            };
+            fetchDbPaymentInfo();
+        }
     }, [product, isOpen]);
 
     // 탭 전환 또는 플랜 변경 시 이전 취소/에러 메시지 즉시 리셋
@@ -686,6 +728,29 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                 receiptNumber: receiptNumber.trim(),
                 buyerEmail: buyerClean
             });
+
+            // 3. 차후 결제 시 재사용할 수 있도록 DB 및 로컬 캐시에 입금자명/증빙정보 보관
+            try {
+                // 로컬 캐시 즉시 저장
+                localStorage.setItem(`3m_pay_info_${buyerClean}`, JSON.stringify({
+                    depositorName: cleanDepositor,
+                    receiptType,
+                    receiptNumber: receiptNumber.trim()
+                }));
+
+                // Supabase users 테이블 업데이트 시도
+                await supabase
+                    .from('users')
+                    .update({
+                        depositor_name: cleanDepositor,
+                        receipt_type: receiptType,
+                        receipt_number: receiptNumber.trim()
+                    })
+                    .eq('email', buyerClean);
+            } catch (saveErr) {
+                console.warn('Payment info auto-save warning:', saveErr);
+            }
+
             setProcessing(false);
         } catch (err: any) {
             console.error('Bank transfer submit error:', err);
