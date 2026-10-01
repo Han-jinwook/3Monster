@@ -432,10 +432,11 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                                         </div>
                                     </div>
                                     <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 20px; margin-bottom: 24px; font-size: 13px; color: #475569;">
-                                        <h4 style="margin: 0 0 10px 0; font-size: 14px; font-weight: 800; color: #0f172a;">⚡ 프로그램 등록 및 실행 안내</h4>
-                                        <p style="margin: 4px 0;">1. 아래 [프로그램 다운로드] 버튼을 눌러 압축 파일을 다운로드 후 압축을 해제합니다.</p>
-                                        <p style="margin: 4px 0;">2. 프로그램을 실행한 뒤 <strong>[라이선스 키 입력]</strong> 창에 위 시리얼키를 붙여넣기(Ctrl+V) 하세요.</p>
-                                        <p style="margin: 4px 0;">3. 입력 즉시 기기(HWID)에 정식 등록되어 모든 기능을 정상 이용하실 수 있습니다.</p>
+                                        <h4 style="margin: 0 0 10px 0; font-size: 14px; font-weight: 800; color: #0f172a;">⚡ 프로그램 설치 및 실행 안내</h4>
+                                        <p style="margin: 6px 0;">1. 아래 [프로그램 다운로드 바로가기] 버튼을 눌러 압축 파일(.zip)을 다운로드합니다.</p>
+                                        <p style="margin: 6px 0;">2. <strong>반드시 압축파일을 바탕화면 등 전용 폴더로 이동 후 [압축 풀기]</strong>를 완료합니다. (압축을 풀지 않고 zip 내부에서 바로 실행하면 오류가 발생합니다.)</p>
+                                        <p style="margin: 6px 0;">3. 압축 해제된 폴더 내 실행 파일(또는 NPlace-DB-실행.bat)을 열고 <strong>[라이선스 키 입력]</strong> 창에 위 시리얼키를 붙여넣기(Ctrl+V) 하세요.</p>
+                                        <p style="margin: 6px 0;">4. 입력 즉시 기기(HWID)에 정식 등록되어 모든 기능을 무제한 정상 이용하실 수 있습니다.</p>
                                     </div>
                                     <div style="text-align: center; margin: 24px 0 16px 0;">
                                         <a href="${downloadUrl}" style="display: inline-block; background: #059669; color: #ffffff; text-decoration: none; padding: 14px 28px; font-size: 14px; font-weight: 800; border-radius: 12px; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3); margin: 6px;">
@@ -477,7 +478,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
             const expireDate = new Date();
             expireDate.setMonth(now.getMonth() + currentTierInfo.months);
             const downloadUrl = getDownloadUrl(product.id);
-            const docsUrl = `https://sundreamer.app/docs/${product.id}`;
+            const siteBaseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://3monster.net';
+            const docsUrl = `${siteBaseUrl}/docs/${product.id}`;
             const expireDateStr = expireDate.toISOString().slice(0, 10);
 
             const prodClean = (() => {
@@ -908,12 +910,24 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                         </div>
                     </div>
 
-                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-[11px] text-slate-600 space-y-1">
-                        <p className="font-black text-slate-800 flex items-center gap-1">
-                            <Sparkles className="w-3.5 h-3.5 text-amber-500" /> 다음 사용 안내:
+                    <div className="p-3 bg-indigo-50/70 rounded-xl border border-indigo-200/80 text-[11px] text-slate-700 space-y-1.5">
+                        <p className="font-black text-indigo-950 flex items-center gap-1.5 text-xs">
+                            <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" /> 프로그램 실행 & 정품 등록 3초 안내:
                         </p>
-                        <p>1. 다운로드받은 프로그램 실행 후 <strong>라이선스 키 입력창</strong>에 위 키를 붙여넣기(Ctrl+V) 하세요.</p>
-                        <p>2. 입력 즉시 정식 버전의 모든 기능이 활성화됩니다.</p>
+                        <div className="space-y-1 pl-1 text-[11px] text-slate-700 font-medium leading-relaxed">
+                            <p className="flex items-start gap-1.5">
+                                <span className="font-black text-indigo-600 shrink-0">1.</span>
+                                <span>다운로드된 <strong>압축파일(.zip)</strong>을 바탕화면 등 원하는 폴더로 이동 후 <strong>반드시 [압축 풀기]</strong>를 완료하세요. (압축 해제 필수)</span>
+                            </p>
+                            <p className="flex items-start gap-1.5">
+                                <span className="font-black text-indigo-600 shrink-0">2.</span>
+                                <span>압축 해제된 폴더 안의 <strong>실행 파일(NPlace-DB)</strong>을 더블 클릭하여 실행합니다.</span>
+                            </p>
+                            <p className="flex items-start gap-1.5">
+                                <span className="font-black text-indigo-600 shrink-0">3.</span>
+                                <span>프로그램 상단 <strong>[라이선스 키 입력]</strong> 창에 위 시리얼키를 붙여넣기(Ctrl+V)하시면 즉시 정품 활성화됩니다.</span>
+                            </p>
+                        </div>
                     </div>
 
                     <div className="space-y-2">
