@@ -103,9 +103,9 @@
 * **심플한 재결제 파이프라인**: 복잡한 잔여일 일할 계산이나 추가 연장 옵션 없이, 만료 임박 또는 한도 소진 시 자사몰에서 신규 30일권을 재결제하여 즉시 새 라이선스를 발급받습니다.
 * **마이페이지 원클릭 이동**: 마이페이지(프로필) 내 보유 라이선스 카드에서 `[30일 이용권 재결제]` 버튼 클릭 시 해당 제품의 쇼룸 결제 카드로 즉시 이동합니다.
 
-### 5.3 1 PC 1 라이선스 HWID 바인딩 및 실시간 수집량 동기화
+### 5.3 1 라이선스 1 PC HWID 바인딩 및 실시간 수집량 동기화
 * 모든 상용 라이선스는 `constraint_type: 'HWID'`로 발급됩니다.
-* 사용자가 데스크톱 소프트웨어에서 최초로 시리얼 키를 등록하면 해당 PC의 메인보드/CPU 고유 하드웨어 식별자(HWID)가 Supabase `licenses.bound_value`에 기록됩니다.
+* 사용자가 데스크톱 소프트웨어에서 최초로 라이선스 키를 등록하면 해당 PC의 메인보드/CPU 고유 하드웨어 식별자(HWID)가 Supabase `licenses.bound_value`에 기록됩니다.
 * **실시간 수집량 동기화 (`used_count`)**: 클라이언트 앱(CafeCrawler, AutoComment, EventStats, NPlace-DB 등)은 무제한 플랜을 포함하여 수집 작업 수행 시마다 Supabase `licenses.used_count` 컬럼에 실시간 자동 PATCH 동기화합니다.
 * 기기 변경(PC 교체)이 필요한 경우 관리자 고객센터 문의를 통해 관리자가 기존 바인딩 값을 초기화(`bound_value: null`)하여 재등록을 지원합니다.
 
@@ -129,9 +129,9 @@
    - 클라이언트에서 결제 상품, 플랜, 인증된 구매자 이메일, 주문 고유번호(`ordr_idxx`)를 생성하고 KCP 스마트 페이 허브 스크립트(`kcp_spay_hub.js`)를 호출합니다.
 2. **결제 승인 콜백 처리 (`handlePaymentComplete`)**:
    - PG 결제 모듈로부터 성공 응답 및 주문번호를 수신합니다.
-3. **시리얼 키 자동 발급 규격**:
+3. **라이선스 키 자동 발급 규격**:
    - 형식: `CM-[4자리 영숫자]-[4자리 영숫자]-[4자리 영숫자]` (예: `CM-A7B2-9F1C-K8D3`)
-   - 암호학적 난수 생성기를 사용하여 중복 없는 시리얼 키를 즉시 생성합니다.
+   - 암호학적 난수 생성기를 사용하여 중복 없는 라이선스 키를 즉시 생성합니다.
 4. **만료 일시 계산**:
    - 결제 시점(`now`)을 기준으로 선택 플랜의 기간(`currentTierInfo.months`)을 가산하여 ISO 8601 타임스탬프(`expire_date`)를 생성합니다.
 5. **데이터베이스 레코드 기록**:
@@ -142,7 +142,7 @@
      * `buyer_name`: 이메일 로컬 파트 (예: `buyer@domain.com` -> `buyer`)
      * `contact`: 구매자 이메일 주소
      * `channel`: `'3Monster (KCP 카드결제)'`
-     * `serial_key`: 생성된 시리얼 키
+     * `serial_key`: 생성된 라이선스 키
      * `expire_date`: 계산된 만료 일시
      * `collection_limit`: 스탠다드 플랜은 `1000`, 무제한 플랜은 `null`
      * `status`: `'active'` (결제 즉시 30일 카운트 가동되는 정상 상태)
@@ -152,22 +152,25 @@
 6. **사용자 역할 동기화**:
    - 구매자의 `users` 레코드를 조회하여 역할을 `'buyer'`로 즉시 승격 동기화합니다.
 7. **클라이언트 완료 응답 및 전달**:
-   - 발급된 시리얼 키, 만료일, 정식 다운로드 URL을 화면에 즉시 표시하며 원클릭 복사 클립보드 기능을 제공합니다.
+   - 발급된 라이선스 키, 만료일, 정식 다운로드 URL을 화면에 즉시 표시하며 원클릭 복사 클립보드 기능을 제공합니다.
 
 ---
 
 ## 7. 배포 및 체험판 무한 루프 방지 파이프라인 (Distribution & Anti-Abuse)
 
-### 7.1 GitHub Releases 다이렉트 배포 연동
-* 모든 소프트웨어 체험판 및 설치 파일은 GitHub 공식 릴리즈 자산(Releases Assets)과 직접 연동됩니다.
+### 7.1 GitHub Releases 다이렉트 배포 연동 및 순수 정적 URL 규격 (No Query String)
+* 모든 소프트웨어 체험판 및 정식 설치 파일은 GitHub 공식 릴리즈 자산(Releases Assets)과 직접 연동됩니다.
 
-| 대상 제품 | 배포 파일명 | 다운로드 엔드포인트 규격 |
+| 대상 제품 | 배포 파일명 | 다운로드 엔드포인트 규격 (순수 정적 URL) |
 | :--- | :--- | :--- |
-| **NPlace-DB** | `Map_DB-Trial.zip` | `https://github.com/Han-jinwook/n-place-db/releases/latest/download/Map_DB-Trial.zip?t={timestamp}` |
-| **Cafe Monster 제품군** (`CafeCrawler`, `AutoComment`, `EventStats`) | `CafeMonster-Trial.zip` | `https://github.com/Han-jinwook/CafeScraper/releases/latest/download/CafeMonster-Trial.zip?t={timestamp}` |
+| **NPlace-DB (체험판)** | `NPlace-DB-Trial.zip` | `https://github.com/Han-jinwook/n-place-db/releases/latest/download/NPlace-DB-Trial.zip` |
+| **NPlace-DB (정식판)** | `NPlace-DB-Pro.zip` | `https://github.com/Han-jinwook/n-place-db/releases/latest/download/NPlace-DB-Pro.zip` |
+| **Cafe Monster (통합 체험판)** | `CafeMonster-Trial.zip` | `https://github.com/Han-jinwook/CafeScraper/releases/latest/download/CafeMonster-Trial.zip` |
+| **카페 댓글 관리기 (정식판)** | `AutoComment-Pro.zip` | `https://github.com/Han-jinwook/CafeScraper/releases/latest/download/AutoComment-Pro.zip` |
 
-* **캐시 버스팅 (Cache Busting)**:
-  - 브라우저, 프록시, CDN에서 이전 구버전 압축 파일이 캐싱되어 오다운로드되는 문제를 원천 차단하기 위해, 다운로드 URL 생성 시 매번 현재 Unix 타임스탬프(`?t=Date.now()`)를 쿼리 파라미터로 강제 부착합니다.
+* **쿼리스트링 절대 금지 철칙 (No Cache-Busting Parameters)**:
+  - GitHub Releases 및 Azure Blob CDN 자산 다운로드 시, 타임스탬프(`?t=...`) 등 임의의 쿼리스트링을 추가할 경우 CDN 리다이렉트 충돌 및 브라우저 다운로드 중단/재개 실패("인터넷 연결 상태 확인")가 발생합니다.
+  - 따라서 쇼룸, 공식 문서, 결제 완료 모달, 발송 이메일 등 모든 시스템에서 일체의 쿼리스트링을 완전히 배제한 **순수 정적 URL**로 직결합니다.
 
 ### 7.2 바이너리 패키징 및 보안 규격 (Packaging Standard)
 * **PyInstaller onedir 패키징 의무화**:
@@ -178,7 +181,7 @@
 
 ### 7.3 체험판 어뷰징(무한 루프) 방지 철칙
 * **HWID 기반 `trial_logs` 영구 기록**:
-  - 무료 체험판은 시리얼 키 없이 1회성으로 구동되며, 기기 HWID를 서버의 `trial_logs` 테이블에 기록하여 **기기당 생애 1회 50건 추출**으로 영구 고정합니다.
+  - 무료 체험판은 라이선스 키 없이 1회성으로 구동되며, 기기 HWID를 서버의 `trial_logs` 테이블에 기록하여 **기기당 생애 1회 50건 추출**으로 영구 고정합니다.
 * **엔진 시작 전 강제 누적 사용량 동기화 (`_trial_baseline`)**:
   - 사용자가 로컬 SQLite DB나 설정 JSON 파일을 임의로 삭제/조작하여 무료 사용 한도를 리셋하려는 어뷰징을 방지하기 위해, 크롤러/수집 엔진이 구동되기 직전 반드시 Supabase 서버와 통신하여 최신 누적 사용량을 강제 동기화하고 기준선(`_trial_baseline`)을 재설정합니다.
   - 서버와의 통신이 실패하거나 누적 사용량이 50건을 초과한 경우 앱 동작을 즉시 중단합니다.

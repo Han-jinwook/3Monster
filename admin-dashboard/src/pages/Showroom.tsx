@@ -228,12 +228,11 @@ export const Showroom = () => {
     };
 
     const getDownloadUrl = (productId: string) => {
-        const t = Date.now();
         const clean = productId.toLowerCase().replace(/[-_]/g, '');
         if (clean.includes('cafe') || clean.includes('comment') || clean.includes('event') || clean.includes('auto')) {
-            return `https://github.com/Han-jinwook/CafeScraper/releases/latest/download/CafeMonster-Trial.zip?t=${t}`;
+            return `https://github.com/Han-jinwook/CafeScraper/releases/latest/download/CafeMonster-Trial.zip`;
         }
-        return `https://github.com/Han-jinwook/n-place-db/releases/latest/download/NPlace-DB-Trial.zip?t=${t}`;
+        return `https://github.com/Han-jinwook/n-place-db/releases/latest/download/NPlace-DB-Trial.zip`;
     };
 
     const searchParams = new URLSearchParams(location.search);

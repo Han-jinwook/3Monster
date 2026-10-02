@@ -417,7 +417,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                                         <p style="font-size: 13px; color: #64748b; margin: 0;">플랜: <strong>${tierLabel}</strong> · 만료일: <strong>${expireDate}</strong></p>
                                     </div>
                                     <div style="background: #0f172a; border-radius: 16px; padding: 24px; margin: 24px 0; text-align: center; border: 1px solid #1e293b;">
-                                        <div style="color: #818cf8; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;">정식 라이선스 키 (Serial Key)</div>
+                                        <div style="color: #818cf8; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;">정식 라이선스 키 (License Key)</div>
                                         <div style="font-family: monospace; font-size: 20px; font-weight: 900; color: #fde047; letter-spacing: 0.08em; background: #1e293b; padding: 12px 16px; border-radius: 10px; word-break: break-all; border: 1px dashed #475569;">
                                             ${serialKey}
                                         </div>
@@ -425,9 +425,9 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                                     <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 20px; margin-bottom: 24px; font-size: 13px; color: #475569;">
                                         <h4 style="margin: 0 0 10px 0; font-size: 14px; font-weight: 800; color: #0f172a;">⚡ 프로그램 설치 및 실행 안내</h4>
                                         <p style="margin: 6px 0;">1. 아래 [프로그램 다운로드 바로가기] 버튼을 눌러 압축 파일(.zip)을 다운로드합니다.</p>
-                                        <p style="margin: 6px 0;">2. <strong>반드시 압축파일을 바탕화면 등 원하는 전용 폴더로 이동 후 [압축 풀기]</strong>를 완료합니다. (압축을 풀지 않고 zip 내부에서 바로 실행하면 오류가 발생합니다.)</p>
-                                        <p style="margin: 6px 0;">3. 압축 해제된 폴더 내 실행 파일(또는 NPlace-DB-실행.bat)을 열고 <strong>[라이선스 키 입력]</strong> 창에 위 시리얼키를 붙여넣기(Ctrl+V) 하세요.</p>
-                                        <p style="margin: 6px 0;">4. <strong>[1인 1PC 전용]</strong> 시리얼키는 최초 등록한 PC의 하드웨어 고유값(HWID)에 1:1 귀속되어 정식 활성화됩니다. (PC 교체 또는 포맷 시 3Monster 고객센터에서 1:1 재인증 지원)</p>
+                                        <p style="margin: 6px 0;">2. 다운로드된 압축파일(.zip)을 원하는 폴더로 이동 후 <strong>[압축 풀기]</strong>를 완료합니다.</p>
+                                        <p style="margin: 6px 0;">3. 압축 해제된 폴더 내 실행 파일(또는 NPlace-DB-실행.bat)을 열고 <strong>[라이선스 키 입력]</strong> 창에 위 라이선스 키를 붙여넣기(Ctrl+V) 하세요.</p>
+                                        <p style="margin: 6px 0;">4. <strong>[1 라이선스 1 PC]</strong> 최초 등록된 PC 기기(HWID)에 귀속되어 정식 활성화됩니다. (PC 교체 또는 포맷 시 고객센터에서 재인증 지원)</p>
                                     </div>
                                     <div style="text-align: center; margin: 24px 0 16px 0;">
                                         <a href="${downloadUrl}" style="display: inline-block; background: #059669; color: #ffffff; text-decoration: none; padding: 14px 28px; font-size: 14px; font-weight: 800; border-radius: 12px; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3); margin: 6px;">
@@ -906,12 +906,12 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                             <p className="font-black text-indigo-950 flex items-center gap-1.5 text-xs">
                                 <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" /> 프로그램 실행 & 정품 등록 안내:
                             </p>
-                            <span className="text-[10px] font-black bg-indigo-600 text-white px-2 py-0.5 rounded-full">1인 1PC 전용</span>
+                            <span className="text-[10px] font-black bg-indigo-600 text-white px-2 py-0.5 rounded-full">1 라이선스 1 PC</span>
                         </div>
                         <div className="space-y-1 pl-1 text-[11px] text-slate-700 font-medium leading-relaxed">
                             <p className="flex items-start gap-1.5">
                                 <span className="font-black text-indigo-600 shrink-0">1.</span>
-                                <span>다운로드된 <strong>압축파일(.zip)</strong>을 바탕화면 등 원하는 폴더로 이동 후 <strong>반드시 [압축 풀기]</strong>를 완료하세요. (압축 해제 필수)</span>
+                                <span>다운로드된 <strong>압축파일(.zip)</strong>을 원하는 폴더로 이동 후 <strong>[압축 풀기]</strong>를 완료하세요.</span>
                             </p>
                             <p className="flex items-start gap-1.5">
                                 <span className="font-black text-indigo-600 shrink-0">2.</span>
@@ -919,7 +919,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                             </p>
                             <p className="flex items-start gap-1.5">
                                 <span className="font-black text-indigo-600 shrink-0">3.</span>
-                                <span>프로그램 상단 <strong>[라이선스 키 입력]</strong> 창에 위 시리얼키를 붙여넣기(Ctrl+V)하시면 해당 PC에 1:1 귀속되어 즉시 정품 활성화됩니다. (PC 포맷/교체 시 재인증 지원)</span>
+                                <span>프로그램 상단 <strong>[라이선스 키 입력]</strong> 창에 위 라이선스 키를 붙여넣기(Ctrl+V)하시면 해당 PC에 귀속되어 즉시 정품 활성화됩니다. (PC 포맷/교체 시 재인증 지원)</span>
                             </p>
                         </div>
                     </div>

@@ -105,13 +105,20 @@
      }
      ```
 
-2. **N플레이스 DB 추출기 체험판**:
-   * **다운로드 연결 파일**: `Map_DB-Trial.zip`
-   * **쇼룸 코드**:
+2. **N플레이스 DB 추출기 (체험판 & 정품)**:
+   * **체험판 다운로드 연결 파일**: `NPlace-DB-Trial.zip`
+   * **정품 다운로드 연결 파일**: `NPlace-DB-Pro.zip`
+   * **다운로드 엔드포인트**:
      ```typescript
-     selectedProduct.id === 'nplace-db'
-         ? "https://github.com/Han-jinwook/n-place-db/releases/latest/download/Map_DB-Trial.zip"
+     // 체험판
+     "https://github.com/Han-jinwook/n-place-db/releases/latest/download/NPlace-DB-Trial.zip"
+     // 정식판
+     "https://github.com/Han-jinwook/n-place-db/releases/latest/download/NPlace-DB-Pro.zip"
      ```
+
+### 🔗 릴리즈 자산 다운로드 URL 쿼리스트링 절대 금지 철칙
+* GitHub Releases 및 Azure Blob CDN 자산 다운로드 링크에는 브라우저 캐시 방지 등을 목적으로 타임스탬프 등 쿼리스트링(`?t=...`)을 절대 붙이지 않는다.
+* 쿼리스트링 부착 시 대용량 파일(.zip) 다운로드 중단, 재개(Resume) 거부, 브라우저 다운로드 실패("인터넷 연결 상태 확인")를 유발하므로, 모든 프로덕트의 릴리즈 다운로드 링크는 일체의 파라미터가 없는 **순수 정적 URL(`https://github.com/.../releases/latest/download/[파일명].zip`)**로 직결한다.
 
 ---
 

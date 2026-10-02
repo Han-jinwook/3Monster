@@ -51,11 +51,10 @@ export function Docs() {
 
     // Download URL generator
     const getTrialDownloadUrl = () => {
-        const t = Date.now();
         if (selectedGroup === 'cafe-monster') {
-            return `https://github.com/Han-jinwook/CafeScraper/releases/latest/download/CafeMonster-Trial.zip?t=${t}`;
+            return `https://github.com/Han-jinwook/CafeScraper/releases/latest/download/CafeMonster-Trial.zip`;
         }
-        return `https://github.com/Han-jinwook/n-place-db/releases/latest/download/NPlace-DB-Trial.zip?t=${t}`;
+        return `https://github.com/Han-jinwook/n-place-db/releases/latest/download/NPlace-DB-Trial.zip`;
     };
 
     return (
@@ -334,14 +333,10 @@ export function Docs() {
                                         <div className="border border-slate-200/80 rounded-2xl p-5 space-y-2 bg-slate-50/50">
                                             <div className="flex items-center gap-2 text-indigo-600 font-black">
                                                 <span className="w-6 h-6 rounded-full bg-indigo-600 text-white text-xs flex items-center justify-center">2</span>
-                                                <span>바탕화면 등 원하는 폴더로 이동 후 [압축 풀기] (필수)</span>
+                                                <span>원하는 폴더로 이동 후 [압축 풀기]</span>
                                             </div>
                                             <p className="pl-8 text-slate-600">
-                                                다운로드된 압축 파일(.zip)을 그대로 열어서 실행하지 마시고, <strong>반드시 바탕화면 등 원하는 작업 폴더로 이동 후 마우스 우클릭하여 [압축 풀기]</strong>를 완료합니다.
-                                                <br />
-                                                <span className="text-xs text-rose-600 font-bold">
-                                                    ※ 압축을 풀지 않고 .zip 파일 내부에서 바로 실행할 경우 설정 파일 및 엑셀 저장 시 오류가 발생할 수 있습니다.
-                                                </span>
+                                                다운로드된 압축 파일(.zip)을 원하는 작업 폴더로 이동 후 마우스 우클릭하여 <strong>[압축 풀기]</strong>를 완료합니다.
                                                 <br />
                                                 <span className="text-xs text-amber-600 font-bold">
                                                     ※ 권장 경로: <code className="bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">C:\3Monster\NPlace-DB</code> 또는 바탕화면 전용 폴더 (한글 특수문자 없는 영문 경로 권장)
@@ -389,13 +384,13 @@ export function Docs() {
                                                     프로그램 우측 상단(또는 환경설정 메뉴)의 <strong>[라이선스 키 등록]</strong> 버튼을 클릭합니다.
                                                 </li>
                                                 <li>
-                                                    발급받으신 시리얼 키(<code className="bg-white border border-indigo-200 px-2 py-0.5 rounded text-indigo-600 font-mono font-bold">CM-XXXX-XXXX-XXXX</code>)를 복사하여 붙여넣은 뒤 <strong>[인증 확인]</strong>을 누릅니다.
+                                                    발급받으신 라이선스 키(<code className="bg-white border border-indigo-200 px-2 py-0.5 rounded text-indigo-600 font-mono font-bold">CM-XXXX-XXXX-XXXX</code>)를 복사하여 붙여넣은 뒤 <strong>[인증 확인]</strong>을 누릅니다.
                                                 </li>
                                                 <li>
                                                     인증 즉시 무료체험 제한(100건)이 해제되며, 구매하신 기간 동안 무제한 정품 라이선스가 활성화됩니다.
                                                 </li>
                                                 <li>
-                                                    <strong>[1인 1PC 전용]</strong> 최초 등록된 PC 기기(하드웨어 고유 식별값 HWID)에 1:1 귀속되어 안전하게 보호됩니다. (PC 포맷 또는 컴퓨터 교체 시 고객센터를 통해 기기 변경 재인증을 받으실 수 있습니다.)
+                                                    <strong>[1 라이선스 1 PC]</strong> 최초 등록된 PC 기기(하드웨어 고유 식별값 HWID)에 귀속되어 안전하게 보호됩니다. (PC 포맷 또는 컴퓨터 교체 시 고객센터를 통해 재인증을 받으실 수 있습니다.)
                                                 </li>
                                             </ul>
                                         </div>
@@ -609,10 +604,10 @@ export function Docs() {
                                         <div className="border border-slate-200/80 rounded-2xl p-5 space-y-2 bg-slate-50/50">
                                             <div className="flex items-center gap-2 text-orange-600 font-black">
                                                 <span className="w-6 h-6 rounded-full bg-orange-600 text-white text-xs flex items-center justify-center">2</span>
-                                                <span>바탕화면 등 원하는 폴더로 이동 후 [압축 풀기] (필수)</span>
+                                                <span>원하는 폴더로 이동 후 [압축 풀기]</span>
                                             </div>
                                             <p className="pl-8 text-slate-600">
-                                                다운로드된 압축 파일(.zip)을 그대로 열지 마시고, <strong>반드시 바탕화면 등 원하는 작업 폴더로 이동 후 [압축 풀기]</strong>를 완료합니다. (압축을 해제하지 않고 zip 내부에서 바로 실행하면 정상 작동하지 않습니다.)
+                                                다운로드된 압축 파일(.zip)을 원하는 작업 폴더로 이동 후 <strong>[압축 풀기]</strong>를 완료합니다.
                                                 <br />
                                                 압축 해제된 폴더 안의 <code className="bg-slate-900 text-orange-400 px-2 py-0.5 rounded font-mono font-black text-xs">CafeMonster-실행.bat</code> (또는 CafeMonster.exe)을 더블 클릭합니다.
                                             </p>
@@ -639,7 +634,7 @@ export function Docs() {
                                                 <li>쇼룸에서 카페 몬스터 상품 결제 시 발급되는 16자리 키를 복사합니다.</li>
                                                 <li>프로그램 메인 화면 우측 상단 <strong>[라이선스 키 등록]</strong>을 클릭합니다.</li>
                                                 <li>발급받으신 <code className="bg-white border border-orange-200 px-2 py-0.5 rounded text-orange-600 font-mono font-bold">CM-XXXX-XXXX-XXXX</code> 키를 입력하고 [인증]을 누르면 모든 기능의 제한이 즉시 해제됩니다.</li>
-                                                <li><strong>[1인 1PC 전용]</strong> 최초 인증된 PC 기기(HWID)에 1:1 귀속되며, PC 교체 또는 포맷 시 3Monster 고객센터에서 재인증을 지원해 드립니다.</li>
+                                                <li><strong>[1 라이선스 1 PC]</strong> 최초 인증된 PC 기기(HWID)에 귀속되며, PC 교체 또는 포맷 시 고객센터에서 재인증을 지원해 드립니다.</li>
                                             </ul>
                                         </div>
                                     </div>
