@@ -343,26 +343,17 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
     };
 
     const getDownloadUrl = (productId: string) => {
-        const repoMap: Record<string, string> = {
-            'nplace-db': 'n-place-db',
-            'NPlace-DB': 'n-place-db',
-            'content-crawler': 'content-crawler',
-            'ContentCrawler': 'content-crawler',
-            'user-manager-plus': 'user-manager',
-            'UserManager': 'user-manager',
-            'cafe-crawler': 'CafeScraper',
-            'CafeCrawler': 'CafeScraper',
-            'comment-stats': 'CafeScraper',
-            'AutoComment': 'CafeScraper',
-            'event-activity-stats': 'CafeScraper',
-            'EventStats': 'CafeScraper'
-        };
-        const repo = repoMap[productId] || productId.toLowerCase();
-        const t = Date.now();
-        if (productId.includes('cafe') || productId.includes('comment') || productId.includes('event') || productId.includes('Event') || productId.includes('Auto')) {
-            return `https://github.com/Han-jinwook/CafeScraper/releases/latest/download/CafeMonster-Trial.zip?t=${t}`;
+        const clean = productId.toLowerCase().replace(/[-_]/g, '');
+        if (clean.includes('cafe') || clean.includes('comment') || clean.includes('event') || clean.includes('autocomment')) {
+            return `https://github.com/Han-jinwook/CafeScraper/releases/latest/download/AutoComment-Pro.zip`;
         }
-        return `https://github.com/Han-jinwook/${repo}/releases/latest/download/${productId}-Trial.zip?t=${t}`;
+        if (clean.includes('content')) {
+            return `https://github.com/Han-jinwook/content-crawler/releases/latest/download/ContentCrawler-Pro.zip`;
+        }
+        if (clean.includes('user')) {
+            return `https://github.com/Han-jinwook/user-manager/releases/latest/download/UserManager-Pro.zip`;
+        }
+        return `https://github.com/Han-jinwook/n-place-db/releases/latest/download/NPlace-DB-Pro.zip`;
     };
 
     const handleCopy = (text: string) => {
@@ -434,9 +425,9 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                                     <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 20px; margin-bottom: 24px; font-size: 13px; color: #475569;">
                                         <h4 style="margin: 0 0 10px 0; font-size: 14px; font-weight: 800; color: #0f172a;">⚡ 프로그램 설치 및 실행 안내</h4>
                                         <p style="margin: 6px 0;">1. 아래 [프로그램 다운로드 바로가기] 버튼을 눌러 압축 파일(.zip)을 다운로드합니다.</p>
-                                        <p style="margin: 6px 0;">2. <strong>반드시 압축파일을 바탕화면 등 전용 폴더로 이동 후 [압축 풀기]</strong>를 완료합니다. (압축을 풀지 않고 zip 내부에서 바로 실행하면 오류가 발생합니다.)</p>
+                                        <p style="margin: 6px 0;">2. <strong>반드시 압축파일을 바탕화면 등 원하는 전용 폴더로 이동 후 [압축 풀기]</strong>를 완료합니다. (압축을 풀지 않고 zip 내부에서 바로 실행하면 오류가 발생합니다.)</p>
                                         <p style="margin: 6px 0;">3. 압축 해제된 폴더 내 실행 파일(또는 NPlace-DB-실행.bat)을 열고 <strong>[라이선스 키 입력]</strong> 창에 위 시리얼키를 붙여넣기(Ctrl+V) 하세요.</p>
-                                        <p style="margin: 6px 0;">4. 입력 즉시 기기(HWID)에 정식 등록되어 모든 기능을 무제한 정상 이용하실 수 있습니다.</p>
+                                        <p style="margin: 6px 0;">4. <strong>[1인 1PC 전용]</strong> 시리얼키는 최초 등록한 PC의 하드웨어 고유값(HWID)에 1:1 귀속되어 정식 활성화됩니다. (PC 교체 또는 포맷 시 3Monster 고객센터에서 1:1 재인증 지원)</p>
                                     </div>
                                     <div style="text-align: center; margin: 24px 0 16px 0;">
                                         <a href="${downloadUrl}" style="display: inline-block; background: #059669; color: #ffffff; text-decoration: none; padding: 14px 28px; font-size: 14px; font-weight: 800; border-radius: 12px; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3); margin: 6px;">
@@ -911,9 +902,12 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                     </div>
 
                     <div className="p-3 bg-indigo-50/70 rounded-xl border border-indigo-200/80 text-[11px] text-slate-700 space-y-1.5">
-                        <p className="font-black text-indigo-950 flex items-center gap-1.5 text-xs">
-                            <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" /> 프로그램 실행 & 정품 등록 3초 안내:
-                        </p>
+                        <div className="flex items-center justify-between">
+                            <p className="font-black text-indigo-950 flex items-center gap-1.5 text-xs">
+                                <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" /> 프로그램 실행 & 정품 등록 안내:
+                            </p>
+                            <span className="text-[10px] font-black bg-indigo-600 text-white px-2 py-0.5 rounded-full">1인 1PC 전용</span>
+                        </div>
                         <div className="space-y-1 pl-1 text-[11px] text-slate-700 font-medium leading-relaxed">
                             <p className="flex items-start gap-1.5">
                                 <span className="font-black text-indigo-600 shrink-0">1.</span>
@@ -925,7 +919,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, pro
                             </p>
                             <p className="flex items-start gap-1.5">
                                 <span className="font-black text-indigo-600 shrink-0">3.</span>
-                                <span>프로그램 상단 <strong>[라이선스 키 입력]</strong> 창에 위 시리얼키를 붙여넣기(Ctrl+V)하시면 즉시 정품 활성화됩니다.</span>
+                                <span>프로그램 상단 <strong>[라이선스 키 입력]</strong> 창에 위 시리얼키를 붙여넣기(Ctrl+V)하시면 해당 PC에 1:1 귀속되어 즉시 정품 활성화됩니다. (PC 포맷/교체 시 재인증 지원)</span>
                             </p>
                         </div>
                     </div>
